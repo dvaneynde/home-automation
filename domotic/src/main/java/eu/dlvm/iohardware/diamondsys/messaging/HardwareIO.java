@@ -4,8 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import com.google.inject.Inject;
+import eu.dlvm.domotics.DomConfig;
 import eu.dlvm.iohardware.IHardwareReader;
 import eu.dlvm.iohardware.IHardwareWriter;
+import eu.dlvm.iohardware.diamondsys.factories.XmlHwConfigurator;
 import org.slf4j.Logger; import org.slf4j.LoggerFactory;
 
 import eu.dlvm.iohardware.ChannelFault;
@@ -20,6 +23,8 @@ import eu.dlvm.iohardware.diamondsys.messaging.IHwDriverChannel.Reason;
  * Diamond-systems specific implementation of {@link IHardwareIO}.
  * 
  * @author dirk vaneynde
+ *
+ * TODO move to diamondsys package and rename to DiamondSysHardwareIO
  */
 public class HardwareIO implements IHardwareIO {
 
@@ -36,6 +41,7 @@ public class HardwareIO implements IHardwareIO {
 	 * @param bf
 	 * @param hwDriverChannel
 	 */
+    @Deprecated
 	public HardwareIO(IBoardFactory bf, IHwDriverChannel hwDriverChannel) {
 		boards = new ArrayList<Board>();
 		channelMap = new ChannelMap();
@@ -43,6 +49,22 @@ public class HardwareIO implements IHardwareIO {
 
 		this.driverChannel = hwDriverChannel;
 	}
+
+    // TODO separate HwConfig and make it a member field of DomConfig
+    @Inject
+    public HardwareIO(DomConfig config) {
+        if (config.simulation)
+            this.driverChannel = new HwDriverChannelSimulator();
+        else {
+            int readTimeout = config.looptime * 9 / 10;
+            this.driverChannel = new HwDriverTcpChannel(config.hostname, config.port, readTimeout);
+        }
+
+        boards = new ArrayList<Board>();
+        channelMap = new ChannelMap();
+        XmlHwConfigurator xhc = new XmlHwConfigurator(config.hwCfgFile);
+        xhc.configure(boards, channelMap);
+    }
 
 	@Override
 	public void initialize() throws ChannelFault {

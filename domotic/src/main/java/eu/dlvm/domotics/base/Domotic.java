@@ -8,6 +8,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import com.google.inject.Inject;
+import eu.dlvm.domotics.DomConfig;
+import eu.dlvm.domotics.PidSave;
+import eu.dlvm.domotics.factories.XmlDomoticConfigurator;
+import eu.dlvm.iohardware.diamondsys.HardwareBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,7 +46,7 @@ import eu.dlvm.iohardware.IHardwareIO;
  *         TODO veel te veel methodes, opsplitsen - maar hoe? TODO monitoring en
  *         restart werkte niet, weggooien?
  */
-public class Domotic implements IDomoticBuilder, IStateChangeRegistrar {
+public class Domotic implements IDomoticBuilder, IStateChangeRegistrar, IUiCapableBlocksProvider {
 
 	public static final int MONITORING_INTERVAL_MS = 5000;
 
@@ -66,9 +71,10 @@ public class Domotic implements IDomoticBuilder, IStateChangeRegistrar {
 	protected List<IStateChangedListener> stateChangeListeners;
 	protected long loopSequence = -1L;
 
-	private List<IUiCapableBlock> uiblocks = new ArrayList<IUiCapableBlock>(64);
+	private final List<IUiCapableBlock> uiblocks = new ArrayList<IUiCapableBlock>(64);
 
-	public static synchronized Domotic singleton() {
+/* TODO remove
+    public static synchronized Domotic singleton() {
 		return singleton;
 	}
 
@@ -83,7 +89,22 @@ public class Domotic implements IDomoticBuilder, IStateChangeRegistrar {
 		saveState = new OutputStateSaver();
 		stateChangeListeners = new LinkedList<>();
 	}
+ */
 
+    @Inject
+    public Domotic(DomConfig config, IHardwareIO hw) {
+        super();
+        saveState = new OutputStateSaver();
+        stateChangeListeners = new LinkedList<>();
+        setHw(hw);
+        try {
+            XmlDomoticConfigurator.configure(config.blocksCfgFile, hw, this);
+        } catch (Exception e) {
+            log.error("Cannot configure system, abort.", e);
+            throw new RuntimeException("Abort. Cannot configure system.", e);
+        }
+
+    }
 	private void setHw(IHardwareIO hw) {
 		this.hw = hw;
 	}
@@ -140,6 +161,7 @@ public class Domotic implements IDomoticBuilder, IStateChangeRegistrar {
 		//log.info("Add controller '" + controller.getName()+"' - "+controller.toString());
 	}
 
+    @Override
 	public IUiCapableBlock findUiCapable(String name) {
 		for (IUiCapableBlock ui : uiblocks) {
 			if (ui.getUiInfo().getName().equals(name))
@@ -153,6 +175,7 @@ public class Domotic implements IDomoticBuilder, IStateChangeRegistrar {
 	 *         that implement {@link IUiCapableBlock}, or those blocks
 	 *         registered explicitly...
 	 */
+    @Override
 	public List<IUiCapableBlock> getUiCapableBlocks() {
 		return uiblocks;
 	}
@@ -259,7 +282,7 @@ public class Domotic implements IDomoticBuilder, IStateChangeRegistrar {
 	 * Runs it.
 	 * 
 	 * @param looptime
-	 * @param pathToDriver
+	 * @param path2Driver
 	 *            If non-null, attempts to start the HwDriver executable at that
 	 *            path. Note that this driver must be on the same host, since
 	 *            'localhost' is passed to it as an argument. Otherwise that
@@ -268,24 +291,24 @@ public class Domotic implements IDomoticBuilder, IStateChangeRegistrar {
 	 * @param htmlRootFile
 	 *            index.html of web app UI
 	 */
-	public void runDomotic(int looptime, String pathToDriver, File htmlRootFile) {
-		// TODO see addShutdownHook(this);
+	public void runDomotic(int looptime, String path2Driver, File htmlRootFile) {
+
+        PidSave pidSave = new PidSave(new File("./domotic.pid"));
+        String pid = pidSave.getPidFromCurrentProcessAndStoreToFile();
+        log.info("STARTING Domotic system. Configuration:\n\tdriver:\t" + path2Driver + "\n\tlooptime:\t" + looptime + "\n\tprocess pid:\t" + pid);
+
+
+        // TODO see addShutdownHook(this);
 		this.maintThread = Thread.currentThread();
 
-		ServiceServer server = null;
-		if (htmlRootFile != null) {
-			server = new ServiceServer(htmlRootFile);
-			server.start(this);
-		} else
-		    log.warn("HTTP server not started as there is no html root file given.");
 
 		// TODO see
 		// http://www.javaworld.com/javaworld/jw-12-2000/jw-1229-traps.html?page=4
 		normalStopRequested.set(false);
 		boolean fatalError = false;
 		while (!normalStopRequested.get() && !fatalError) {
-			if (pathToDriver != null) {
-				fatalError = startDriverAndMonitoring(pathToDriver, fatalError);
+			if (path2Driver != null) {
+				fatalError = startDriverAndMonitoring(path2Driver, fatalError);
 				if (fatalError)
 					break;
 			}
@@ -322,7 +345,7 @@ public class Domotic implements IDomoticBuilder, IStateChangeRegistrar {
 				} else
 					nrNoResponsesFromDriver = 0;
 				lastLoopSequence = currentLoopSequence;
-				if (pathToDriver != null) {
+				if (path2Driver != null) {
 					if (driverMonitor.everythingSeemsWorking()) {
 						MON.info("Checked driver sub-process, seems OK.");
 					} else {
@@ -331,7 +354,7 @@ public class Domotic implements IDomoticBuilder, IStateChangeRegistrar {
 					}
 				}
 			}
-			stopDriverOscilatorAndMonitor(pathToDriver, osc);
+			stopDriverOscilatorAndMonitor(path2Driver, osc);
 			if (errorStopRequested.get()) {
 				log.info("Halt with exit code 1 so watchdog will restart.");
 				System.exit(1);

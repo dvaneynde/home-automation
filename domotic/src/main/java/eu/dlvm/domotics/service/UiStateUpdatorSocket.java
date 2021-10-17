@@ -3,6 +3,7 @@ package eu.dlvm.domotics.service;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.inject.Inject;
 import eu.dlvm.domotics.base.Domotic;
 import eu.dlvm.domotics.base.IStateChangeRegistrar;
 import eu.dlvm.domotics.base.IStateChangedListener;
@@ -25,59 +26,62 @@ import eu.dlvm.domotics.service.uidata.UiInfo;
 @WebSocket
 public class UiStateUpdatorSocket implements IStateChangedListener {
 
-	private static final Logger LOG = LoggerFactory.getLogger(UiStateUpdatorSocket.class);
-	private static int COUNT = 0;
-	private ObjectMapper objectMapper;
-	private int id;
-	private IStateChangeRegistrar registrar;
-	private Session savedSession;
+    private static final Logger LOG = LoggerFactory.getLogger(UiStateUpdatorSocket.class);
+    private static int COUNT = 0;
+    private ObjectMapper objectMapper;
+    private int id;
+    private IStateChangeRegistrar registrar;
+    private Session savedSession;
 
-	public UiStateUpdatorSocket(IStateChangeRegistrar registrar) {
-		this.registrar = registrar;
-		this.objectMapper= new ObjectMapper();
-		this.id = COUNT++;
-		LOG.debug("Created UiStateUpdatorSocket, id=" + id);
-	}
+    @Inject
+    private Domotic domotic;
 
-	@OnWebSocketConnect
-	public void onOpen(Session session) {
-		this.savedSession = session;
-		registrar.addStateChangedListener(this);
-		LOG.debug("Opened websocket session (id=" + id + ") for remote " + this.savedSession.getRemoteAddress());
-	}
+    public UiStateUpdatorSocket(IStateChangeRegistrar registrar) {
+        this.registrar = registrar;
+        this.objectMapper = new ObjectMapper();
+        this.id = COUNT++;
+        LOG.debug("Created UiStateUpdatorSocket, id=" + id);
+    }
 
-	@OnWebSocketClose
-	public void onClose(int closeCode, String closeReasonPhrase) {
-		this.savedSession = null;
-		registrar.removeStateChangedListener(this);
-		LOG.debug("Closed websocket session (id=" + id + "), reason=" + closeReasonPhrase);
-	}
+    @OnWebSocketConnect
+    public void onOpen(Session session) {
+        this.savedSession = session;
+        registrar.addStateChangedListener(this);
+        LOG.debug("Opened websocket session (id=" + id + ") for remote " + this.savedSession.getRemoteAddress());
+    }
 
-	@Override
-	public int getId() {
-		return id;
-	}
-	
-	@Override
-	public void updateUi() {
-		LOG.debug("updateUI called on websocket id=" + id + ", session=" + savedSession);
-		if (savedSession == null)
-			return;
-		try {
-			String json = objectMapper.writeValueAsString(createUiInfos());
-			savedSession.getRemote().sendString(json);
-		} catch (Exception e) {
-			LOG.warn("Cannot send state to client. Perhaps race condition, i.e. closed in parallel to update?", e);
-		}
-	}
+    @OnWebSocketClose
+    public void onClose(int closeCode, String closeReasonPhrase) {
+        this.savedSession = null;
+        registrar.removeStateChangedListener(this);
+        LOG.debug("Closed websocket session (id=" + id + "), reason=" + closeReasonPhrase);
+    }
 
-	private List<UiInfo> createUiInfos() {
-		List<UiInfo> uiInfos = new ArrayList<>();
-		for (IUiCapableBlock ui : Domotic.singleton().getUiCapableBlocks()) {
-			if (ui.getUiGroup() == null)
-				continue;
-			uiInfos.add(ui.getUiInfo());
-		}
-		return uiInfos;
-	}
+    @Override
+    public int getId() {
+        return id;
+    }
+
+    @Override
+    public void updateUi() {
+        LOG.debug("updateUI called on websocket id=" + id + ", session=" + savedSession);
+        if (savedSession == null)
+            return;
+        try {
+            String json = objectMapper.writeValueAsString(createUiInfos());
+            savedSession.getRemote().sendString(json);
+        } catch (Exception e) {
+            LOG.warn("Cannot send state to client. Perhaps race condition, i.e. closed in parallel to update?", e);
+        }
+    }
+
+    private List<UiInfo> createUiInfos() {
+        List<UiInfo> uiInfos = new ArrayList<>();
+        for (IUiCapableBlock ui : domotic.getUiCapableBlocks()) {
+            if (ui.getUiGroup() == null)
+                continue;
+            uiInfos.add(ui.getUiInfo());
+        }
+        return uiInfos;
+    }
 }

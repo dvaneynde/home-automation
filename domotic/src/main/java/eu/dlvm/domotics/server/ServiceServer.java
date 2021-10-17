@@ -34,107 +34,106 @@ import eu.dlvm.domotics.service.UiStateUpdatorSocket;
 
 /**
  * Serves whatever stuff via http (rest) or websocket.
- * 
- * @author dirk
  *
+ * @author dirk
  */
 public class ServiceServer {
 
-	private static final Logger log = LoggerFactory.getLogger(ServiceServer.class);
-	private Server server;
-	private File rootHtmlFile;
+    private static final Logger log = LoggerFactory.getLogger(ServiceServer.class);
+    private Server server;
+    private File rootHtmlFile;
 
-	public ServiceServer(File rootHtmlFile) {
-		this.rootHtmlFile = rootHtmlFile;
-	}
+    public ServiceServer(File rootHtmlFile) {
+        this.rootHtmlFile = rootHtmlFile;
+    }
 
-	public static class UiSocketCreator implements WebSocketCreator {
-		private IStateChangeRegistrar registrar;
-		
-		public UiSocketCreator(IStateChangeRegistrar registrar) {
-			this.registrar = registrar;
-		}
+    public static class UiSocketCreator implements WebSocketCreator {
+        private IStateChangeRegistrar registrar;
 
-		@Override
-		public Object createWebSocket(ServletUpgradeRequest req, ServletUpgradeResponse resp) {
-			InetSocketAddress remoteAddress = req.getRemoteSocketAddress();
-			log.debug("Creating websocket connection, remote address="+remoteAddress.toString());
-			UiStateUpdatorSocket uiStateUpdatorSocket = new UiStateUpdatorSocket(registrar);
-			return uiStateUpdatorSocket;
-		}
-	}
+        public UiSocketCreator(IStateChangeRegistrar registrar) {
+            this.registrar = registrar;
+        }
 
-	public void start(IStateChangeRegistrar stateChangeRegistrar) {
-		server = new Server();
-		ServerConnector connector = new ServerConnector(server);
-		connector.setPort(8080);
-		server.addConnector(connector);
+        @Override
+        public Object createWebSocket(ServletUpgradeRequest req, ServletUpgradeResponse resp) {
+            InetSocketAddress remoteAddress = req.getRemoteSocketAddress();
+            log.debug("Creating websocket connection, remote address=" + remoteAddress.toString());
+            UiStateUpdatorSocket uiStateUpdatorSocket = new UiStateUpdatorSocket(registrar);
+            return uiStateUpdatorSocket;
+        }
+    }
 
-		try {
-			// Setup the basic application "context" for this application at "/"
-			// This is also known as the handler tree (in jetty speak)
-			ServletContextHandler contextHandler = new ServletContextHandler(ServletContextHandler.SESSIONS);
-			contextHandler.setContextPath("/");
-			//Resource staticRoot = Resource.newClassPathResource("static-root");
-			Resource staticRoot = Resource.newResource(rootHtmlFile);
-			contextHandler.setBaseResource(staticRoot);
-			contextHandler.setWelcomeFiles(new String[] { "index.html" });
-			server.setHandler(contextHandler);
+    public void start(IStateChangeRegistrar stateChangeRegistrar) {
+        try {
+            server = new Server();
+            ServerConnector connector = new ServerConnector(server);
+            connector.setPort(8080);
+            server.addConnector(connector);
 
-			// Add the filter, and then use the provided FilterHolder to configure it
-			FilterHolder cors = contextHandler.addFilter(CrossOriginFilter.class,"/*",EnumSet.of(DispatcherType.REQUEST));
-			cors.setInitParameter(CrossOriginFilter.ALLOWED_ORIGINS_PARAM, "*");
-			cors.setInitParameter(CrossOriginFilter.ACCESS_CONTROL_ALLOW_ORIGIN_HEADER, "*");
-			cors.setInitParameter(CrossOriginFilter.ALLOWED_METHODS_PARAM, "GET,POST,HEAD");
-			cors.setInitParameter(CrossOriginFilter.ALLOWED_HEADERS_PARAM, "X-Requested-With,Content-Type,Accept,Origin");
+            // Setup the basic application "context" for this application at "/"
+            // This is also known as the handler tree (in jetty speak)
+            ServletContextHandler contextHandler = new ServletContextHandler(ServletContextHandler.SESSIONS);
+            contextHandler.setContextPath("/");
+            //Resource staticRoot = Resource.newClassPathResource("static-root");
+            Resource staticRoot = Resource.newResource(rootHtmlFile);
+            contextHandler.setBaseResource(staticRoot);
+            contextHandler.setWelcomeFiles(new String[]{"index.html"});
+            server.setHandler(contextHandler);
 
-			// Add the websocket filter
-			WebSocketUpgradeFilter wsfilter = WebSocketUpgradeFilter.configureContext(contextHandler);
-			// Configure websocket behavior
-			wsfilter.getFactory().getPolicy().setIdleTimeout(5000);
-			// Add websocket mapping
-			wsfilter.addMapping(new ServletPathSpec("/status/"), new UiSocketCreator(stateChangeRegistrar));
+            // Add the filter, and then use the provided FilterHolder to configure it
+            FilterHolder cors = contextHandler.addFilter(CrossOriginFilter.class, "/*", EnumSet.of(DispatcherType.REQUEST));
+            cors.setInitParameter(CrossOriginFilter.ALLOWED_ORIGINS_PARAM, "*");
+            cors.setInitParameter(CrossOriginFilter.ACCESS_CONTROL_ALLOW_ORIGIN_HEADER, "*");
+            cors.setInitParameter(CrossOriginFilter.ALLOWED_METHODS_PARAM, "GET,POST,HEAD");
+            cors.setInitParameter(CrossOriginFilter.ALLOWED_HEADERS_PARAM, "X-Requested-With,Content-Type,Accept,Origin");
 
-			// Add REST interface handler
-			// https://www.acando.no/thedailypassion/200555/a-rest-service-with-jetty-and-jersey
-			Set<Class<?>> services = new HashSet<>();
-			services.add(RestService.class);
-			ResourceConfig config = new ResourceConfig(services);
-			config.register(JacksonFeature.class);
-			ServletHolder jerseyServletHolder = new ServletHolder(new ServletContainer(config));
-			contextHandler.addServlet(jerseyServletHolder, "/rest/*");
+            // Add the websocket filter
+            WebSocketUpgradeFilter wsfilter = WebSocketUpgradeFilter.configureContext(contextHandler);
+            // Configure websocket behavior
+            wsfilter.getFactory().getPolicy().setIdleTimeout(5000);
+            // Add websocket mapping
+            wsfilter.addMapping(new ServletPathSpec("/status/"), new UiSocketCreator(stateChangeRegistrar));
 
-			// Add default servlet
-			ServletHolder holderDefault = new ServletHolder("default", DefaultServlet.class);
-			holderDefault.setInitParameter("dirAllowed", "true");
-			contextHandler.addServlet(holderDefault, "/*");
+            // Add REST interface handler
+            // https://www.acando.no/thedailypassion/200555/a-rest-service-with-jetty-and-jersey
+            Set<Class<?>> services = new HashSet<>();
+            services.add(RestService.class);
+            ResourceConfig config = new ResourceConfig(services);
+            config.register(JacksonFeature.class);
+            ServletHolder jerseyServletHolder = new ServletHolder(new ServletContainer(config));
+            contextHandler.addServlet(jerseyServletHolder, "/rest/*");
 
-			// TODO
-			// https://stackoverflow.com/questions/28190198/cross-origin-filter-with-embedded-jetty
-			// Lijkt erop dat ik 9.4 nodig heb ipv 9.3?
-				
-			server.start();
-			//server.join();
-		} catch (Throwable t) {
-			log.error("Error starting server.", t);
-		}
-	}
+            // Add default servlet
+            ServletHolder holderDefault = new ServletHolder("default", DefaultServlet.class);
+            holderDefault.setInitParameter("dirAllowed", "true");
+            contextHandler.addServlet(holderDefault, "/*");
 
-	public void stop() {
-		// http://stackoverflow.com/questions/928211/how-to-shutdown-com-sun-net-httpserver-httpserver
-		try {
-			server.stop();
-		} catch (Exception e) {
-			log.error("Unexpected exception, ignored.", e);
-		}
-		log.info("HTTP Server stopped.");
-	}
+            // TODO
+            // https://stackoverflow.com/questions/28190198/cross-origin-filter-with-embedded-jetty
+            // Lijkt erop dat ik 9.4 nodig heb ipv 9.3?
 
-	public static void main(String[] args) throws IOException, Exception {
-		ServiceServer ss = new ServiceServer(new File("/Users/dirk/dev/ws-domotica/domotic"));
-		ss.start(null);
-		System.out.println(String.format("Server app started.\nHit enter to stop it..."));
-		System.in.read();
-		ss.stop();
-	}
+            server.start();
+            //server.join();
+        } catch (Throwable t) {
+            log.error("Error starting server.", t);
+        }
+    }
+
+    public void stop() {
+        // http://stackoverflow.com/questions/928211/how-to-shutdown-com-sun-net-httpserver-httpserver
+        try {
+            server.stop();
+        } catch (Exception e) {
+            log.error("Unexpected exception, ignored.", e);
+        }
+        log.info("HTTP Server stopped.");
+    }
+
+    public static void main(String[] args) throws IOException, Exception {
+        ServiceServer ss = new ServiceServer(new File("/Users/dirk/dev/ws-domotica/domotic"));
+        ss.start(null);
+        System.out.println(String.format("Server app started.\nHit enter to stop it..."));
+        System.in.read();
+        ss.stop();
+    }
 }

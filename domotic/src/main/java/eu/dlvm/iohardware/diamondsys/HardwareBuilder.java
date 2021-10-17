@@ -8,9 +8,11 @@ import eu.dlvm.iohardware.diamondsys.messaging.HwDriverChannelSimulator;
 import eu.dlvm.iohardware.diamondsys.messaging.HwDriverTcpChannel;
 import eu.dlvm.iohardware.diamondsys.messaging.IHwDriverChannel;
 
+@Deprecated
 public class HardwareBuilder implements IHardwareBuilder {
 
     @Override
+    @Deprecated
     public IHardwareIO build(String cfgFile, String host, int port, int readTimeout, boolean simulated) {
         XmlHwConfigurator xhc = new XmlHwConfigurator(cfgFile);
         IHwDriverChannel hdc;

@@ -10,6 +10,8 @@ import org.slf4j.LoggerFactory;
 import eu.dlvm.iohardware.diamondsys.HwConsole;
 
 public class HwConsoleRunner {
+    // TODO other place? in iohardware namespace, non-diamond specific?
+    public static final Logger logDriver = LoggerFactory.getLogger("DRIVER");
 
 	private static final Logger log = LoggerFactory.getLogger(HwConsoleRunner.class);
 
@@ -36,7 +38,7 @@ public class HwConsoleRunner {
 				BufferedReader br = new BufferedReader(new InputStreamReader(process.getInputStream()));
 				String line;
 				while ((line = br.readLine()) != null) {
-					Main.logDriver.info(line);
+					logDriver.info(line);
 				}
 			} catch (IOException e) {
 				log.error("Problem starting or running HwDriver program '" + pathToDriver + "'.", e);

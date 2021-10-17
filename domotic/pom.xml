@@ -29,6 +29,15 @@
 		<jackson-2-version>2.3.0</jackson-2-version>
 	</properties>
 
+    <!--
+    <repositories>
+        <repository>
+            <id>maven2</id>
+            <url>https://repo.maven.apache.org/maven2</url>
+        </repository>
+    </repositories>
+    -->
+
 	<pluginRepositories>
 		<pluginRepository>
 			<id>apache.org</id>
@@ -49,7 +58,20 @@
 			<artifactId>domotic-scala_2.12</artifactId>
 			<version>1.0</version>
 		</dependency>
-		<dependency>
+
+        <!-- Dependency Injection -->
+        <dependency>
+            <groupId>com.google.inject</groupId>
+            <artifactId>guice</artifactId>
+            <version>4.2.3</version>
+        </dependency>
+        <dependency>
+            <groupId>io.logz</groupId>
+            <artifactId>guice-jersey</artifactId>
+            <version>1.0.13</version>
+        </dependency>
+
+        <dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
 			<version>1.7.21</version>
