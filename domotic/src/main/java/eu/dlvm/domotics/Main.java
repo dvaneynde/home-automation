@@ -32,8 +32,9 @@ public class Main {
             cfg = new DomConfig(args);
 
             ServiceServer server = null;
-            if (htmlRootFile != null) {
-                server = new ServiceServer(htmlRootFile);
+            if (cfg.htmlRootFile != null) {
+                // TODO see https://opensourcelibs.com/lib/guice-jersey and also how to properly initialize Jetty & Jersey...
+                server = new ServiceServer(cfg.htmlRootFile);
                 server.start(this);
             } else
                 log.warn("HTTP server not started as there is no html root file given.");
