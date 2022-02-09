@@ -1,62 +1,85 @@
-.metadata
-bin/
-tmp/
-*.tmp
-*.bak
-*.swp
-*~.nib
-local.properties
-.settings/
-.loadpath
-.recommenders
+target/
+/domotic.pid
+/jersey.log.lck
+/target
+/logs/
+*.log
+/DomoticOutputStates.txt
+/driver.pid
+/doc/
 
-# External tool builders
-.externalToolBuilders/
+# ----------------------------------------------------------------------------------------------------------------
+# Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio, WebStorm and Rider
+# Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
 
-# Locally stored "Eclipse launch configurations"
-*.launch
+# User-specific stuff
+.idea/**/workspace.xml
+.idea/**/tasks.xml
+.idea/**/usage.statistics.xml
+.idea/**/dictionaries
+.idea/**/shelf
 
-# PyDev specific (Python IDE for Eclipse)
-*.pydevproject
+# AWS User-specific
+.idea/**/aws.xml
 
-# CDT-specific (C/C++ Development Tooling)
-.cproject
+# Generated files
+.idea/**/contentModel.xml
 
-# CDT- autotools
-.autotools
+# Sensitive or high-churn files
+.idea/**/dataSources/
+.idea/**/dataSources.ids
+.idea/**/dataSources.local.xml
+.idea/**/sqlDataSources.xml
+.idea/**/dynamic.xml
+.idea/**/uiDesigner.xml
+.idea/**/dbnavigator.xml
 
-# Java annotation processor (APT)
-.factorypath
+# Gradle
+.idea/**/gradle.xml
+.idea/**/libraries
 
-# PDT-specific (PHP Development Tools)
-.buildpath
+# Gradle and Maven with auto-import
+# When using Gradle or Maven with auto-import, you should exclude module files,
+# since they will be recreated, and may cause churn.  Uncomment if using
+# auto-import.
+#.idea/artifacts
+#.idea/compiler.xml
+#.idea/jarRepositories.xml
+#.idea/modules.xml
+#.idea/*.iml
+#.idea/modules
+#*.iml
+#*.ipr
 
-# sbteclipse plugin
-.target
+# CMake
+cmake-build-*/
 
-# Tern plugin
-.tern-project
+# Mongo Explorer plugin
+.idea/**/mongoSettings.xml
 
-# TeXlipse plugin
-.texlipse
+# File-based project format
+*.iws
 
-# STS (Spring Tool Suite)
-.springBeans
+# IntelliJ
+out/
 
-# Code Recommenders
-.recommenders/
+# mpeltonen/sbt-idea plugin
+.idea_modules/
 
-# Annotation Processing
-.apt_generated/
-.apt_generated_test/
+# JIRA plugin
+atlassian-ide-plugin.xml
 
-# Scala IDE specific (Scala & Java development for Eclipse)
-.cache-main
-.scala_dependencies
-.worksheet
+# Cursive Clojure plugin
+.idea/replstate.xml
 
-# Uncomment this line if you wish to ignore the project description file.
-# Typically, this file would be tracked if it contains build/dependency configurations:
-#.project
+# Crashlytics plugin (for Android Studio and IntelliJ)
+com_crashlytics_export_strings.xml
+crashlytics.properties
+crashlytics-build.properties
+fabric.properties
 
-deployment/install/
+# Editor-based Rest Client
+.idea/httpRequests
+
+# Android studio 3.1+ serialized cache file
+.idea/caches/build_file_checksums.ser
