@@ -1,38 +1,34 @@
-# DIY home automation
+# domotica
 
-## Contact & Licensing
-- Author: Dirk Vaneynde
-- Contact: dirk@dlvmechanografie.eu
-- License: [MIT License](./LICENSE.txt)
+## How to run
 
-## Overview
+```bash
+# For help
+$ java -jar domotica-1.0-jar-with-dependencies.jar -h
 
-Home automation system built up from common hardware. 
+Usage:	Main domo [-s] [-r] [-d path2Driver] [-t looptime] [-h hostname] [-p port] [-w webapproot] -b blocks-config-file -c hardware-config-file
+	Main hw [-d path2Driver] [-h hostname] [-p port] -c hardware-config-file
+	-s simulate hardware driver (domotic only, for testing and development)
+	-d path to driver, if it needs to be started and managed by this program
+	-t time between loops, in ms; defaults to 20 ms.
+	-h hostname of hardware driver; incompatible with -d
+	-p port of hardware driver; incompatible with -d	
+    -w path of directory with webapp (where index.html is located)
+	-b domotic blocks xml configuration file
+	-c hardware xml configuration file
+To configure logging externally, use 'java -Dlogback.configurationFile=/path/to/config.xml ...' or system env variable.
+Domotica Main
 
-> **Caution:** It only handles lights and sun screens, not wall sockets or heating or other fancy stuff. 
 
-The primary goal of this system is for me, as a software engineer, to keep my skills up to date, have some fun and sometimes help convince recruiters to hire me ;-) There are much more feature rich open-source systems available elsewhere.
+# To run in simulation mode
+$ java -jar domotica-1.0-jar-with-dependencies.jar -Dlogback.configurationFile=src/main/resources/logback-dev.xml \
+    domo -s -c DiamondBoardsConfig.xml -b DomoticConfig.xml -w static
+```
 
-Here is a view of the hardware I currently use.
+## TODO
 
-![The System](images/domo-v2-b.png)
+- HardwareIO heeft al exit 1 !!!
+- xml resources in src/main/resources, as default
+- logging config in src/main/resources, as default
+- logging.properties ook op bordje, en -D bij domotic.sh
 
-Basically it uses Advantech and Diamond hardware with digital and analog inputs and outputs, connected to switches, lamps, voltage controlled dimmers or a weather station that measures wind and light.
-
-There are two inputs: the common switches and an [elm](https://elm-lang.org) based UI.
-
-More details are in [Design](./DESIGN.md), and some historical evolutions (and more photos) are in [History](./HISTORY.md).
-
-## Projects
-
-Each project is in a sub-folder, with its own README:
-
-1. [domotic](./domoti/../../README.md) : the main program, java based
-2. [hwdriver](./hwdriver/dscud5/README.txt) : the C program talking to the hardware
-3. [elm-ui](./elm-ui/README.md) : the web UI
-4. [deployment](deployment/install/instructions.txt) : automated deployment and also first time setup
-5. azimuth : library to calculated azimuth, scala based
-
-## Build and Deploy
-
-See [Deployment](./deployment/README.md).

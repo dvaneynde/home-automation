@@ -1,0 +1,51 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Launch Current File",
+            "request": "launch",
+            "mainClass": "${file}"
+        },
+        {
+            "type": "java",
+            "name": "Launch Main",
+            "request": "launch",
+            "mainClass": "eu.dlvm.domotics.Main",
+            "projectName": "domotica",
+            "vmArgs": "-Dlogback.configurationFile=src/main/resources/logback-dev.xml",
+            "args": "domo -s -c DiamondBoardsConfig.xml -b DomoticConfig.xml -w static"
+        },
+        {
+            "type": "java",
+            "name": "Launch Sinus",
+            "request": "launch",
+            "mainClass": "eu.dlvm.domotics.controllers.gadgets.Sinus",
+            "projectName": "domotica"
+        },
+        {
+            "type": "java",
+            "name": "Launch ServiceServer",
+            "request": "launch",
+            "mainClass": "eu.dlvm.domotics.server.ServiceServer",
+            "projectName": "domotica"
+        },
+        {
+            "type": "java",
+            "name": "Launch OpenWeatherMap",
+            "request": "launch",
+            "mainClass": "eu.dlvm.domotics.utils.OpenWeatherMap",
+            "projectName": "domotica"
+        },
+        {
+            "type": "java",
+            "name": "Launch HwConsole",
+            "request": "launch",
+            "mainClass": "eu.dlvm.iohardware.diamondsys.HwConsole",
+            "projectName": "domotica"
+        }
+    ]
+}

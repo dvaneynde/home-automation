@@ -25,7 +25,7 @@ then
 	exit 2
 fi
 pushd .
-pushd ../../domotic
+pushd ../..
 
 echo
 echo "BUILD ========================"
