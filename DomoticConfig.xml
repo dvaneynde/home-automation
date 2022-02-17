@@ -15,10 +15,13 @@
 		<off src="SchakLichtInkom" event="LongClick" />
 	</lamp>
 
-	<switch name="SchakVentilatorWC0" />
+	<switch name="SchakVentilatorWC0" singleClick="true" longClick="true"/>
 	<fan name="VentilatorWC0" desc="Ventilator WC" delayOnSec="180" delayOffSec="180" onSec="300">
+		<!--
 		<toggle src="SchakVentilatorWC0" />
-		<off src="SchakVentilatorWC0" event="LongClick" />
+		-->
+		<on src="SchakVentilatorWC0" event="SingleClick" /> 
+		<off src="SchakVentilatorWC0" event="LongClick" /> 
 		<delayedOnOff src="LichtWC0" />
 	</fan>
 
@@ -86,50 +89,50 @@
 	</lamp>
 
 	<switch name="SchakLichtGangBoven" />
-	<lamp name="LichtGangBoven" desc="Gang Boven" ui="Kinderen:1" autoOffSec="300" blink="true">
+	<lamp name="LichtGangBoven" desc="Gang Boven" ui="Kinderen:0" autoOffSec="300" blink="true">
 		<toggle src="SchakLichtGangBoven" />
 		<off src="SchakLichtInkom" event="LongClick" />
 	</lamp>
 
 	<switch name="SchakLichtBadk1" />
-	<lamp name="LichtBadk1" desc="Badkamer +1" ui="Kinderen:5">
+	<lamp name="LichtBadk1" desc="Badkamer +1" ui="Kinderen:1">
 		<toggle src="SchakLichtBadk1" />
 		<off src="SchakLichtInkom" event="LongClick" />
 	</lamp>
 
-	<switch name="SchakLichtTomasWand" />
-	<lamp name="LichtTomasWand" desc="Dries Wand" ui="Kinderen:0">
-		<toggle src="SchakLichtTomasWand" />
+	<switch name="SchakSlaapZuidwestWand" />
+	<lamp name="LichtSlaapZuidwestWand" desc="Tomas Wand" ui="Kinderen:2">
+		<toggle src="SchakSlaapZuidwestWand" />
 		<off src="SchakLichtInkom" event="LongClick" />
 	</lamp>
 
-	<switch name="SchakLichtTomasSpots" /><!-- TODO nakijken of klopt met bedrading -->
-	<lamp name="LichtTomasSpots" desc="Dries Spots" ui="Kinderen:1"><!-- TODO nakijken of klopt met relais -->
-		<toggle src="SchakLichtTomasSpots" />
+	<switch name="SchakSlaapZuidwestSpots" />
+	<lamp name="LichtSlaapZuidwestSpots" desc="Tomas Spots" ui="Kinderen:3">
+		<toggle src="SchakSlaapZuidwestSpots" />
 		<off src="SchakLichtInkom" event="LongClick" />
 	</lamp>
 
-	<switch name="SchakLichtDriesWand" />
-	<lamp name="LichtDriesWand" desc="Tomas Wand" ui="Kinderen:0">
-		<toggle src="SchakLichtDriesWand" />
+	<switch name="SchakSlaapZuidWand" />
+	<lamp name="LichtSlaapZuidWand" desc="Dries Wand" ui="Kinderen:4">
+		<toggle src="SchakSlaapZuidWand" />
 		<off src="SchakLichtInkom" event="LongClick" />
 	</lamp>
 
-	<switch name="SchakLichtDries" />
-	<lamp name="LichtDries" desc="Tomas Spots" ui="Kinderen:1">
-		<toggle src="SchakLichtDries" />
+	<switch name="SchakSlaapZuidSpots" />
+	<lamp name="LichtSlaapZuidSpots" desc="Dries Spots" ui="Kinderen:5">
+		<toggle src="SchakSlaapZuidSpots" />
 		<off src="SchakLichtInkom" event="LongClick" />
 	</lamp>
 
-	<switch name="SchakLichtRoosWand" />
-	<lamp name="LichtRoosWand" desc="Roos Wand" ui="Kinderen:0">
-		<toggle src="SchakLichtRoosWand" />
+	<switch name="SchakSlaapNoordWand" />
+	<lamp name="LichtSlaapNoordWand" desc="Roos Wand" ui="Kinderen:6">
+		<toggle src="SchakSlaapNoordWand" />
 		<off src="SchakLichtInkom" event="LongClick" />
 	</lamp>
 
-	<switch name="SchakLichtRoos" />
-	<lamp name="LichtRoos" desc="Roos Spots" ui="Kinderen:1">
-		<toggle src="SchakLichtRoos" />
+	<switch name="SchakSlaapNoordSpots" />
+	<lamp name="LichtSlaapNoordSpots" desc="Roos Spots" ui="Kinderen:7">
+		<toggle src="SchakSlaapNoordSpots" />
 		<off src="SchakLichtInkom" event="LongClick" />
 	</lamp>
 
@@ -142,31 +145,31 @@
 	<switch name="SchakScreenAllUp" singleClick="true" longClick="true" />
 	<switch name="SchakScreenAllDown" singleClick="true" longClick="true" />
 
-	<switch name="SchakScreenTomasUp" />
-	<switch name="SchakScreenTomasDown" />
-	<screen name="ScreenTomas" desc="Dries" motor-up-time="30" motor-dn-time="30" ui="ScreensZ:4">
-		<upDown srcDown="SchakScreenTomasDown" srcUp="SchakScreenTomasUp" />
+	<switch name="SchakScreenZuidUp" />
+	<switch name="SchakScreenZuidDown" />
+	<screen name="ScreenZuid" desc="Dries" motor-up-time="30" motor-dn-time="30" ui="ScreensZ:4">
+		<upDown srcDown="SchakScreenZuidDown" srcUp="SchakScreenZuidUp" />
 		<upDown srcDown="SchakScreenAllDown" srcUp="SchakScreenAllUp" event="LongClick" />
 	</screen>
 
-	<switch name="SchakScreenDriesTuinUp" />
-	<switch name="SchakScreenDriesTuinDown" />
-	<screen name="ScreenDriesTuin" desc="Tomas (Tuin)" motor-up-time="30" motor-dn-time="30" ui="ScreensZ:5">
-		<upDown srcDown="SchakScreenDriesTuinDown" srcUp="SchakScreenDriesTuinUp" />
+	<switch name="SchakScreenZuidwestTuinUp" />
+	<switch name="SchakScreenZuidwestTuinDown" />
+	<screen name="ScreenZuidwestTuin" desc="Tomas (Tuin)" motor-up-time="30" motor-dn-time="30" ui="ScreensZ:5">
+		<upDown srcDown="SchakScreenZuidwestTuinDown" srcUp="SchakScreenZuidwestTuinUp" />
 		<upDown srcDown="SchakScreenAllDown" srcUp="SchakScreenAllUp" event="LongClick" />
 	</screen>
 
-	<switch name="SchakScreenDriesOpzijUp" />
-	<switch name="SchakScreenDriesOpzijDown" />
-	<screen name="ScreenDriesOpzij" desc="Tomas (Zijkant)" motor-up-time="30" motor-dn-time="30" ui="ScreensW:1">
-		<upDown srcDown="SchakScreenDriesOpzijDown" srcUp="SchakScreenDriesOpzijUp" />
+	<switch name="SchakScreenZuidwestOpzijUp" />
+	<switch name="SchakScreenZuidwestOpzijDown" />
+	<screen name="ScreenZuidwestOpzij" desc="Tomas (Zijkant)" motor-up-time="30" motor-dn-time="30" ui="ScreensW:1">
+		<upDown srcDown="SchakScreenZuidwestOpzijDown" srcUp="SchakScreenZuidwestOpzijUp" />
 		<upDown srcDown="SchakScreenAllDown" srcUp="SchakScreenAllUp" event="LongClick" />
 	</screen>
 
-	<switch name="SchakScreenRoosUp" />
-	<switch name="SchakScreenRoosDown" />
-	<screen name="ScreenRoos" desc="Roos" motor-up-time="30" motor-dn-time="30" ui="ScreensW:2">
-		<upDown srcDown="SchakScreenRoosDown" srcUp="SchakScreenRoosUp" />
+	<switch name="SchakScreenSlaapNoordUp" />
+	<switch name="SchakScreenSlaapNoordDown" />
+	<screen name="ScreenSlaapNoord" desc="Roos" motor-up-time="30" motor-dn-time="30" ui="ScreensW:2">
+		<upDown srcDown="SchakScreenSlaapNoordDown" srcUp="SchakScreenSlaapNoordUp" />
 		<upDown srcDown="SchakScreenAllDown" srcUp="SchakScreenAllUp" event="LongClick" />
 	</screen>
 
@@ -203,8 +206,8 @@
 		<wind sensor="Windmeter" />
 		<sun sensor="LichtZonZuid" />
 		<screen name="ScreenBreed" />
-		<screen name="ScreenTomas" />
-		<screen name="ScreenDriesTuin" />
+		<screen name="ScreenZuid" />
+		<screen name="ScreenZuidwestTuin" />
 		<screen name="ScreenKeuken" />
 	</sunWindController>
 
@@ -214,8 +217,8 @@
 			groepen kunnen gedefinieerd worden, met verschillende parameters, b.v. ook alarm etc. moeten hier bij wind en sun. -->
 		<wind sensor="Windmeter" />
 		<sun sensor="LichtZonWest" />
-		<screen name="ScreenDriesOpzij" />
-		<screen name="ScreenRoos" />
+		<screen name="ScreenZuidwestOpzij" />
+		<screen name="ScreenSlaapNoord" />
 	</sunWindController>
 
 	<!-- Ter vervanging van schemer sensor -->
