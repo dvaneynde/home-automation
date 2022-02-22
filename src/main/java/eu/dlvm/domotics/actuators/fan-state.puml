@@ -2,19 +2,19 @@
 
 hide empty description
 
-On : lamp on
-Off : lamp off
+On : fan on
+Off : fan off
 On --> Off : toggle |\n[on-duration]
 On <-- Off : toggle
 [*] -> Off
 Off --> Off_Delay2On : delay-on
-Off_Delay2On : lamp still off
+Off_Delay2On : fan still off
 Off_Delay2On -> On_Delay : toggle |\n [delay-to-on-sec]
 Off_Delay2On -> Off : delay-off
-On_Delay : lamp on
+On_Delay : fan on
 On_Delay -> On_Delay2Off : delay-off
 On_Delay -> Off_Delay2On : toggle
-On_Delay2Off : lamp still on
+On_Delay2Off : fan still on
 Off <-up- On_Delay : [on-duration + delay-to-off-sec]\n| really-off
 Off <-up- On_Delay2Off : [delay-to-off-sec]\n| really-off
 
