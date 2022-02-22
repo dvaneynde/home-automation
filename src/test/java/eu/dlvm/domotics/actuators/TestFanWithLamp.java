@@ -228,17 +228,17 @@ public class TestFanWithLamp {
 	}
 
 	@Test
-	public void toggleToOnWhenInDelayedOn() {
+	public void togglWhenIn_OFF_DELAY2ON_HasNoEffect() {
 		fan.loop(current);
 		assert_OFF();
 		// Lamp on
 		lamp.on();
 		fan.loop(current += 10);
 		assert_OFF_DELAY2ON();
-		// Toggle, must go to on
+		// Toggle
 		fan.toggle();
 		fan.loop(current += 10);
-		assert_ON_DELAY();
+		assert_OFF_DELAY2ON();
 	}
 
 	@Test
