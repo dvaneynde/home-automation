@@ -16,11 +16,8 @@
 	</lamp>
 
 	<switch name="SchakVentilatorWC0" singleClick="true" longClick="true"/>
-	<fan name="VentilatorWC0" desc="Ventilator WC" delayOnSec="180" delayOffSec="180" onSec="300">
-		<!--
+	<fan name="VentilatorWC0" desc="Ventilator WC" delayOnSec="180" delayOffSec="180" onSec="420">
 		<toggle src="SchakVentilatorWC0" />
-		-->
-		<on src="SchakVentilatorWC0" event="SingleClick" /> 
 		<off src="SchakVentilatorWC0" event="LongClick" /> 
 		<delayedOnOff src="LichtWC0" />
 	</fan>
