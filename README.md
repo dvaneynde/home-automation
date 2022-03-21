@@ -1,4 +1,4 @@
-# domotica
+# DIY home automation - Main Java Program
 
 ## How to run
 
@@ -18,9 +18,13 @@ Usage:	Main domo [-s] [-r] [-d path2Driver] [-t looptime] [-h hostname] [-p port
 	-c hardware xml configuration file
 To configure logging externally, use 'java -Dlogback.configurationFile=/path/to/config.xml ...' or system env variable.
 Domotica Main
+```
 
 
-# To run in simulation mode
+## Run in simulation mode
+Make sure subfolder `static` has the javascript (from elm) code.
+
+```bash
 $ java -jar domotica-1.0-jar-with-dependencies.jar -Dlogback.configurationFile=src/main/resources/logback-dev.xml \
     domo -s -c DiamondBoardsConfig.xml -b DomoticConfig.xml -w static
 ```

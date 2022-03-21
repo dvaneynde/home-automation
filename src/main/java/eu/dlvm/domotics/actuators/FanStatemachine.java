@@ -68,7 +68,7 @@ public class FanStatemachine {
 				logEvent(oldState, "toggle");
 				break;
 			case OFF_DELAY2ON:
-				fanOn = changeState(States.ON);
+				fanOn = changeState(States.ON_DELAY);
 				logEvent(oldState, "toggle", fan.getOnDurationSec()+fan.getDelayToOffSec());
 				break;
 			case ON_DELAY2OFF:

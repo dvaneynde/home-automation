@@ -8,7 +8,7 @@ import eu.dlvm.domotics.blocks.DomoticMock;
 import eu.dlvm.domotics.connectors.Connector;
 import eu.dlvm.domotics.events.EventType;
 import eu.dlvm.iohardware.IHardwareIO;
-import junit.framework.Assert;
+import org.junit.Assert;
 
 public class TestFanWithLamp {
 
@@ -238,7 +238,7 @@ public class TestFanWithLamp {
 		// Toggle
 		fan.toggle();
 		fan.loop(current += 10);
-		assert_OFF_DELAY2ON();
+		assert_ON_DELAY();
 	}
 
 	@Test

@@ -3,8 +3,6 @@ package eu.dlvm.domotics.sensors;
 import org.junit.Assert;
 import org.junit.Test;
 
-import eu.dlvm.domotics.sensors.FrequencyGauge;
-
 public class TestFreqGauge {
 
 	// BASIC TESTS
@@ -74,7 +72,7 @@ public class TestFreqGauge {
 		FrequencyGauge fg = new FrequencyGauge(50);
 		oscillateSteady(fg, 24, 20, 2);
 		System.out.println("testWithOscillator_24Hz_20ms_limit: measured freq=" + fg.getMeasurement());
-		Assert.assertEquals(24.0, Math.floor(fg.getMeasurement()));
+		Assert.assertEquals(24.7, fg.getMeasurement(), 0.1 );
 	}
 
 	@Test
