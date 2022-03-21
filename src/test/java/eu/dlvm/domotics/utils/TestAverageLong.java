@@ -1,8 +1,7 @@
 package eu.dlvm.domotics.utils;
 
 import org.junit.Test;
-
-import junit.framework.Assert;
+import org.junit.Assert;
 
 public class TestAverageLong {
 
@@ -13,7 +12,7 @@ public class TestAverageLong {
 			avgInt.add(i);
 		}
 		Assert.assertTrue(avgInt.enoughSamples());
-		Assert.assertEquals(4.5, avgInt.avgAndClear());
+		Assert.assertEquals(4.5, avgInt.avgAndClear(), 0.01);
 		Assert.assertFalse(avgInt.enoughSamples());
 	}
 
@@ -25,7 +24,7 @@ public class TestAverageLong {
 		}
 		Assert.assertFalse(avgInt.enoughSamples());
 		try {
-			Assert.assertEquals(2, avgInt.avgAndClear());
+			Assert.assertEquals(2, avgInt.avgAndClear(), 0.01);
 			Assert.fail("Should throw exception.");
 		} catch (IllegalArgumentException e) {
 		}

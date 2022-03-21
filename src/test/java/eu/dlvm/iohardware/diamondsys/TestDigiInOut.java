@@ -1,8 +1,7 @@
 package eu.dlvm.iohardware.diamondsys;
 
 import org.junit.Test;
-
-import junit.framework.Assert;
+import org.junit.Assert;
 
 public class TestDigiInOut {
 

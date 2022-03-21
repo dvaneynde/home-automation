@@ -1,9 +1,7 @@
 package eu.dlvm.domotics.actuators;
 
 import org.junit.Test;
-
-import eu.dlvm.domotics.actuators.Screen;
-import junit.framework.Assert;
+import org.junit.Assert;
 
 public class TestScreens extends TestScreensBase {
 

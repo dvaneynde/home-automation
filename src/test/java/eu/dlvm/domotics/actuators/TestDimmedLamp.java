@@ -2,11 +2,11 @@ package eu.dlvm.domotics.actuators;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.Assert;
 
 import eu.dlvm.domotics.blocks.BaseHardwareMock;
 import eu.dlvm.domotics.blocks.DomoticMock;
 import eu.dlvm.iohardware.IHardwareIO;
-import junit.framework.Assert;
 
 // TODO werkt met 50ms sample, maar niet meer met 20ms sample; daarom loop() zoals bij WindSensor test.
 public class TestDimmedLamp {

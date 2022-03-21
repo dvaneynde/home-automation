@@ -4,16 +4,15 @@ import java.util.HashMap;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.actuators.Lamp;
 import eu.dlvm.domotics.base.Domotic;
 import eu.dlvm.domotics.base.RememberedOutput;
-import eu.dlvm.domotics.connectors.Connector;
 import eu.dlvm.domotics.events.EventType;
 import eu.dlvm.domotics.sensors.Switch;
-import junit.framework.Assert;
 
 public class TestSwitchDedicatedAllOff {
 	static Logger log = LoggerFactory.getLogger(TestSwitchDedicatedAllOff.class);

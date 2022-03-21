@@ -1,10 +1,8 @@
 package eu.dlvm.domotics.actuators;
 
 import org.junit.Test;
-
-import eu.dlvm.domotics.actuators.Screen;
+import org.junit.Assert;
 import eu.dlvm.domotics.events.EventType;
-import junit.framework.Assert;
 
 // TODO vervangen door TestScreenController
 
@@ -189,18 +187,19 @@ public class TestScreensProtection extends TestScreensBase {
 	/*
 	 * Helpers
 	 */
+	private static double delta = 0.01D;
 	protected void assertRestAndOpen() {
 		Assert.assertEquals(Screen.States.REST, sr.getState());
 		Assert.assertFalse(hw.dnRelais);
 		Assert.assertFalse(hw.upRelais);
-		Assert.assertEquals(0.0, sr.getRatioClosed());
+		Assert.assertEquals(0.0, sr.getRatioClosed(), delta);
 		Assert.assertEquals(false, sr.getProtect());
 	}
 	protected void assertRestAndClosed() {
 		Assert.assertEquals(Screen.States.REST, sr.getState());
 		Assert.assertFalse(hw.dnRelais);
 		Assert.assertFalse(hw.upRelais);
-		Assert.assertEquals(1.0, sr.getRatioClosed());
+		Assert.assertEquals(1.0, sr.getRatioClosed(), delta);
 		Assert.assertEquals(false, sr.getProtect());
 	}
 	protected void assertDown() {
@@ -226,6 +225,6 @@ public class TestScreensProtection extends TestScreensBase {
 		Assert.assertFalse(hw.dnRelais);
 		Assert.assertFalse(hw.upRelais);
 		Assert.assertEquals(true, sr.getProtect());
-		Assert.assertEquals(0.0, sr.getRatioClosed());
+		Assert.assertEquals(0.0, sr.getRatioClosed(), delta);
 	}
 }

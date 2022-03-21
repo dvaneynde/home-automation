@@ -2,12 +2,12 @@ package eu.dlvm.domotics.actuators;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.Assert;
 
 import eu.dlvm.domotics.base.IDomoticBuilder;
 import eu.dlvm.domotics.blocks.BaseHardwareMock;
 import eu.dlvm.domotics.blocks.DomoticMock;
 import eu.dlvm.iohardware.IHardwareIO;
-import junit.framework.Assert;
 
 public class TestLampWithAutoOff {
 

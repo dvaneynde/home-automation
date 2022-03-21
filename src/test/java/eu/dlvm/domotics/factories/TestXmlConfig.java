@@ -3,7 +3,7 @@ package eu.dlvm.domotics.factories;
 import org.junit.Test;
 
 import eu.dlvm.domotics.blocks.DomoticMock;
-import junit.framework.Assert;
+import org.junit.Assert;
 
 public class TestXmlConfig {
 

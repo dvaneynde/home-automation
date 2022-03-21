@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.dlvm.iohardware.IHardwareIO;
-import junit.framework.Assert;
+import org.junit.Assert;
 
 public abstract class BaseHardwareMock implements IHardwareIO {
 

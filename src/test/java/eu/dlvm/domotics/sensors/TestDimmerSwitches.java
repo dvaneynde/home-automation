@@ -2,6 +2,7 @@ package eu.dlvm.domotics.sensors;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.Assert;
 
 import eu.dlvm.domotics.base.Block;
 import eu.dlvm.domotics.blocks.BaseHardwareMock;
@@ -9,7 +10,6 @@ import eu.dlvm.domotics.blocks.DomoticMock;
 import eu.dlvm.domotics.events.EventType;
 import eu.dlvm.domotics.events.IEventListener;
 import eu.dlvm.iohardware.IHardwareIO;
-import junit.framework.Assert;
 
 public class TestDimmerSwitches {
 	public class Hardware extends BaseHardwareMock implements IHardwareIO {
