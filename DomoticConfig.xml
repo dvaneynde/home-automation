@@ -218,10 +218,10 @@
 		<screen name="ScreenSlaapNoord" />
 	</sunWindController>
 
-	<!-- Ter vervanging van schemer sensor -->
+	<!-- Ter vervanging van schemer sensor, of extra beveiliging dat het aan/uit gaat. -->
 	<timerDayNight name="TimerNacht">
-		<on hour="18" minute="0" />
-		<off hour="6" minute="0" />
+		<on hour="23" minute="0" />
+		<off hour="8" minute="0" />
 	</timerDayNight>
 
 	<!-- Terras en stopcontacten buiten -->
@@ -242,11 +242,12 @@
 	<lightGauge name="LichtmeterSchemering" threshold="2000" low2highTime="180" high2lowTime="180" channel="AnalogIn" ui="SPECIAAL:4" />
 	<lamp name="LichtTerras" desc="Licht terras en zijkant" ui="Buiten:0">
 		<toggle src="SchakBuitenTuin" />
-		<!--
-		<off src="TimerTerras" event="off" />
+
+		<!-- <off src="TimerTerras" event="off" /> -->
+
 		<off src="LichtmeterSchemering" event="LightHigh" />
 		<on src="LichtmeterSchemering" event="LightLow" />
-		-->
+
 		<on src="TimerNacht" event="on" />
 		<off src="TimerNacht" event="off" />
 	</lamp>

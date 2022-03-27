@@ -7,7 +7,7 @@
 On development machine:
 
 ```bash
-cd install
+cd deployment/install/
 ./install.sh domotica # or any hostname or ip
 ```
 
