@@ -1,30 +1,145 @@
-# Design
+<span style="font-family:Arial; font-size:3em;">Home Automation<br/>Software Architecture Document</span>
 
-## Architectural Drivers
+> author: dirk@dlvmechanografie.eu
+> 
+> date: 30/5/2022
+
+
+**Table of Contents**
+
+- [1. Introduction](#1-introduction)
+- [2. Context](#2-context)
+- [3. Architectural Drivers](#3-architectural-drivers)
+- [4. Solution Architecture](#4-solution-architecture)
+  - [4.1. Functional View](#41-functional-view)
+    - [4.1.1. Model](#411-model)
+    - [4.1.2. Rationale & Alternatives](#412-rationale--alternatives)
+  - [4.2. Deployment View](#42-deployment-view)
+  - [4.3. Module View](#43-module-view)
+  - [4.4. Layers View](#44-layers-view)
+  - [4.5. Availability Perspective](#45-availability-perspective)
+    - [4.5.1. Model](#451-model)
+    - [4.5.2. Rationale](#452-rationale)
+    - [4.5.3. Calculations](#453-calculations)
+  - [4.6. Architectural Evaluation](#46-architectural-evaluation)
+- [5. End of Document](#5-end-of-document)
+
+
+# 1. Introduction
+
+This document describes the context, architectural drivers and design of the home automation system.
+
+Its purpose is to:
+- List the main requirements that drive the architecture.
+- Explain the structure of the system without having to dive in thousands of lines of code. Great for newbees, as well to the author who tends to forget stuff easily.
+- Evaluate if and how the design realizes the requirements (drivers), and any alternatives considered.
+
+
+
+# 2. Context
+
+See [README-FIRST](../README-FIRST.md), the first chapters.
+
+The hardware is described in _Domotica 2 Hardware.pages_.
+
+# 3. Architectural Drivers
 
 This lists these home automation requirements that drive the design.
 
-1. Layout Configurability: Easy to configure when sensors or actuators are added, removed or changed. For example, assigning a switch to another lamp, changing name of a lamp, change the sun sensitivity for automatic screens, change when lights outside go on and off automatically.
-2. UI Configurability: A UI that is generated from the configuration. So no coding work whenever the configuration (see 1) changes.
-3. Reliable: Since I'm sometimes traveling and my wife or children lack knowledge on the system, it must have no bugs.
-4. Safe: hardware like screenmotors must never get signals that make them break.
-5. Available: 99,99% uptime over 1 week, so 1.01 minutes a week. 
-6. HW Change: other hardware could be chosen than the current one, and that should have no or very little (max. 1 man-week work) impact.
-7. A test-bed for new software technologies and a showcase. So some degree of over-engineering is allowed ;-)
+| ID | Category | Driver | 
+| -- | --- | --- |
+| CfgLayout | Configurable | Layout Configurability: Easy to configure when sensors or actuators are added, removed or changed. For example, assigning a switch to another lamp, changing name of a lamp, change the sun sensitivity for automatic screens, change when lights outside go on and off automatically. |
+| CfgUi | Configurable | A UI that is generated from the configuration. So no coding work whenever the configuration (see 1) changes. |
+| BugFree | Reliability | Since I'm sometimes traveling and my wife or children lack knowledge on the system, it must have no bugs. |
+| HwSafe | Safety | Software must not destroy, short-circuit or overheat hardware like screen motors or lamps. Additional safeguards must avoid this. |
+| Available | Availability | 99,99% uptime over 1 week, so 1.01 unavailability minutes a week. |
+| HwChange | Flexibility | Other hardware could be chosen than the current one, and that should have max. 1 man-month work impact. |
+| Explore | Flexibility | A test-bed for new software technologies and a showcase. So some degree of over-engineering is allowed ;-) |
 
-The next chapters describe different views of the archictectural design that explain the structure of the system.
-The final chapter will use these views to explain how the above architectural requirements (drivers) are realized.
 
------------
+---
+# 4. Solution Architecture
 
-## Deployment View
+## 4.1. Functional View
+
+### 4.1.1. Model 
+```plantuml
+@startuml "Functional View"
+
+package UserInterfaces {
+    component ui <<webapp>>
+    component switches_lamps_etc <<hardware>>
+}
+
+component domotic <<java exe>> 
+interface IDomApi <<rest>>
+interface IStatic <<http>>
+interface IUiCapableBlock <<websocket>>
+IDomApi -- domotic
+IStatic -- domotic
+IUiCapableBlock -- domotic
+ui --> IStatic
+ui --> IDomApi 
+ui <-- IUiCapableBlock 
+
+component hwdriver <<c exe>>
+interface IHwApi <<tcp>>
+domotic -> IHwApi
+IHwApi -- hwdriver
+
+component IO_board <<hardware>>
+hwdriver <-> IO_board : <<mem-dmmat>
+
+switches_lamps_etc <--> IO_board : <<electricity>>
+@enduml
+```
+
+Legend:
+- rectangle: **component**; a runnable software component, except for `switches_lamps_etc` which is hardware
+- arrow: **connector**; communication between components and/or interfaces; arrow direction is from communication-initiator to target
+- lollipop: **interface**; optional, explicit interface offered by the component it has a line too
+
+Description of the different components, interfaces and connectors:
+
+| element | description |
+|---|---|
+| switches_lamps_etc | The classical Human User Interface being switches, light & wind sensors, lamps, screens etc. |
+| ui | ELM based WebApp GUI as an alternative to mechanical switches. |
+| domotic | Java program that contains all the logic of the domotic system. It has an embedded Jetty HTTP server, see [ServiceServer](../src/main/java/eu/dlvm/domotics/server/ServiceServer.java). |
+| IStatic | HTTP endpoint to serve static content, specifically the `ui` front-end. It listens on the root path, e.g. `http://localhost/`. |
+| IDomApi | REST API offered by `domotic`, to read domotic state as well as update it. See [RestService](../src/main/java/eu/dlvm/domotics/service/RestService.java) for details. It listens on the `rest` paths, e.g. `http://localhost/rest/`. **Needs rework!** |
+| IUiCapableBlock | Websocket connection, sends each state update (lamp, wind, light sensor etc) to registered websocket clients. It is a list of [IUiCapableBlock](../src/main/java/eu/dlvm/domotics/base/IUiCapableBlock.java) informations sent at each state change. |
+| hwdriver | C program that runs in supervisor mode so that it can talk to the IO boards that in turn connect with switches, lamps etc. This is a very thin component, only executing the simple read/write commands it gets through `IHwApi` on the `IO Boards` hardware. |
+| IHwApi | Custom protocol to read inputs (switches, light sensort etc.) from the IO boards, and write outputs to the IO boards to control lamps, screens, dimmers etc. It is a custom protocol - specific for Diamonds IO boards - that is text based and uses TCP/IP. |
+| IO_board | IO Boards from Diamond System Corporation, compatible with PC/104 standard. IO Boards - multiple - have numerous digital inputs and outputs as well as a few analog inputs and outputs. Reading and writing IO goes via direct memory access (hence the supervisor mode of `hwdriver`) according to DMATT protocol. This is detailed in Diamond Systems documentation.<br/>Between the IO Boards and the switches, lamps (via relais or voltage-controlled dimmer) etc. is pure electricity based. | 
+| IO boards |  These connect to lamps, screens, switches, dimmers etc. |
+
+
+
+### 4.1.2. Rationale & Alternatives
+
+For productivity (around 2010) and safety (creash resistance) Java was chosen for `domotic`. 
+
+To communicate with the switches, lamps etc. we use Diamond Systems IO hardware, which comes with a C DMMAT library. So Java needed to access C code, which can be done in a number of ways:
+- JNI (Java Native Interface): best performance, but crashes in the C code crash the entire system
+- ad-hoc protocol on top of TCP: much more robust; also allows for easier development, having the `hwdriver` on the actual hardware but the `domotic` on a Mac talking remotely to the `hwdriver`.
+
+We choose for the latter solution, keeping the `hwdriver` as small as possible. _More information in Availability View (early frequent crashes due to memory leak)._
+
+The web UI was written in ELM. An earlier simpler version was written with JQuery and Javascript, but this was really ugly code, difficult to maintain and understand, let alone to extend. Thanks to Frank Piessens I learned about ELM, pure functional and pure fun.
+
+For the IO Boards different hardware could be used from a different vendor. The system would then have to be adapted in the following places:
+1. Another `HwDriver` specific for the new hardware. Note that this program is as small as possible, not containing any business logic.
+2. A IO Boards specific version of `IHwApi` if needed.
+3. Update of Domotic hardware-access layer in `Domotic`. For Diamond Systems this is fully isolated in [diamondsys](../src/main/java/eu/dlvm/iohardware/diamondsys). Another hardware should implement a similar package. The rest of `Domotic` should need no change.
+
+## 4.2. Deployment View
 
 ```plantuml
 @startuml Deployment
-node browser  {
-    component ui <<elm>> {
 
-    }
+node browser  {
+    component ui <<elm>>
 }
 
 node server <<linux>> {
@@ -36,51 +151,45 @@ node server <<linux>> {
     }
     file DiamondBoardsConfig <<xml>>
     file DomoticConfig <<xml>>
-    node IO_boards {
-
-    }
+    file domotic.pid
+    file driver.pid
+    file DomoticOutputStates.txt
+    folder logs
 }
 
-ui -r-> domotic : [http]
+ui -r- domotic : [http]
 domotic -- hwdriver : [tcp]
-hwdriver - IO_boards
 domotic .> DomoticConfig
 domotic .> DiamondBoardsConfig
+domotic .> domotic.pid
+domotic ..> DomoticOutputStates.txt
+hwdriver .> driver.pid
+domotic ..> logs
+logs <. hwdriver
+
 @enduml
 ```
 
-Description of the different nodes and components:
+Description of the different nodes and components is in below table. Elements already explained are left out.
 
 |element | description |
 |---|---|
-| server | Ubuntu Linux on an Advantech Atom PC, with PC/104 connectors. |
-| IO boards | Diamond System Corporation PC/104 compatible boards. These connect to lamps, screens, switches, dimmers etc. |
+| server | Ubuntu Linux on an Advantech Atom PC, with PC/104 IO Boards from Diamond Systems. |
 | browser | Any browser on the local network, so `192.168.*.*`. |
-| hwdriver | Program that runs in supervisor mode so that it can talk to the IO boards. |
-| domotic | Java program that contains all the logic of the domotic system. It has an embedded Jetty HTTP server. |
-| ui | ELM based GUI as an alternative to mechanical switches. |
 | DomoticConfig | Defines all inputs, outputs and behaviours of the home automation system. Switches, Lamps, Screens etc., and how the are connected and configured.<br/>It also defines the layout in the UI.|
 | DiamondBoardsConfig | Defines how the hardware is configured. See Layered View later, this allows for different hardware to be used without touching the domotic specific code. |
-
-The protocols are as follows:
-| protocol | description |
-|---|---|
-| http | Simple http, so no security, so local network only. |
-| tcp | TCP based interaction protocol between domotic and hwdriver. Protocol is self designed, but simple. |
-
-The corresponding files are:
-|element | filename | 
-|---|---| 
-| domotic | domotica-1.0-jar-with-dependencies.jar (ignore the 1.0) | 
-| DomoticConfig | DomoticConfig.xml |
-| DiamondBoardsConfig | DiamondBoardsConfig.xml |
-| ui | domotic.js, index.html |
-| hwdriver | hwdriver |
-
-Not described here are the Linux service definition and health check. See [deployment](./deployment/README.md) subfolder for more information.
+| logs | Both `domotic` and `hwdriver` send logs to this folder. They use `logback` and `log4c` respectively.
+| domotic.pid | File containing the PID of the `domotic` program. Used for restarting. |
+| driver.pid | File containing the PID of the `hwdriver` program. Used for restarting. |
+| DomoticOutputStates.txt | File containing the actual states of the output devices, e.g. whether a certain lamp is on or off. Used when restarting to restore the old state. |
 
 
-## Class View
+Not described here are the Linux service definition and health check. See [deployment](./deployment/README.md) subfolder for more information. These are also described in the _Availability View_.
+
+It is perfectly possible to have `domotic` and `hwdriver`, each with their respective supporting files, run on different computers.
+
+
+## 4.3. Module View
 
 The main classes of the system are depicted below.
 
@@ -194,7 +303,7 @@ The separation of event notification and handling its' state changes in `loop()`
 
 Safety is further improved by separating hardware access for Sensor, Controller and Actuator, and the fact that Sensors cannot be the target of events.
 
-## Layers View
+## 4.4. Layers View
 
 There are 4 major parts:
 1. UI
@@ -244,9 +353,116 @@ But since we do not need this (yet? ever?) it has not been implemented.
 Note that hwdriver is also specific to the hardware we've chosen.
 
 
+## 4.5. Availability Perspective
+
+### 4.5.1. Model
+
+In below model a few additional elements appear.
+
+| element | description |
+|---|---|
+| init.d | Ubuntu 16 service mechanism. |
+| domotic.sh | Script to start, stop or restart `domotic` as a service. The start command will automatically be executed at server boot.|
+| cron | Linux cron facility. |
+| watchdog.sh | Script that checks if `domotic` process still exists, using `domotic.pid`, and restart if needed. |
+
+> Note: Better option may be to use `systemd` as a replacement for `init.d` which can restart services. The original Ubuntu version did not have that facility yet. Replacement is planned.
+
+Legend:
+- dashed line: start or kill a process
+- dotted line: check a process
+- bold plain line: start as a sub-process
+
+```plantuml
+@startuml Availability
+
+node server <<linux>> {
+    component cron <<service>>
+    component init.d <<service>>
+    component domotic.sh <<script>>
+    component watchdog.sh <<script>>
+    component domotic <<java exe>>
+    component hwdriver <<c exe>>
+    file domotic.pid
+    file driver.pid
+
+    init.d ..> domotic.sh : 1_on_boot_start_domotic
+    domotic.sh ..> domotic : 1.1_start
+    domotic -[bold]-> hwdriver : 1.2_start_as_subprocess
+    cron ..> watchdog.sh : 2_run_every_60sec
+    watchdog.sh -[dotted]-> domotic : 2.1_check_process
+    domotic -> domotic : 3_self_check
+
+    domotic.sh <. watchdog.sh : 4_run_restart_if_dead
+    domotic.sh .> hwdriver : 4.1_kill
+    domotic.sh ..> domotic : 4.2_kill_and_start
+
+    domotic.pid <- domotic
+    driver.pid <- hwdriver
+}
+server -> server : 5_reboot_on_crash
+@enduml
+```
+
+| interaction | description |
+|---|---|
+| 1_on_boot_start_domotic | When the server starts, `init.d` will automatically call `domotic.sh start`. |
+| 1.1_start | The domotic system is started. Configuration parameters are in this script! |
+| 1.2_start_as_subprocess | `domotic` will start the `hwdriver` as a sub-process. |
+| 2_run_every_60sec | `cron` will execute `watchdog.sh` every 60 seconds, passing it the path to `domotic.pid`. |
+| 2.1_check_process | `watchdog.sh` checks if the `domotic` process still exists. If so, good, if not, see step 4. |
+| 3_self_check | If `loop()` did not execute 3 times, so typically after 60 ms., `domotic` will exit with code 1. This is checked in a separate thread. If this happens the system clearly cannot function anymore, so exiting is good.<br/>Note that if the `hwdriver` is gone or not responding anymore (e.g. memory leaks led to this) then `loop()` is blocked too, so this problem is also detected. |
+| 4_run_restart_if_dead | If `watchdog.sh` does not find a running `domotic` anymore it requests a restart via `domotic.sh`. |
+| 4.1_kill | To be sure, first the `hwdriver` is killed. |
+| 4.2_kill_and_start | Next, again to be sure, `domotic` is killed, and next started.|
+| 5_reboot_on_crash | If the Linux server crashes, the server is configured to automatically reboot (CPU board configuration). And back to 1.  |
+
+### 4.5.2. Rationale 
+
+The availability requirement of 99,99% is pretty high. Also, when I'm traveling for work, nobody can really intervene if something goes wrong. Therefore the approach taken is to detect malfunctioning and restart the system. 
+
+Lesson learned: keep it as simple as possible. When checking malfunctions - lik checking subprocesses, reads and writes between `domotic` and `hwdriver` which I tried - is complex, the overall availability decreases because the checking code does not work properly. Eventually I found out - thanks to logs - what the best way was to detect failure and act upon that. Turned out that if the `loop()` described earlier did not happen anymore, checked via a separate thread, the system needs restarting.
+
+### 4.5.3. Calculations
+
+First, we do not consider hardware permanent failures. For example, a hard disk that fails (happened twice already) needs either a few days of work (ordering a new HD takes a few days already) and my personal involvement, or a complex and expensive multi-computer and multi-IO setup. 
+
+The main requirement is that when the system hangs or crashes it recovers automatically without human intervention.
+
+The MTTR (Mean Time To Repair, similar to RTO or Restore Time Objective) consists of:
+1. `watchdog.sh` runs every 60 seconds, so 30 sec. on average
+2. `watchdog.sh` waits 10 seconds before restarting (_probably to avoid tcp issues_)
+3. restarting `domotic` and `hwdriver` takes max. 10 seconds
+
+So 50 seconds on average. With the 99.99% availability this means:
+$$ 99.99\% = {MTBF \over (MTBF + MTTR)} = {MTBF \over (MTBF + 50 sec)} $$
+
+Solving this: MTBF = 5.8 days minimal, which should be easily achievable.
+
+> Note: the actual state is written to disk every 5 seconds (default). This is ignored in the calculation - we loose maximally changes from last 5 seconds, and this is not crucial for users anyway.
+
+Let us now include hardware failures and software failures that cannot be repaired automatically.
+
+| component | est. availability | data |
+| -- | -- | -- |
+| disk | 99.995% | SSD EVO 870 has 1.5e6 hours MTTF and 72 hours estimated to repair (ordering and installing) |
+| cpu board | 99.74% | 15 years estimated MTTF and 14 days to order, wait delivery and repair; not it already works over 10 years without issue |
+| ubuntu | 99.998% | estimated 1 crash every 6 months, 5 minutes restart|
+| domotic-a | 99.99% | estimated; see higher, failure every 5.8 days |
+| domotic-b | 99,997% | estimated; system hangs, cannot detect failure and hence not restart; happens once a year, 15 minutes on average to solve (terminal or switch off-on)|
+
+So the overall availability would be:
+$$Av = Av_{ubuntu} \times Av_{disk} \times Av_{cpu_board} \times Av_{domotic-a} \times Av_{domotic-b}$$
+
+$$Av = 99.995\% \times 99.74\% \times 99.9985\% \times 99.99\% \times 99.997\% = 99.72%$$
+
+The limiting factor is clearly the CPU board, which can be mitigated by having a spare CPU board.
+
+**TODO actual numbers from logs.**
+
 -----------
 
-## Architectural Evaluation
+## 4.6. Architectural Evaluation
 
 So how does this design realizes the architectural requirements listed in the beginning of this document?
 
@@ -259,3 +475,6 @@ So how does this design realizes the architectural requirements listed in the be
 | Available |The domotic and hwdriver processes run as a service, have a health check and a cron job restarts when no heartbeat is detected (not yet described in any view). Also automated tests contribute here.  |
 | HW Change | See Layering View. |
 
+
+
+# 5. End of Document
