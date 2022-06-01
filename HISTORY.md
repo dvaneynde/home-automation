@@ -1,5 +1,6 @@
 # History
 
+
 ## v1 2005 - Siemens PLC
 
 PLC based solution, built by my brother in law Willem and my father - I was too busy in the major refactoring of our house. 
@@ -7,6 +8,7 @@ PLC based solution, built by my brother in law Willem and my father - I was too 
 ![PLC based](./images/domo-v1.png)
 
 Worked very well. But changing stuff - e.g. change the speed of dimming - was too difficult. So I decided for a complete different approach.
+
 
 ## v2 2010-2013 - Simple hardware & Java
 
@@ -36,9 +38,10 @@ Addition of a Web UI, written in the extremely interesting language [elm](https:
 
 Also wind- and sun sensors were implemented, and websockets to have a nice graph in the UI of the current wind and sun.
 
-## FUTURE v4 2021 - React, Streaming and AWS
 
-To keep my skills up to date v4 will be about:
+## Future Ideas
+
+Some ideas:
 - rewrite front end in React and Javascript
 - use Kafka to stream events between hw-driver, domotic, ui-server and analytics (e.g. electricity consumption, gas pricess going up!)
 - put the ui-server in aws so we can have strong authentication for the UI, and global access
