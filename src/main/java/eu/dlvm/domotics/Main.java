@@ -2,13 +2,13 @@ package eu.dlvm.domotics;
 
 import java.io.File;
 
-import eu.dlvm.iohardware.diamondsys.HardwareBuilder;
+import eu.dlvm.iohardware.diamondsys.DiamondsysHardwareBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.base.Domotic;
 import eu.dlvm.domotics.factories.XmlDomoticConfigurator;
-import eu.dlvm.iohardware.IHardwareIO;
+import eu.dlvm.iohardware.IHardware;
 
 /**
  * Domotic system main entry point.
@@ -21,7 +21,7 @@ public class Main {
 
     private static final Logger log = LoggerFactory.getLogger(Main.class);
 
-    public Domotic setupBlocksConfig(String cfgFilename, IHardwareIO hw) {
+    public Domotic setupBlocksConfig(String cfgFilename, IHardware hw) {
         try {
             Domotic domotic = Domotic.createSingleton(hw);
             XmlDomoticConfigurator.configure(cfgFilename, hw, domotic);
@@ -40,7 +40,7 @@ public class Main {
                 + "\n\tblocks cfg:\t" + blocksCfgFile + "\n\tprocess pid:\t" + pid);
 
         // See coments in IHardwareBuilder, this is not yet generic enough
-        IHardwareIO hw = (new HardwareBuilder()).build(hwCfgFile, hostname, port, looptime * 9 / 10, simulation);
+        IHardware hw = (new DiamondsysHardwareBuilder()).build(hwCfgFile, hostname, port, looptime * 9 / 10, simulation);
         Domotic dom = setupBlocksConfig(blocksCfgFile, hw);
 
         dom.runDomotic(looptime, path2Driver, htmlRootFile);

@@ -15,7 +15,6 @@ import eu.dlvm.domotics.Main;
 import eu.dlvm.iohardware.ChannelFault;
 import eu.dlvm.iohardware.ChannelType;
 import eu.dlvm.iohardware.diamondsys.factories.XmlHwConfigurator;
-import eu.dlvm.iohardware.diamondsys.messaging.HardwareIO;
 import eu.dlvm.iohardware.diamondsys.messaging.HwDriverTcpChannel;
 
 // TODO moet naar diamondsys sub-package, want gebruikt meer dan alleen IHardwareIO... Zie import statemens !
@@ -23,7 +22,7 @@ public class HwConsole {
 
 	static Logger log = LoggerFactory.getLogger(Main.class);
 
-	private HardwareIO hw;
+	private DiamondsysHardware hw;
 
 	final static String ESC = "\033[";
 	private Pattern patternHELP = Pattern.compile("h(?:elp)?\\s*", Pattern.CASE_INSENSITIVE);
@@ -59,7 +58,7 @@ public class HwConsole {
 		XmlHwConfigurator cfgr = new XmlHwConfigurator(cfgFile.toString());
 		// Om te testen, zonder hw: volgende twee lijnen vervangen door een pseudo mock IHardwareIO maken, met boards en channelMap.
 		HwDriverTcpChannel hdtc = new HwDriverTcpChannel(hostname, port, 1000);
-		hw = new HardwareIO(cfgr, hdtc);
+		hw = new DiamondsysHardware(cfgr, hdtc);
 		try {
 			hw.initialize();
 		} catch (ChannelFault e) {

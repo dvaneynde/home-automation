@@ -5,11 +5,11 @@ import org.junit.Before;
 import eu.dlvm.domotics.base.IDomoticBuilder;
 import eu.dlvm.domotics.blocks.BaseHardwareMock;
 import eu.dlvm.domotics.blocks.DomoticMock;
-import eu.dlvm.iohardware.IHardwareIO;
+import eu.dlvm.iohardware.IHardware;
 
 public class TestScreensBase {
 
-	public class Hardware extends BaseHardwareMock implements IHardwareIO {
+	public class Hardware extends BaseHardwareMock implements IHardware {
 		public boolean dnRelais;
 		public boolean upRelais;
 

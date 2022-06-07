@@ -1,6 +1,6 @@
 <span style="font-family:Arial; font-size:3em;">DIY Home Automation<br/>Software Architecture Document</span>
 
-> author: dirk@dlvmechanografie.eu<br/>date: 30/5/2022
+> author: dirk@dlvmechanografie.eu<br/>date: 8/6/2022
 
 
 **Table of Contents**
@@ -19,13 +19,14 @@
     - [4.3.2. Rationale](#432-rationale)
     - [4.3.3. Calculations](#433-calculations)
   - [4.4. Development View](#44-development-view)
-    - [4.4.1. Layers](#441-layers)
-    - [4.4.2. Modules](#442-modules)
+    - [4.4.1. Modules and Layers](#441-modules-and-layers)
+    - [4.4.2. Modules related to Configuration and Execution](#442-modules-related-to-configuration-and-execution)
+    - [4.4.3. Simple Example](#443-simple-example)
+    - [4.4.4. Alternatives for Execution](#444-alternatives-for-execution)
 - [5. Architectural Evaluation & Risks](#5-architectural-evaluation--risks)
   - [5.1. Evaluation](#51-evaluation)
   - [5.2. Risks & Mitigation](#52-risks--mitigation)
 - [6. End of Document](#6-end-of-document)
-
 
 # 1. Introduction
 
@@ -70,10 +71,10 @@ This lists these home automation requirements that drive the design.
 
 | ID | Category | Driver | 
 | -- | --- | --- |
-| CfgLayout | Configurable | Layout Configurability: Easy to configure when sensors or actuators are added, removed or changed. For example, assigning a switch to another lamp, changing name of a lamp, change the sun sensitivity for automatic screens, change when lights outside go on and off automatically. |
-| CfgUi | Configurable | A UI that is generated from the configuration. So no coding work whenever the configuration (see 1) changes. |
+| Layout Config | Configurability | Layout Configurability: Easy to configure when sensors or actuators are added, removed or changed. For example, assigning a switch to another lamp, changing name of a lamp, change the sun sensitivity for automatic screens, change when lights outside go on and off automatically. |
+| UI Config | Configurable | A UI that is generated from the configuration. So no coding work whenever the configuration (see 1) changes. |
 | BugFree | Reliability | Since I'm sometimes traveling and my wife or children lack knowledge on the system, it must have no bugs. |
-| HwSafe | Safety | Software must not destroy, short-circuit or overheat hardware like screen motors or lamps. Additional safeguards must avoid this. |
+| Safe | Safety | Software must not destroy, short-circuit or overheat hardware like screen motors or lamps. Additional safeguards must avoid this. |
 | Available | Availability | 99,99% uptime over 1 week, so 1.01 unavailability minutes a week. |
 | HwChange | Flexibility | Other hardware could be chosen than the current one, and that should have max. 1 man-month work impact. |
 | Explore | Flexibility | A test-bed for new software technologies and a showcase. So some degree of over-engineering is allowed ;-) |
@@ -363,64 +364,88 @@ The limiting factor is clearly the CPU board, which can be mitigated by having a
 
 ## 4.4. Development View
 
-### 4.4.1. Layers 
+### 4.4.1. Modules and Layers 
 
-For the IO Boards different hardware could be used from a different vendor. The system would then have to be adapted in the following places:
-1. Another `HwDriver` specific for the new hardware. Note that this program is as small as possible, not containing any business logic.
-2. A IO Boards specific version of `IHwApi` if needed.
-3. Update of Domotic hardware-access layer in `Domotic`. For Diamond Systems this is fully isolated in [diamondsys](../src/main/java/eu/dlvm/iohardware/diamondsys). Another hardware should implement a similar package. The rest of `Domotic` should need no change.
+There are 3 major layers:
+1. User Interfaces - Both the Web App and the physical switches / lamps etc.
+2. Home Automation Logic - All Java classes that contains all functional logic and that has the `main()` routine. It is hardware independent. It also defines a collection of interfaces, itself hardware independent, that hardware-dependent logic has to implement 
+3. Hardware Specific Logic - When another hardware platform is used than today's Diamond Systems I/O boards then only this layer should be replaced, and the upper two layers not.
 
-There are 4 major parts:
-1. UI
-2. eu.dlvm.domotics: namespace of all Java classes that are independent of the hardware, and contains all functional logic; this also has the `main()` routine
-3. eu.dlmv.iohardware: namespace of hardware specific classes, abstracted away behind 'IHardwareBuilder' and `IHardwareIO` interfaces.
-4. hwdriver is a small C executable
+Below figure shows these layers and some of the modules relevant to the layers. 
 
-Note that parts 2 and 3 are inside one Java executable (.jar file).
+Legend: see UML Class Diagrams, with these specifics:
+- &lt;&lt;layer&gt;&gt; - Package defining a layer.
+- &lt;&lt;exe&gt;&gt; - Executable, basically contains a `main()` routine.
 
 ```plantuml
-package ui <<elm>> {
-
+@startuml
+package User_Interfaces <<layer>> {
+    package WebUI <<elm>>
+    package SwitchesAndLampsEtc <<real-world>>
 }
-package domotic <<java exe>> {
-    interface RestAPI
-    ui -> RestAPI : HTTP
-    package eu.dlvm.domotics {
-        file DomoticConfig <<xml>>   
-    }
-    RestAPI <|.. eu.dlvm.domotics
-    interface IHardwareBuilder
-    interface IHardwareIO
-    package eu.dlvm.iohardware {
+
+package Home_Automation_Logic <<layer>> {
+        package eu.dlvm.domotics <<java exe>> {
+            interface RestAPI
+            file DomoticConfig <<xml>>   
+        }
+
+        package eu.dlvm.iohardware <<java>>{
+            interface IHardwareBuilder
+            interface IHardware
+            interface IHardwareReader
+            interface IHardwareWriter
+            IHardware <|-- IHardwareReader
+            IHardware <|-- IHardwareWriter
+        }
+
+        eu.dlvm.domotics ..> IHardwareBuilder
+        eu.dlvm.domotics ..> IHardware
+}
+
+WebUI ..> RestAPI
+
+package Hardware_Specific_Logic <<layer>> {
+    package eu.dlvm.iohardware.diamondsys as ds <<java>> {
+        IHardware <|.. DiamondsysHardware
+        IHardwareReader <|.. DiamondsysHardware
+        IHardwareWriter <|.. DiamondsysHardware
+        IHardwareBuilder <|.. DiamondsysHardwareBuilder
         file DiamondBoardsConfig <<xml>>
-
+        DiamondsysHardware -[hidden]- DiamondBoardsConfig
     }
-    eu.dlvm.domotics --> IHardwareBuilder
-    eu.dlvm.domotics --> IHardwareIO
-    IHardwareBuilder <|.. eu.dlvm.iohardware
-    IHardwareIO <|.. eu.dlvm.iohardware
-}
-package hwdriver <<c exe>>{
-
+    interface ReadWriteProtocol <<txt/tcp>>
+    package HwDriver <<C exe>>
+    ds ..> ReadWriteProtocol
+    HwDriver ..> ReadWriteProtocol
 }
 
-eu.dlvm.iohardware -> hwdriver : TCP
+SwitchesAndLampsEtc ..> HwDriver : via-IO-boards
+@enduml
 ```
 
-Interface `IHardwareIO` includes interfaces `IHardwareReader` and `IHardwareWriter`. 
+| element | description |
+|---|---|
+| eu.dlvm.domotics |  Main java program, the executable. All logic is hardware independent. It offers all its functionality, including UI specific information, via `RestAPI`. The actual configuration of switches, lamps, timers, dimmers etc. and how they should behave is defined in a hardware independent way in `DomoticConfig` XML file. |
+| eu.dlvm.iohardware | Imposes a generic interface onto hardware specific logic. Note that these interfaces are still part of the hardware-independent layer. <br/> Interface `IHardware` has an operation to start and stop the hardware, and includes interfaces `IHardwareReader` and `IHardwareWriter` to read inputs and write outputs respectively.<br/> Interface `IHardwareBuilder` is used at initialization to get an instance of `IHardware`. |
+| eu.dlvm.iohardware.diamondsys | Java classes `DiamondsysHardware` and `DiamondsysHardwareBuilder`realize the interfaces from `eu.dlvm.iohardware` for Diamond Systems specific boards. It also has an XML configuration file `DiamondBoardsConfig` that links the generic I/O addresses used in the higher layer to specific boards (via memory address) and board-specific input or output numbers.|
+| ReadWriteProtocol | This is a description of the text based and TCP/IP based protocol to communicate between the Java code and the HwDriver. It is specified as comments in specific `eu.dlvm.iohardware.diamondsys` classes and in the `HwDriver` code. |
+| HwDriver | C based program. See higher for its description. |
 
-Interface `IHardwareBuilder` is used at initialization to get an instance of `IHardwareIO`. The idea is to be hardware independent. This is not fully implemented yet, for that to happen:
-1. Hardware specific code must in separate .jar file, loaded at startup by domotic system.
-2. Parameters for the hardware must be passed as opaque key-value lists to the domotic command line and just passed on as a list.
+> **To Improve**:  `IHardwareWriter` and `IHardwareReader` should not extend `IHardware` but instead should be members of it (delegation).
 
-But since we do not need this (yet? ever?) it has not been implemented.
+Suppose another hardware is used than Diamond Systems, what needs to change?
+1. Another Java implementation of the interfaces in `eu.dlvm.iohardware`.
+2. Depending on the hardware and its driver, another `HwDriver` is needed or perhaps another solution (who knows, that hardware might include a Java driver).
+3. Another configuration means replacing `DiamondBoardsConfig`,
 
-Note that hwdriver is also specific to the hardware we've chosen.
+That should be it. Often a new kind of hardware might impact the interfaces in `eu.dlvm.iohardware` making them more generic so that they can handle more different types of hardware. But today's separation already makes it more easy.
 
+### 4.4.2. Modules related to Configuration and Execution
 
-### 4.4.2. Modules
+The main classes related to a specific configuration of a home automation system, and how it is executed, are depicted below.
 
-The main classes of the system are depicted below.
+> Note: it may be instructive to read this together - back and forth - with the example in the next chapter.
 
 ```plantuml
 @startuml
@@ -438,17 +463,24 @@ interface IEventListener {
     void onEvent(Block source, EventType event)
 }
 
-class Sensor  {
+abstract class Sensor  {
     string channel
 }
 
-class Controller {
+abstract class Controller {
 
 }
 
-class Actuator {
+abstract class Actuator {
     string channel
 }
+
+class Connector {
+    fromEvent
+    toEvent
+}
+IEventListener <|.. Connector
+IEventListener "1" <-- Connector
 
 interface IHardwareReader {
     void refreshInputs()
@@ -484,14 +516,15 @@ IEventListener "*" <-- Block  : listeners <
 @enduml
 ```
 
-|class | description |
+| element | description |
 |---|---|
 | Block | Supertype that just has a unique name and information for the UI (1). |
 | Sensor | Sensors sense input from hardware. They have at least one input channel, sometimes more. They transform simple hardware inputs into higher level events, such as DoubleClick or SingleClick or WindHigh.<br/> Only Sensors can read data from hardware. <br/>Sensors send events to Controllers or directly to Actuators.| 
 | Actuator | Actuators actuate output. They have at least one output channel like a switch, or multiple like up/down for screens. <br/>Only Actuators can change outputs of hardware. <br/> Actuators do not send events to other Blocks.
 | Controller | Controller typically contain functionally complex logic.<br/>Controllers have no access to hardware.<br/>Controllers send events to  Actuators or other Controllers. |
+| IEventListener | Blocks can send events o other Blocks, e.g. when a Switch is pressed (Sensor) it sends an event to a Lamp (Actuator) so it is switched on or off.<br/>For safety event propagation is limited (see previous rows, from Sensor to Controller to Actuator, never reverse) and state changes can only happen in `loop()`|
+| Connector | Used between Blocks to convert one event-type into another. Is fully stateless, and very lightweight. <br/>E.g. in earlier Switch/Lamp example a Switch sends `SingleClicked` events and Lamps expect `Toggle` events. So a `Connector` is placed in between to convert this event.
 | IDomoticLoop | All Blocks implement the `loop()` function called from `loopOnce()` described later. State changes of a Block, like 'on' or 'off' in an Actuator, must only occur from within a `loop()` function (not from an event). |
-| IEventListener | Blocks can send events to other Blocks, e.g. when a switch is pressed (Sensor) a lamp is switched on (Actuator). For safety event propagation is limited (see previous rows, from Sensor to Controller (optional) to Actuator, never reverse) and state changes can only happen in `loop()`|
 | IHardwareReader IHardwareWriter | Sensors and Actuators respectively read from and write to the hardware via an implementation of this interface. This abstracts away the actual hardware used.|
 
 (1) The UI is completely dynamic, as it is built up from information in the configuration files. So no programming required when domotic configuration changes.
@@ -532,6 +565,116 @@ The separation of event notification and handling its' state changes in `loop()`
 
 Safety is further improved by separating hardware access for Sensor, Controller and Actuator, and the fact that Sensors cannot be the target of events.
 
+### 4.4.3. Simple Example
+
+Suppose the `DomoticConfig.xml` file contains the following configuration.
+```xml
+	<switch name="SchakLichtInkom" />
+	<lamp name="LichtInkom" desc="Inkom" autoOffSec="300" blink="true">
+		<toggle src="SchakLichtInkom" />
+	</lamp>
+```
+Functionally this means:
+- There is a switch at the house's entrance hall.
+- There is also a lamp, unsurprisingly, that toggles between on and off depdengin on the switch.
+- The lamp turns off automatically after 300 seconds - kids forget to switch it off. The lamp will shortly blink before going off, so you can quickly toggle the switch to prevent that - typically you're chatting at the door with your neighbour.
+
+So how does this relate to the structure explained in the previous section? First let's see how Lamp and Switch fit in. Easy - but check also the other elements in previous section that are inherited. I included some of the methods we'll need later.
+
+```plantuml
+@startuml
+abstract class Sensor  {
+    string channel
+}
+
+abstract class Actuator {
+    string channel
+}
+
+class Switch {
+    void loop(long timeMs)
+}
+
+class Lamp {
+    void loop(long timeMs)
+    void onEvent(Block source, EventType event)
+}
+
+Sensor <|-- Switch
+Actuator <|-- Lamp
+@enduml
+```
+
+Concretely the following object diagram translates the configuration. Note the listener link, the Lamp listens on events from the Switch.
+
+```plantuml
+@startuml
+object "SchakLichtInkom : Switch" as s
+s : name = SchakLichtInkom
+s : listener = c1
+object "c1:Connector" as c
+c : fromEvent = SingleClick
+c : toEvent = Toggle
+c : listener = LichtInkom
+object "LichtInkom : Lamp" as l
+l : name = LichtInkom
+l : autoOffSec = 300
+l : blink = true
+s - c : listener >
+c - l : listener >
+@enduml
+```
+
+Next let's see at execution. Suppose the lamp is Off and a user just clicked the switch.
+
+```plantuml
+@startuml
+control ": Oscillator" as o
+participant ": IHardware" as h
+participant "SchakLichtInkom : Switch" as s
+participant "c1 : Connector" as c
+participant "LichtInkom : Lamp" as l
+o --> o : loopOnce()
+note left: every 20 ms.
+activate o
+o --> h : refreshInputs()
+note right: all inputs are read and buffered
+o --> s : loop(100)
+activate s
+h <-- s : readDigitalInput()
+note right : assume Switch detected single-click (using state machine)
+s -> c : notify("SingleClick")
+c -> l : notify("Toggle")
+activate l
+l -> l : remember 'Toggle' event
+deactivate l
+deactivate s
+
+o --> l : loop(100)
+activate l
+l -> l : setState(on)
+h <-- l : writeDigitalOutput()
+deactivate l
+
+o --> h : refreshOutputs()
+note right: outputs were buffered and now send to IO boards
+deactivate o
+@enduml
+```
+
+More complex configurations exist, using multiple inputs or `Controller`s, but this gives the general flow.
+
+
+
+### 4.4.4. Alternatives for Execution
+A pure reactive approach was first considered, see [Wikipedia's article on Reactive Programming](https://en.wikipedia.org/wiki/Reactive_programming#Change_propagation_algorithms). 
+
+But since we are dealing with real lamps, screen motors and 230V, safety is important. The downsides of Reactive Programming - see "Implementation challenges in reactive programming" in the article - I went for a more hybrid approach:
+- Events are still used, but they are just 'noted down' in the receiver.
+- Strict separation between `Sensor`, `Controller` and `Actuator`.
+- Handling the events is done during `loop()` which is first done for all `Sensor`s, then `Controller`s and only then `Actuator`s.
+
+
 
 # 5. Architectural Evaluation & Risks
 
@@ -540,9 +683,9 @@ So how does this design realizes the architectural requirements listed in the be
 
 | Driver | Evaluation |
 | --- | --- |
-| Layout Configurability | The DomoticConfig XML file fully describes the layout, and is processed at re-start. See Deployment View and Layering View. |
-| UI Configurability | The DomoticConfig XML file includes the UI configuration. _Not yet described in design._ |
-| Reliable | Fully automated regression tests are provided. The ability to simulate time is fundamental here.<br/>Also a sound approach to how events are handled and state changes are separated from the events is fundamental. These concepts are explained in Class View.|
+| Layout Config | The DomoticConfig XML file fully describes the layout, and is processed at re-start. See Deployment View and Layering View. |
+| UI Config | The DomoticConfig XML file includes the UI configuration. _Not yet described in design._ |
+| BugFree | Fully automated regression tests are provided. The ability to simulate time is fundamental here.<br/>Also a sound approach to how events are handled and state changes are separated from the events is fundamental. These concepts are explained in Class View.|
 | Safe | Only Actuators can change outputs so the issues is localized in specific code, improving safety by not scattering this functionality around. Further state changes are localized in Actuator's `loop()` and outputs must only change as a consequence of a state change, further localizing this functionality. Lastly in the Actuator's `loop()` a safeguard must be implemented ensuring that an output does not change too often, e.g. max 1 time per second.|
 | Available |The domotic and hwdriver processes run as a service, have a health check and a cron job restarts when no heartbeat is detected (not yet described in any view). Also automated tests contribute here.  |
 | HW Change | See Layering View. |

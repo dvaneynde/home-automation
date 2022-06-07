@@ -59,12 +59,13 @@ $ java -jar domotica-1.0-jar-with-dependencies.jar -Dlogback.configurationFile=s
 
 # Outstanding TODOs
 
-1. Listen on port 80, not 8080.
-2. REST API, herwerken, b.v. POST etc.
-3. `systemd` ipv `init.d`.
-4. Health check via REST api, bovenop interne check op loop().
-5. HardwareIO heeft al exit 1 !!!
-6. xml resources in src/main/resources, as default
-7. logging config in src/main/resources, as default
-8. logging.properties ook op bordje, en -D bij domotic.sh
+1. `IHardwareWriter` and `IHardwareReader` should not extend `IHardware` but instead should be members of it (delegation).
+2. Listen on port 80, not 8080.
+3. REST API, herwerken, b.v. POST etc.
+4. `systemd` ipv `init.d`.
+5. Health check via REST api, bovenop interne check op loop().
+6. HardwareIO heeft al exit 1 !!!
+7. xml resources in src/main/resources, as default
+8. logging config in src/main/resources, as default
+9. logging.properties ook op bordje, en -D bij domotic.sh
 

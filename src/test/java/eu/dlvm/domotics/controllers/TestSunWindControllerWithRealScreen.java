@@ -8,11 +8,11 @@ import eu.dlvm.domotics.actuators.Screen;
 import eu.dlvm.domotics.blocks.BaseHardwareMock;
 import eu.dlvm.domotics.blocks.DomoticMock;
 import eu.dlvm.domotics.events.EventType;
-import eu.dlvm.iohardware.IHardwareIO;
+import eu.dlvm.iohardware.IHardware;
 
 public class TestSunWindControllerWithRealScreen {
 
-	public class HardwareMock extends BaseHardwareMock implements IHardwareIO {
+	public class HardwareMock extends BaseHardwareMock implements IHardware {
 		public boolean dnRelais;
 		public boolean upRelais;
 

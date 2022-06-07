@@ -11,11 +11,11 @@ import eu.dlvm.domotics.blocks.BaseHardwareMock;
 import eu.dlvm.domotics.blocks.DomoticMock;
 import eu.dlvm.domotics.events.EventType;
 import eu.dlvm.domotics.events.IEventListener;
-import eu.dlvm.iohardware.IHardwareIO;
+import eu.dlvm.iohardware.IHardware;
 
 public class TestLightSensor implements IEventListener {
 
-	public class Hardware extends BaseHardwareMock implements IHardwareIO {
+	public class Hardware extends BaseHardwareMock implements IHardware {
 		public int level;
 
 		@Override

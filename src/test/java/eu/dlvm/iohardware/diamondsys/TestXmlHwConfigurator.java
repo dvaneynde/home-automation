@@ -10,9 +10,8 @@ import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.HwDriverChannelMock;
 import eu.dlvm.iohardware.ChannelType;
-import eu.dlvm.iohardware.IHardwareIO;
+import eu.dlvm.iohardware.IHardware;
 import eu.dlvm.iohardware.diamondsys.factories.XmlHwConfigurator;
-import eu.dlvm.iohardware.diamondsys.messaging.HardwareIO;
 
 public class TestXmlHwConfigurator {
 
@@ -122,7 +121,7 @@ public class TestXmlHwConfigurator {
 		// Hardware
 		HwDriverChannelMock drv = new HwDriverChannelMock();
 		XmlHwConfigurator xhc = new XmlHwConfigurator("src/test/resources/TestDiamondHwConfig2.xml");
-		IHardwareIO hw = new HardwareIO(xhc, drv);
+		IHardware hw = new DiamondsysHardware(xhc, drv);
 
 		drv.responseFromDriverToUse0 = "INP_O 0x310 127\nINP_D 0x400 - 0 0\nINP_D 0x410 46 - -\nINP_D 0x420 255 0 0";
 		hw.refreshInputs();
@@ -136,7 +135,7 @@ public class TestXmlHwConfigurator {
 		// Hardware
 		HwDriverChannelMock drv = new HwDriverChannelMock();
 		XmlHwConfigurator xhc = new XmlHwConfigurator("src/test/resources/TestDiamondHwConfig2.xml");
-		IHardwareIO hw = new HardwareIO(xhc, drv);
+		IHardware hw = new DiamondsysHardware(xhc, drv);
 
 		drv.responseFromDriverToUse0 = "";
 		hw.refreshOutputs();

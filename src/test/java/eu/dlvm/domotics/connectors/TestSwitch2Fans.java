@@ -14,7 +14,7 @@ import eu.dlvm.domotics.base.RememberedOutput;
 import eu.dlvm.domotics.blocks.BaseHardwareMock;
 import eu.dlvm.domotics.events.EventType;
 import eu.dlvm.domotics.sensors.Switch;
-import eu.dlvm.iohardware.IHardwareIO;
+import eu.dlvm.iohardware.IHardware;
 
 public class TestSwitch2Fans {
 
@@ -23,7 +23,7 @@ public class TestSwitch2Fans {
 	private final int FAN1_OUT = 3;
 	private final int FAN2_OUT = 4;
 
-	public static class TestHardware extends BaseHardwareMock implements IHardwareIO {
+	public static class TestHardware extends BaseHardwareMock implements IHardware {
 		private Map<String, Boolean> inputs = new HashMap<String, Boolean>();
 		private Map<String, Boolean> outputs = new HashMap<String, Boolean>();
 

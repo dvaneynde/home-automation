@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 import eu.dlvm.domotics.DriverMonitor;
 import eu.dlvm.domotics.server.ServiceServer;
 import eu.dlvm.iohardware.ChannelFault;
-import eu.dlvm.iohardware.IHardwareIO;
+import eu.dlvm.iohardware.IHardware;
 
 /**
  * 
@@ -22,7 +22,7 @@ import eu.dlvm.iohardware.IHardwareIO;
  * <p>
  * Overview of methods:
  * <ol>
- * <li>{@link #createSingleton(IHardwareIO)} creates singleton and accepts
+ * <li>{@link #createSingleton(IHardware)} creates singleton and accepts
  * hardware driver connection</li>
  * <li>addSensor etc. methods (TODO should be addBlock), to be called first, to
  * construct the domotic system</li>
@@ -59,7 +59,7 @@ public class Domotic implements IDomoticBuilder, IStateChangeRegistrar {
 	private int nrNoResponsesFromDriver;
 
 	// protected access for test cases only
-	protected IHardwareIO hw = null;
+	protected IHardware hw = null;
 	protected List<Sensor> sensors = new ArrayList<Sensor>(64);
 	protected List<Actuator> actuators = new ArrayList<Actuator>(64);
 	protected List<Controller> controllers = new ArrayList<Controller>(64);
@@ -72,7 +72,7 @@ public class Domotic implements IDomoticBuilder, IStateChangeRegistrar {
 		return singleton;
 	}
 
-	public static synchronized Domotic createSingleton(IHardwareIO hw) {
+	public static synchronized Domotic createSingleton(IHardware hw) {
 		singleton = new Domotic();
 		singleton.setHw(hw);
 		return singleton;
@@ -84,11 +84,11 @@ public class Domotic implements IDomoticBuilder, IStateChangeRegistrar {
 		stateChangeListeners = new LinkedList<>();
 	}
 
-	private void setHw(IHardwareIO hw) {
+	private void setHw(IHardware hw) {
 		this.hw = hw;
 	}
 
-	public IHardwareIO getHw() {
+	public IHardware getHw() {
 		return hw;
 	}
 
@@ -175,7 +175,7 @@ public class Domotic implements IDomoticBuilder, IStateChangeRegistrar {
 	 * Specifically, hardware outputs are set correctly, and UI blocks are
 	 * gathered from allready registered blocks.
 	 * <p>
-	 * Must be called before {@link #loopOnce(long)} or {@link IHardwareIO#stop()}.
+	 * Must be called before {@link #loopOnce(long)} or {@link IHardware#stop()}.
 	 * 
 	 * @param prevOuts
 	 *            Map of actuator names and previous outputs. If not used must
@@ -347,14 +347,14 @@ public class Domotic implements IDomoticBuilder, IStateChangeRegistrar {
 	/**
 	 * This is what happens:
 	 * <ol>
-	 * <li>{@link IHardwareIO#refreshInputs()} is called, so that hardware layer
+	 * <li>{@link IHardware#refreshInputs()} is called, so that hardware layer
 	 * inputs are refreshed.</li>
 	 * <li>All registered Sensors have their {@link Sensor#loop(long)} run to read
 	 * input and/or check timeouts etc. This typically triggers Actuators. Same
 	 * happens for Controllers.</li>
 	 * <li>Then any registered Actuators have their {@link Actuator#loop(long)}
 	 * executed, so they can update hardware output state.</li>
-	 * <li>{@link IHardwareIO#refreshOutputs()} is called, so that hardware
+	 * <li>{@link IHardware#refreshOutputs()} is called, so that hardware
 	 * layer outputs are updated.</li>
 	 * <li>Finally any {@link IStateChangedListener}s are called to update model
 	 * state of connected client UIs.

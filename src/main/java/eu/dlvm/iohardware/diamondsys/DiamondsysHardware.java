@@ -1,29 +1,27 @@
-package eu.dlvm.iohardware.diamondsys.messaging;
+package eu.dlvm.iohardware.diamondsys;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import eu.dlvm.iohardware.IHardwareReader;
-import eu.dlvm.iohardware.IHardwareWriter;
 import org.slf4j.Logger; import org.slf4j.LoggerFactory;
 
 import eu.dlvm.iohardware.ChannelFault;
-import eu.dlvm.iohardware.IHardwareIO;
-import eu.dlvm.iohardware.diamondsys.Board;
-import eu.dlvm.iohardware.diamondsys.ChannelMap;
-import eu.dlvm.iohardware.diamondsys.FysCh;
+import eu.dlvm.iohardware.IHardware;
 import eu.dlvm.iohardware.diamondsys.factories.IBoardFactory;
+import eu.dlvm.iohardware.diamondsys.messaging.GeneralMsg;
+import eu.dlvm.iohardware.diamondsys.messaging.IBoardMessaging;
+import eu.dlvm.iohardware.diamondsys.messaging.IHwDriverChannel;
 import eu.dlvm.iohardware.diamondsys.messaging.IHwDriverChannel.Reason;
 
 /**
- * Diamond-systems specific implementation of {@link IHardwareIO}.
+ * Diamond-systems specific implementation of {@link IHardware}.
  * 
  * @author dirk vaneynde
  */
-public class HardwareIO implements IHardwareIO {
+public class DiamondsysHardware implements IHardware {
 
-	static Logger log = LoggerFactory.getLogger(HardwareIO.class);
+	static Logger log = LoggerFactory.getLogger(DiamondsysHardware.class);
 
 	private List<Board> boards;
 	private ChannelMap channelMap; // logical channel --> physical channel
@@ -36,7 +34,7 @@ public class HardwareIO implements IHardwareIO {
 	 * @param bf
 	 * @param hwDriverChannel
 	 */
-	public HardwareIO(IBoardFactory bf, IHwDriverChannel hwDriverChannel) {
+	public DiamondsysHardware(IBoardFactory bf, IHwDriverChannel hwDriverChannel) {
 		boards = new ArrayList<Board>();
 		channelMap = new ChannelMap();
 		bf.configure(boards, channelMap);

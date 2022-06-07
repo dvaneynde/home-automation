@@ -16,10 +16,10 @@ import eu.dlvm.domotics.sensors.DimmerSwitch;
 import eu.dlvm.iohardware.ChannelType;
 import eu.dlvm.iohardware.diamondsys.Board;
 import eu.dlvm.iohardware.diamondsys.ChannelMap;
+import eu.dlvm.iohardware.diamondsys.DiamondsysHardware;
 import eu.dlvm.iohardware.diamondsys.FysCh;
 import eu.dlvm.iohardware.diamondsys.factories.IBoardFactory;
 import eu.dlvm.iohardware.diamondsys.messaging.DmmatBoardWithMsg;
-import eu.dlvm.iohardware.diamondsys.messaging.HardwareIO;
 import eu.dlvm.iohardware.diamondsys.messaging.OpalmmBoardWithMsg;
 
 public class TestEnd2EndDimmer {
@@ -30,7 +30,7 @@ public class TestEnd2EndDimmer {
 	public static final String SW_UP_1 = "1";
 	public static final String DIMMER1 = "100";
 
-	HardwareIO hw;
+	DiamondsysHardware hw;
 	HwDriverChannelMock drv;
 	private long current;
 
@@ -54,7 +54,7 @@ public class TestEnd2EndDimmer {
 		current = 0L;
 		// Hardware
 		drv = new HwDriverChannelMock();
-		hw = new HardwareIO(new TestConfigurator(), drv);
+		hw = new DiamondsysHardware(new TestConfigurator(), drv);
 		// Domotic
 		dom = Domotic.createSingleton(hw);
 		dsw = new DimmerSwitch("dsw1", "Dimmer Switches 1", SW_DN_1, SW_UP_1, hw, dom);

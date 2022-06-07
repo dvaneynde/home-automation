@@ -16,7 +16,7 @@ import eu.dlvm.domotics.blocks.BaseHardwareMock;
 import eu.dlvm.domotics.events.EventType;
 import eu.dlvm.domotics.sensors.DimmerSwitch;
 import eu.dlvm.domotics.sensors.Switch;
-import eu.dlvm.iohardware.IHardwareIO;
+import eu.dlvm.iohardware.IHardware;
 
 public class TestSwitchBoardDimmers {
 
@@ -32,7 +32,7 @@ public class TestSwitchBoardDimmers {
 	public static final String DIMMER1 = Integer.toString(10);
 	public static final String DIMMER2 = Integer.toString(11);
 
-	public static class Hardware extends BaseHardwareMock implements IHardwareIO {
+	public static class Hardware extends BaseHardwareMock implements IHardware {
 		private Map<String, Boolean> inputs = new HashMap<String, Boolean>();
 		private Map<String, Integer> outputs = new HashMap<String, Integer>();
 

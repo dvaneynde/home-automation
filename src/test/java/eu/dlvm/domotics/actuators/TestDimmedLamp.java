@@ -6,14 +6,14 @@ import org.junit.Assert;
 
 import eu.dlvm.domotics.blocks.BaseHardwareMock;
 import eu.dlvm.domotics.blocks.DomoticMock;
-import eu.dlvm.iohardware.IHardwareIO;
+import eu.dlvm.iohardware.IHardware;
 
 // TODO werkt met 50ms sample, maar niet meer met 20ms sample; daarom loop() zoals bij WindSensor test.
 public class TestDimmedLamp {
 
 	public static int MAX_OUT = 32;
 
-	public class Hardware extends BaseHardwareMock implements IHardwareIO {
+	public class Hardware extends BaseHardwareMock implements IHardware {
 		public int level;
 
 		@Override

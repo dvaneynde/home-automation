@@ -7,12 +7,12 @@ import eu.dlvm.domotics.blocks.BaseHardwareMock;
 import eu.dlvm.domotics.blocks.DomoticMock;
 import eu.dlvm.domotics.connectors.Connector;
 import eu.dlvm.domotics.events.EventType;
-import eu.dlvm.iohardware.IHardwareIO;
+import eu.dlvm.iohardware.IHardware;
 import org.junit.Assert;
 
 public class TestFanWithLamp {
 
-	public class Hardware extends BaseHardwareMock implements IHardwareIO {
+	public class Hardware extends BaseHardwareMock implements IHardware {
 		public boolean lampStatus;
 		public boolean fanStatus;
 

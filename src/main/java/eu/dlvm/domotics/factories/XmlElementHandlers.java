@@ -6,7 +6,7 @@ import java.util.Map;
 
 import javax.xml.bind.DatatypeConverter;
 
-import eu.dlvm.iohardware.IHardwareIO;
+import eu.dlvm.iohardware.IHardware;
 import eu.dlvm.iohardware.IHardwareReader;
 import eu.dlvm.iohardware.IHardwareWriter;
 import org.slf4j.Logger;
@@ -42,7 +42,7 @@ class XmlElementHandlers extends DefaultHandler2 {
 	static Logger logger = LoggerFactory.getLogger(XmlElementHandlers.class);
 
 	private IDomoticBuilder builder;
-	private IHardwareIO hw;
+	private IHardware hw;
 	private int depth = -1; // -1 because domotic startelement makes it start
 							// and that is really 0
 	private Block currentBlock;
@@ -63,7 +63,7 @@ class XmlElementHandlers extends DefaultHandler2 {
         return hw;
     }
 
-    public XmlElementHandlers(IDomoticBuilder builder, IHardwareIO hardware) {
+    public XmlElementHandlers(IDomoticBuilder builder, IHardware hardware) {
 		super();
 		this.builder = builder;
 		this.hw = hardware;

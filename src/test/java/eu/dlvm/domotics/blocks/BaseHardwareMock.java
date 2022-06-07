@@ -3,10 +3,10 @@ package eu.dlvm.domotics.blocks;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import eu.dlvm.iohardware.IHardwareIO;
+import eu.dlvm.iohardware.IHardware;
 import org.junit.Assert;
 
-public abstract class BaseHardwareMock implements IHardwareIO {
+public abstract class BaseHardwareMock implements IHardware {
 
 	static Logger log = LoggerFactory.getLogger(BaseHardwareMock.class);
 

@@ -9,11 +9,11 @@ import eu.dlvm.domotics.blocks.BaseHardwareMock;
 import eu.dlvm.domotics.blocks.DomoticMock;
 import eu.dlvm.domotics.events.EventType;
 import eu.dlvm.domotics.events.IEventListener;
-import eu.dlvm.iohardware.IHardwareIO;
+import eu.dlvm.iohardware.IHardware;
 
 public class TestSwitch {
 
-	public class Hardware extends BaseHardwareMock implements IHardwareIO {
+	public class Hardware extends BaseHardwareMock implements IHardware {
 		public boolean inval;
 
 		@Override

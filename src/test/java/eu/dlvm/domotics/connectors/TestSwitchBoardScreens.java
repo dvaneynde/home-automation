@@ -13,7 +13,7 @@ import eu.dlvm.domotics.base.RememberedOutput;
 import eu.dlvm.domotics.blocks.BaseHardwareMock;
 import eu.dlvm.domotics.events.EventType;
 import eu.dlvm.domotics.sensors.Switch;
-import eu.dlvm.iohardware.IHardwareIO;
+import eu.dlvm.iohardware.IHardware;
 
 /**
  * Tests with Switches connected to Screens with Connector.
@@ -35,7 +35,7 @@ public class TestSwitchBoardScreens {
 	public static final int REL_DN_2 = 12;
 	public static final int REL_UP_2 = 13;
 
-	public class Hardware extends BaseHardwareMock implements IHardwareIO {
+	public class Hardware extends BaseHardwareMock implements IHardware {
 		private Map<String, Boolean> inputs = new HashMap<String, Boolean>();
 		private Map<String, Boolean> outputs = new HashMap<String, Boolean>();
 

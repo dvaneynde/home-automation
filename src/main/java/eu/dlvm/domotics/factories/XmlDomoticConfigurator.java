@@ -7,7 +7,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import eu.dlvm.iohardware.IHardwareIO;
+import eu.dlvm.iohardware.IHardware;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -20,7 +20,7 @@ public class XmlDomoticConfigurator {
 
 	private static Logger logger = LoggerFactory.getLogger(XmlDomoticConfigurator.class);
 
-	public static void configure(String cfgFilepath,  IHardwareIO hardware, IDomoticBuilder builder) {
+	public static void configure(String cfgFilepath,  IHardware hardware, IDomoticBuilder builder) {
 		try {
 			File cfgFile = convertCfgFilepath(cfgFilepath);
 

@@ -19,10 +19,10 @@ import eu.dlvm.domotics.blocks.BaseHardwareMock;
 import eu.dlvm.domotics.controllers.Timer;
 import eu.dlvm.domotics.events.EventType;
 import eu.dlvm.domotics.sensors.Switch;
-import eu.dlvm.iohardware.IHardwareIO;
+import eu.dlvm.iohardware.IHardware;
 
 public class TestSwitchOrTimer2Lamp {
-	public static class Hardware extends BaseHardwareMock implements IHardwareIO {
+	public static class Hardware extends BaseHardwareMock implements IHardware {
 		private Map<String, Boolean> inputs = new HashMap<String, Boolean>();
 		private Map<String, Boolean> outputs = new HashMap<String, Boolean>();
 

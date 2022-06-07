@@ -27,7 +27,7 @@ package eu.dlvm.iohardware;
  * @author Dirk Vaneynde
  */
 
-public interface IHardwareIO extends IHardwareReader, IHardwareWriter {
+public interface IHardware extends IHardwareReader, IHardwareWriter {
 
 	/**
 	 * Connect to hardware driver and initialize hardware.

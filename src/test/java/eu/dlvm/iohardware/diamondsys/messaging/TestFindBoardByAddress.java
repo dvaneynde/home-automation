@@ -9,6 +9,7 @@ import org.junit.Test;
 
 import eu.dlvm.iohardware.diamondsys.Board;
 import eu.dlvm.iohardware.diamondsys.ChannelMap;
+import eu.dlvm.iohardware.diamondsys.DiamondsysHardware;
 import eu.dlvm.iohardware.diamondsys.factories.IBoardFactory;
 
 public class TestFindBoardByAddress {
@@ -45,7 +46,7 @@ public class TestFindBoardByAddress {
     @Test
     public void test() {
         BoardsFactory bf = new BoardsFactory();
-        HardwareIO hw = new HardwareIO(bf, new HwDriverChannelMock());
+        DiamondsysHardware hw = new DiamondsysHardware(bf, new HwDriverChannelMock());
 
         assertEquals(null, hw.findBoardBy(0x26f));
         assertEquals(0x270, hw.findBoardBy(0x270).getAddress());

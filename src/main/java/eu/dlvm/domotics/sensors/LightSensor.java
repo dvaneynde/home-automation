@@ -11,11 +11,11 @@ import eu.dlvm.domotics.base.Sensor;
 import eu.dlvm.domotics.events.EventType;
 import eu.dlvm.domotics.service.uidata.UiInfo;
 import eu.dlvm.domotics.service.uidata.UiInfoLevel;
-import eu.dlvm.iohardware.IHardwareIO;
+import eu.dlvm.iohardware.IHardware;
 
 /**
  * Measures light via analog input (via
- * {@link IHardwareIO#readAnalogInput(String)}) .
+ * {@link IHardware#readAnalogInput(String)}) .
  * <p>
  * If this input value is higher than {@link #getThreshold()} for
  * {@link #getLowToHighDelaySec()} milliseconds a {@link EventType#LIGHT_HIGH}
@@ -66,7 +66,7 @@ public class LightSensor extends Sensor implements IUiCapableBlock {
 
 	/**
 	 * Preset threshold value on input values (via
-	 * {@link IHardwareIO#readAnalogInput(String)}) .
+	 * {@link IHardware#readAnalogInput(String)}) .
 	 * 
 	 * @return threshold value
 	 */
