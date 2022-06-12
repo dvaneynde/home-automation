@@ -7,7 +7,7 @@
 
 - [1. Introduction](#1-introduction)
 - [2. Context](#2-context)
-- [3. Architectural Drivers](#3-architectural-drivers)
+- [3. Architectural Drivers (aka Architectural Significant Requirements)](#3-architectural-drivers-aka-architectural-significant-requirements)
 - [4. Solution Architecture](#4-solution-architecture)
   - [4.1. Functional View](#41-functional-view)
     - [4.1.1. Model](#411-model)
@@ -51,21 +51,24 @@ Here is a view of the hardware I currently use.
 
 ![The System](images/domo-v2-b.png)
 
-At the bottom is an Advantech Atom CPU based motherboard, on top of which stack multiple I/O boards from Diamond Systems. The I/O boards provide digital and analog inputs and outputs, which connect to switches, lamps, screens voltage controlled dimmers or a weather station that measures wind and light.
+At the bottom is an Advantech Atom CPU based motherboard, on top of which stack multiple I/O boards from Diamond Systems. The I/O boards provide digital and analog inputs and outputs, which connect to switches, lamps, screens, fans, voltage controlled dimmers or a weather station that measures wind and light.
 
 This hardware is connected to many many wires, relays, dimmers, power supplies in below closet.
 ![The Closet](./images/closet.png)
 
 At the far left, left from the CPU and stacked I/O boards, there is an extra PCB with extra buffers and analog in/out amplifiers. Reason is that this was cheaper than buying extra Diamond Boards.
 
-Finally, besides the switches and so on, there is a web based UI.
-![ELM UI](./images/elm-ui.png)
-
+Finally, we have two Human User Interfaces:
+1. the main one being wall switches, lamps and so on, and 
+2. a web based UI shown below.
+<div>
+<img src="./images/elm-ui.png" width="500" alt="ELM UI"/>
+</div>
 Some historical evolutions (and more photos) are in [History](./HISTORY.md).
 
 
 
-# 3. Architectural Drivers
+# 3. Architectural Drivers (aka Architectural Significant Requirements)
 
 This lists these home automation requirements that drive the design.
 

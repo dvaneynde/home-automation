@@ -6,7 +6,8 @@ target/
 *.log
 /DomoticOutputStates.txt
 /driver.pid
-/doc/
+DESIGN.html
+
 
 # ----------------------------------------------------------------------------------------------------------------
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio, WebStorm and Rider
