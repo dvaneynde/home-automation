@@ -1,6 +1,6 @@
 <span style="font-family:Arial; font-size:3em;">DIY Home Automation<br/>Software Architecture Document</span>
 
-> author: dirk@dlvmechanografie.eu<br/>date: 8/6/2022
+> author: dirk@dlvmechanografie.eu<br/>date: 12/6/2022 (eu)
 
 
 **Table of Contents**
@@ -29,7 +29,7 @@
 - [5. Architectural Evaluation & Risks](#5-architectural-evaluation--risks)
   - [5.1. Evaluation](#51-evaluation)
   - [5.2. Risks & Mitigation](#52-risks--mitigation)
-  - [5.3. Future Work](#53-future-work)
+  - [5.3. Missing Views / Future Work](#53-missing-views--future-work)
 - [6. End of Document](#6-end-of-document)
 
 # 1. Introduction
@@ -678,9 +678,9 @@ Solving this: MTBF = 5.8 days minimal, which should be easily achievable.
 
 > Note: the actual state is written to disk every 5 seconds (default). This is ignored in the calculation - we loose maximally changes from last 5 seconds, which is considered not crucial for users anyway.
 
-Looking at the logs of the actual system, the system restarts once every 14 days on average. This gives for the self-healing part this availability:
+Looking at the logs of the actual system, the system restarts once every 11,17 days hours on average. This gives for the self-healing part this availability:
 
-$$ {14 * 24 * 3600 \over {14 * 24 * 3600 + 50}} = 0,99995866572976 = 99,996\% $$
+$$ {11.17 * 24 * 3600 \over {11.17 * 24 * 3600 + 50}} \approxeq 99.995\% $$
 
 The second category, where a technician is involved, typically has two causes:
 - The automatic self healing mechanism does not work
@@ -695,53 +695,54 @@ The second one might need between an hour of work (e.g. running `fdisk`) or repl
 | disk | 99.995% | SSD EVO 870 has 1.5e6 hours MTTF and 72 hours estimated to repair (ordering and installing). <br/>Note that current SSD has much better MTBF than the magnetic hard disks we had before; we had 2 failures in 10 years with hard disk but this is basically no longer expected to happen.|
 | cpu board | 99.74% | 15 years estimated MTTF and 14 days to order, wait delivery and repair; not it already works over 10 years without issue |
 | ubuntu | 99.998% | estimated 1 crash every 6 months, 5 minutes restart|
-| domotic-a | 99.996% | self-healing automatic restart; see first part of this chapter, failure and restart every 14 days |
-| domotic-b | 99,997% | estimated; system hangs, cannot detect failure and hence not restart; happens once a year, 15 minutes on average to solve (power cycle)|
+| self-heal | 99.995% | self-healing automatic restart; see first part of this chapter, failure and restart every 14 days |
+| hangs | 99,997% | estimated; system hangs, cannot detect failure and hence not restart; happens once a year, 15 minutes on average to solve (power cycle)|
 
 So the overall availability would be:
 
 $$
 \begin{align}
-Av &= Av_{ubuntu} \times Av_{disk} \times Av_{cpu_board} \times Av_{domotic-a} \times Av_{domotic-b} \\
-   &= 99.995\% \times 99.74\% \times 99.9985\% \times 99.996\% \times 99.997\% = 99.73\%
+Av &= Av_{disk} \times Av_{cpu_board} \times Av_{ubuntu} \times Av_{self-heal} \times Av_{hangs} \\
+   &= 99.995\% \times 99.74\% \times 99.998\% \times 99.995\% \times 99.997\% \\
+   &= 99.725\%
 \end{align}
 $$
 
 So we identified an **architectural risk**: the CPU board  makes it impossible to reach 99.99% availability. Having a spare CPU board won't really solve the problem: it is impossible to replace the CPU board in 50 minutes because of the manual work involved, both replacing the hardware and installing all the software. Having two CPU boards is extremely complex, adding a sort of hot-standby but more importantly adding specific hardware to switch the stack of IO Boards between the two CPU's - far too costly and complex.
 
-After discussion with the stakeholders, basically my familly, we've chosen to accept this risk. A permanent hardware failure - disk or CPU - is serious, but happens less than once a year and candles are nice too. So the Availability, excluding permanent hardware failures, becomes:
+After discussion with the stakeholders, basically my familly, we've chosen to accept this risk. A permanent hardware failure of the CPU has a very high repair time, but happens only once a decade or less - and candles are nice too. So the Availability, excluding permanent CPU board failure, becomes:
 
 $$
 \begin{align}
-Av &= 99.995\% \times 99.9985\% \times 99.996\% \times 99.997\% = 99.986\% \\
-   &\approx 99.99\%
+Av  &= Av_{disk} \times Av_{ubuntu} \times Av_{self-heal} \times Av_{hangs} \\
+    &= 99.995\% \times 99.9985\% \times 99.995\% \times 99.997\% \\
+    &= 99.985 \\
+    &\approx 99.99\%
 \end{align}
 $$
+
+So we're good.
 
 
 ### 4.5.3. Rationale and Alternatives
 
-The availability requirement of 99,99% is influenced by many factors:
+The availability requirement of 99,99% is has two major components:
 1. faults that can be self healed, described in previous chapter
 2. software and hardware faults requiring technician involvement
-3. make hardware as robust as possible
-4. make software as robust as possible
 
-Point 1: Self healing was described earlier in this section, we achieved 99,996%.
-
-Point 2: Faults involving technician are thanks to self healing and improved hardware very rare (see also next point), and candles exist, so we accept the 99,73%. 
-
-Point 3: The hardware used from Diamond Systems and Atom is purposely built for industrial systems (PC104 systems), and has a high reliability. This has proven to be true over last 10 years. The only issue was magnetic drives, now replaced by much more reliable SDD.
-
-Point 4: Multiple approaches were used:
-1. Use a safe language as much as possible:
+The tactics involved are multiple:
+1. Self healing, described earlier in this section: we achieved 99,995%.
+2. Use industry-grade hardware to minimize faults.
+   - The hardware used from Diamond Systems and Advantech is purposely built for industrial systems (PC104 systems), and has a high reliability. This has proven to be true over last 10 years. 
+   - An issue was the use of magnetic drives, now replaced by much more reliable SDD.
+3. Use safe languages, and minimize unsafe languages.
    - Java & Scala were chosen for `domotic`, due to crash resistance
    - C part for `HwDriver` is kept as small as possible
    - ELM is far superior to Javascript in bug avoidance 
-2. Make the input/output processing deterministic, as explained in _Development View - Modules for Configuration and Execution_
-3. Automated testing. Thanks to the `loop(currentTime)` interface it is possible to simulate time. This allows for testing the most complex configurations end to end.
+1. Make the input/output processing deterministic and safe, as explained in _Development View - Modules for Configuration and Execution_
+4. Automated testing. Thanks to the `loop(currentTime)` interface it is possible to simulate time. This allows for testing the most complex configurations end to end.
   
-As explained in the Functional View the `hwdriver` needs direct memory access, which Java does not provide. We use Diamond Systems IO hardware, which comes with a C DMMAT library. So Java needed to access C code, which can be done in a number of ways:
+As explained in the Functional View the `hwdriver` needs direct memory access, which Java does not provide. We use Diamond Systems IO hardware, which comes with a C DMMAT library. So Java needed to access C code, which can be done in a number of alternative ways:
 - JNI (Java Native Interface): the C library runs in the `domotic` process space; this gives best performance, but crashes in the C code crash the entire system
 - custom protocol on top of TCP: much more robust; also allows for easier development, having the `hwdriver` on the actual hardware but the `domotic` on a Mac talking remotely to the `hwdriver`.
 
@@ -775,9 +776,9 @@ Legend:
 
 | Risk | Addressed in | Mitigation |
 | -- | -- | -- |
-| Permanent hardware failure gives only 99.72% where 99.99% is required. | Availability Perspective | Accept to exclude permanent hardware failures from the equation, which gives the required 99.99% availability. <br/>Permanent hardware failures require hours or days to repair, but only occur 1 or 2 times a decade, which the stakeholders are ok with. | 
+| CPU Board failure makes the availability detoriate to 99.73%, where 99.99% is required. | Availability and Reliability Perspective | This failure require ±14 days to repair, but is expected to occur once or less a decade. Stakeholders accept to ignore this issue for Availability. Therefore it is excluded from the equation and the overall system has 99.99% availability.<br/> | 
 
-## 5.3. Future Work
+## 5.3. Missing Views / Future Work
 1. Views explaining UI Config
 2. Testability view
 
