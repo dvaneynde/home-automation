@@ -4,7 +4,6 @@
 
 
 **Table of Contents**
-
 - [1. Introduction](#1-introduction)
 - [2. Context](#2-context)
 - [3. Architectural Drivers (aka Architectural Significant Requirements)](#3-architectural-drivers-aka-architectural-significant-requirements)
@@ -12,20 +11,25 @@
   - [4.1. Functional View](#41-functional-view)
     - [4.1.1. Model](#411-model)
     - [4.1.2. Interfaces](#412-interfaces)
-    - [4.1.3. Rationale & Alternatives](#413-rationale--alternatives)
+    - [4.1.3. Rationale and Alternatives](#413-rationale-and-alternatives)
   - [4.2. Deployment View](#42-deployment-view)
-  - [4.3. Availability & Reliability Perspective](#43-availability--reliability-perspective)
-    - [4.3.1.  Model](#431--model)
-    - [4.3.2. Rationale](#432-rationale)
-    - [4.3.3. Calculations](#433-calculations)
-  - [4.4. Development View](#44-development-view)
-    - [4.4.1. Modules and Layers](#441-modules-and-layers)
-    - [4.4.2. Modules related to Configuration and Execution](#442-modules-related-to-configuration-and-execution)
-    - [4.4.3. Simple Example](#443-simple-example)
-    - [4.4.4. Alternatives for Execution](#444-alternatives-for-execution)
+    - [4.2.1. Model](#421-model)
+    - [4.2.2. Rationale and Alternatives](#422-rationale-and-alternatives)
+  - [4.3. Development View - Layers](#43-development-view---layers)
+    - [4.3.1. Model](#431-model)
+    - [4.3.2. Rationale and Alternatives](#432-rationale-and-alternatives)
+  - [4.4. Development View - Modules on Configuration and Execution](#44-development-view---modules-on-configuration-and-execution)
+    - [4.4.1. Model](#441-model)
+    - [4.4.2. Simple Example](#442-simple-example)
+    - [4.4.3. Rationale and Alternatives](#443-rationale-and-alternatives)
+  - [4.5. Availability & Reliability Perspective](#45-availability--reliability-perspective)
+    - [4.5.1.  Fault Detection & Restart Model](#451--fault-detection--restart-model)
+    - [4.5.2. Availability Calculation Model](#452-availability-calculation-model)
+    - [4.5.3. Rationale and Alternatives](#453-rationale-and-alternatives)
 - [5. Architectural Evaluation & Risks](#5-architectural-evaluation--risks)
   - [5.1. Evaluation](#51-evaluation)
   - [5.2. Risks & Mitigation](#52-risks--mitigation)
+  - [5.3. Future Work](#53-future-work)
 - [6. End of Document](#6-end-of-document)
 
 # 1. Introduction
@@ -89,11 +93,18 @@ This lists these home automation requirements that drive the design.
 ## 4.1. Functional View
 
 ### 4.1.1. Model 
+
+Legend for below model diagram:
+- rectangle: **component**; a runnable software component, except for `switches_lamps_etc` which is hardware
+- arrow: **connector**; communication between components and/or interfaces; arrow direction is from communication-initiator to target
+- lollipop: **interface**; optional, explicit interface offered by the component it has a line too
+
+
 ```plantuml
 @startuml "Functional View"
 
 package UserInterfaces {
-    component ui <<webapp>>
+    component webapp <<elm>>
     component switches_lamps_etc <<hardware>>
 }
 
@@ -104,9 +115,12 @@ interface IUiCapableBlock <<websocket>>
 RestAPI -- domotic
 IStatic -- domotic
 IUiCapableBlock -- domotic
-ui --> IStatic
-ui --> RestAPI 
-ui <-- IUiCapableBlock 
+webapp --> IStatic
+webapp --> RestAPI 
+webapp <-- IUiCapableBlock 
+
+interface OpenWeatherApi <<rest>>
+OpenWeatherApi <- domotic
 
 component hwdriver <<c exe>>
 interface IHwApi <<tcp>>
@@ -120,21 +134,17 @@ switches_lamps_etc <--> IO_board : <<electricity>>
 @enduml
 ```
 
-Legend:
-- rectangle: **component**; a runnable software component, except for `switches_lamps_etc` which is hardware
-- arrow: **connector**; communication between components and/or interfaces; arrow direction is from communication-initiator to target
-- lollipop: **interface**; optional, explicit interface offered by the component it has a line too
-
 Description of the different components, interfaces and connectors:
 
 | element | description |
 |---|---|
 | switches_lamps_etc | The classical Human User Interface being switches, light & wind sensors, lamps, screens etc. |
-| ui | [ELM](https://elm-lang.org) based UI based WebApp GUI as an alternative to mechanical switches. |
+| webapp | [ELM](https://elm-lang.org) based UI based WebApp HMI. One could say this is the secondary user-interface, besides the mechanical switches. |
 | domotic | Java program that contains all the logic of the domotic system. It has an embedded Jetty HTTP server, see [ServiceServer](../src/main/java/eu/dlvm/domotics/server/ServiceServer.java). |
-| IStatic | HTTP endpoint to serve static content, specifically the `ui` front-end. It listens on the root path, e.g. `http://localhost/`. |
+| IStatic | HTTP endpoint to serve static content, specifically the `webapp` front-end. It listens on the root path, e.g. `http://localhost/`. |
 | RestAPI | REST API offered by `domotic`, to read domotic state as well as update it. See [RestService](./src/main/java/eu/dlvm/domotics/service/RestService.java) for details. It listens on the `rest` paths, e.g. `http://localhost/rest/`. **Needs rework!** |
 | IUiCapableBlock | Websocket connection, sends each state update (lamp, wind, light sensor etc) to registered websocket clients. It is a list of [IUiCapableBlock](../src/main/java/eu/dlvm/domotics/base/IUiCapableBlock.java) informations sent at each state change. |
+| OpenWeatherApi | Interface from OpenWeather to get information like sunset and sunrise. URL used is http://api.openweathermap.org/data/2.5/weather?q=Leuven,be&appid=... |
 | hwdriver | C program that talks to the IO boards that in turn connect with switches, lamps etc. This is a very thin component, only executing the simple read/write commands it gets from `domotic` via `HardwareIO` interface onto the `IO Boards` hardware. <br/>Note that this program is Diamond Systems specific.|
 | HardwareIO | Custom protocol to read inputs (switches, light sensort etc.) from the IO boards, and write outputs to the IO boards to control lamps, screens, dimmers etc. It is a custom protocol - specific for Diamonds IO boards - that is text based and uses TCP/IP. |
 | IO_board | IO Boards from Diamond System Corporation, compatible with PC/104 standard. IO Boards - multiple - have numerous digital inputs and outputs as well as a few analog inputs and outputs. Reading and writing IO goes via direct memory access (hence the supervisor mode of `hwdriver`) according to DMATT protocol. This is detailed in Diamond Systems documentation.<br/>Between the IO Boards and the switches, lamps (via relais or voltage-controlled dimmer) etc. is pure electricity based. | 
@@ -165,42 +175,53 @@ means that for the board at address 0x300:
 - `240`: analog channel 1 measures 240.
 
  
-### 4.1.3. Rationale & Alternatives
+### 4.1.3. Rationale and Alternatives
 
-The web UI was written in ELM. An earlier simpler version was written with JQuery and Javascript, but this was really ugly code, difficult to maintain and understand, let alone to extend. Thanks to Frank Piessens I learned about ELM, pure functional and pure fun.
+All 'business' functionality is present in the java program `domotic`. It reads the configuration at startup and drives or supports all other components.
 
-The `hwdriver` is a separate executable because it needs to communicate with the IO boards. That requires memory addressing directly, something that is not possible with Java. Therefore it was written in C. It is kept as small as possible. See also Availability & Robustness perspective. 
+The `hwdriver` is a separate executable. It needs to communicate with the IO boards, which requires direct memory addressing, something that is not possible with Java. Therefore it was written in C. It is kept as small as possible though, only forwarding commands between `domotic` and the `IO Boards`. 
+
+Originally there was no `webapp`, only the usual wall switches etc. An earlier simpler version was written with JQuery and Javascript, but this was really ugly code, difficult to maintain and understand, let alone to extend. Thanks to Frank P. I learned about [ELM](https://elm-lang.org), a pure functional language (subset of Haskell + functional reactive) and pure fun.
 
 ## 4.2. Deployment View
+
+### 4.2.1. Model
+
+Legend for below model diagram, which is based on UML:
+- cube: **node**; computer or device
+- rectangle: **component**; a runnable software component, except for `switches_lamps_etc` which is hardware
+- note: **file**; configuration or other key files
+- full line: **connector**; communication between components or nodes
+- dashed line: **usage**; component writes and/or reads that file
 
 ```plantuml
 @startuml Deployment
 
-node browser  {
-    component ui <<elm>>
+node PC_or_mobile  {
+    component browser {
+        component webapp <<elm>>
+    }
 }
 
 node server <<linux>> {
-    component domotic <<java exe>> {
-
-    }
-    component hwdriver <<c exe>>{
-
-    }
+    component domotic <<java exe>>
+    component hwdriver <<c exe>>
     file DiamondBoardsConfig <<xml>>
     file DomoticConfig <<xml>>
-    file domotic.pid
-    file driver.pid
-    file DomoticOutputStates.txt
-    folder logs
+    file domotic.pid <<txt>>
+    file driver.pid <<txt>>
+    file DomoticOutputStates <<txt>>
+    folder logs <<txt>>
 }
 
-ui -r- domotic : [http]
-domotic -- hwdriver : [tcp]
+PC_or_mobile -= server : <<ip>>
+
+webapp -- domotic : <<http>>
+domotic -- hwdriver : <<tcp/ip>>
 domotic .> DomoticConfig
 domotic .> DiamondBoardsConfig
 domotic .> domotic.pid
-domotic ..> DomoticOutputStates.txt
+domotic ..> DomoticOutputStates
 hwdriver .> driver.pid
 domotic ..> logs
 logs <. hwdriver
@@ -208,12 +229,13 @@ logs <. hwdriver
 @enduml
 ```
 
-Description of the different nodes and components is in below table. Elements already explained are left out.
+Description of the different nodes and components is in below table. Elements already explained earlier are left out.
 
 |element | description |
 |---|---|
 | server | Ubuntu Linux on an Advantech Atom PC, with PC/104 IO Boards from Diamond Systems. |
-| browser | Any browser on the local network, so `192.168.*.*`. |
+| PC_or_mobile | Client device such as personal computer or tablet or smartphone. Must be on the home network, e.g. `192.168.*.*` |
+| browser | Any web browser, but currently only tested with Safari. |
 | DomoticConfig | Defines all inputs, outputs and behaviours of the home automation system. Switches, Lamps, Screens etc., and how the are connected and configured.<br/>It also defines the layout in the UI.|
 | DiamondBoardsConfig | Defines how the hardware is configured. See Layered View later, this allows for different hardware to be used without touching the domotic specific code. |
 | logs | Both `domotic` and `hwdriver` send logs to this folder. They use `logback` and `log4c` respectively.
@@ -222,152 +244,20 @@ Description of the different nodes and components is in below table. Elements al
 | DomoticOutputStates.txt | File containing the actual states of the output devices, e.g. whether a certain lamp is on or off. Used when restarting to restore the old state. |
 
 
-Not described here are the Linux service definition and health check. See [deployment](./deployment/README.md) subfolder for more information. These are also described in the _Availability View_.
+More information is on service definitions and startup / health-check-restart is in the _Availability View_.
 
-It is perfectly possible to have `domotic` and `hwdriver`, each with their respective supporting files, run on different computers.
+### 4.2.2. Rationale and Alternatives
 
+The Advantech CPU board may seem overdimensioned for what is needed, but:
+1. The "Exploration" requirements asks for overdimensioning, since the idea was (is) to add more new technologies and processes to it later on. As time passed other services might be offloaded to cloud or other servers, so this is no longer true. On the other hand at the time of writing (2022) this hardware is more than 10 years old.
+2. This is not a commercial product to be sold in the 1000s, so productivity on functionality was more important than keeping the cost of hardware as low as possible.
 
-## 4.3. Availability & Reliability Perspective
-
-### 4.3.1.  Model
-
-In below model a few additional elements appear.
-
-| element | description |
-|---|---|
-| init.d | Ubuntu 16 service mechanism. |
-| domotic.sh | Script to start, stop or restart `domotic` as a service. The start command will automatically be executed at server boot.|
-| cron | Linux cron facility. |
-| watchdog.sh | Script that checks if `domotic` process still exists, using `domotic.pid`, and restart if needed. |
-
-> Note: Better option may be to use `systemd` as a replacement for `init.d` which can restart services. The original Ubuntu version did not have that facility yet. Replacement is planned.
-
-Legend:
-- dashed line: start or kill a process
-- dotted line: check a process
-- bold plain line: start as a sub-process
-
-```plantuml
-@startuml Availability
-
-node server <<linux>> {
-    component cron <<service>>
-    component init.d <<service>>
-    component domotic.sh <<script>>
-    component watchdog.sh <<script>>
-    component domotic <<java exe>>
-    component hwdriver <<c exe>>
-    file domotic.pid
-    file driver.pid
-
-    init.d ..> domotic.sh : 1_on_boot_start_domotic
-    domotic.sh ..> domotic : 1.1_start
-    domotic -[bold]-> hwdriver : 1.2_start_as_subprocess
-    cron ..> watchdog.sh : 2_run_every_60sec
-    watchdog.sh -[dotted]-> domotic : 2.1_check_process
-    domotic -> domotic : 3_self_check
-
-    domotic.sh <. watchdog.sh : 4_run_restart_if_dead
-    domotic.sh .> hwdriver : 4.1_kill
-    domotic.sh ..> domotic : 4.2_kill_and_start
-
-    domotic.pid <- domotic
-    driver.pid <- hwdriver
-}
-server -> server : 5_reboot_on_crash
-@enduml
-```
-
-| interaction | description |
-|---|---|
-| 1_on_boot_start_domotic | When the server starts, `init.d` will automatically call `domotic.sh start`. |
-| 1.1_start | The domotic system is started. Configuration parameters are in this script! |
-| 1.2_start_as_subprocess | `domotic` will start the `hwdriver` as a sub-process. |
-| 2_run_every_60sec | `cron` will execute `watchdog.sh` every 60 seconds, passing it the path to `domotic.pid`. |
-| 2.1_check_process | `watchdog.sh` checks if the `domotic` process still exists. If so, good, if not, see step 4. |
-| 3_self_check | If `loop()` (see Development View) did not execute 3 times, so typically after 60 ms., `domotic` will exit with code 1. This is checked in a separate thread. If this happens the system clearly cannot function anymore, so exiting is good.<br/>Note that if the `hwdriver` is gone or not responding anymore (e.g. memory leaks led to this) then `loop()` is blocked too, so this problem is also detected. |
-| 4_run_restart_if_dead | If `watchdog.sh` does not find a running `domotic` anymore it requests a restart via `domotic.sh`. |
-| 4.1_kill | To be sure, first the `hwdriver` is killed. |
-| 4.2_kill_and_start | Next, again to be sure, `domotic` is killed, and next started.|
-| 5_reboot_on_crash | If the Linux server crashes, the server is configured to automatically reboot (CPU board configuration). And back to 1.  |
-
-### 4.3.2. Rationale 
-
-The availability requirement of 99,99% is pretty high. Also, when I'm traveling for work, nobody can really intervene if something goes wrong. Therefore the approach taken is multifold:
-1. automatically detect malfunctioning and restart the system
-2. make code as robust as possible
-3. automated testing - see Testability View (TODO)
-
-The above model shows how malfunctions are detected, and if a failure occurs how this leads to a restart of the system. Note that also the Ubuntu system self-restarts.
-
-> Lesson learned: keep it as simple as possible. When checking malfunctions - lik checking subprocesses, reads and writes between `domotic` and `hwdriver` which I tried - is complex, the overall availability decreases because the checking code does not work properly. Eventually I found out - thanks to logs - what the best way was to detect failure and act upon that. Turned out that if the `loop()` described earlier did not happen anymore, checked via a separate thread, the system needs restarting.
-
-On the 2nd point, make the system reliable, a number of approaches were used:
-1. Use a safe language as much as possible (Java/Scala/ELM versus C), and decouple the unsafe part (HwDriver)
-2. Make the input/output processing deterministic
-  
-Regarding safe languages, meaning no direct memory access and other goodies:
-- Java & Scala were chosen for `domotic`, due to crash resistance
-- C part is kept as small as possible
-- ELM is far superior to Javascript in bug avoidance 
-
-As explained in the Functional View the `hwdriver` needs direct memory access, so C was chosen. We use Diamond Systems IO hardware, which comes with a C DMMAT library. So Java needed to access C code, which can be done in a number of ways:
-- JNI (Java Native Interface): the C library runs in the `domotic` process space; this gives best performance, but crashes in the C code crash the entire system
-- custom protocol on top of TCP: much more robust; also allows for easier development, having the `hwdriver` on the actual hardware but the `domotic` on a Mac talking remotely to the `hwdriver`.
-
-We choose for the latter solution, keeping the `hwdriver` as small as possible. 
-
-The deterministic input/outpu processing is described in Development View (**TODO** separation sensor/controller/actuator and separation event-reactive with loop()).
-
-### 4.3.3. Calculations
-
-Calculations are split in two categories:
-1. Failures that do not need intervention of a technician; self-healing
-2. Failures that do need a technician (basically the author today - perhaps my youngest son one day)
-
-The first category are the cases described higher, where the system detects a failure and restarts automatically.
-
-The MTTR (Mean Time To Repair) (similar to RTO or Restore Time Objective) consists of:
-1. `watchdog.sh` runs every 60 seconds, so 30 sec. on average
-2. `watchdog.sh` waits 10 seconds before restarting (_probably to avoid tcp issues_)
-3. restarting `domotic` and `hwdriver` takes max. 10 seconds
-
-So 50 seconds on average. With the 99.99% availability requirement this means:
-$$ 99.99\% = {MTBF \over (MTBF + MTTR)} = {MTBF \over (MTBF + 50 sec)} $$
-
-Solving this: MTBF = 5.8 days minimal, which should be easily achievable.
-
-> Note: the actual state is written to disk every 5 seconds (default). This is ignored in the calculation - we loose maximally changes from last 5 seconds, which is considered not crucial for users anyway.
+It is perfectly possible to have `domotic` and `hwdriver` run on different computers. This can make development easier as `domotic` runs on a Mac with full IDE and the `hwdriver` runs on the `Atom CPU board`.
 
 
-The second category, where a technician is involved, typically concerns permanent hardware failures. For example, a hard disk that fails (happened twice already) needs either a few days of work (ordering a new HD takes a few days already). It also occurred that the system just hangs, and a power cycle solved the problem - but this too involves the technician. So let's estimate availability with hardware  and software failures that cannot be repaired automatically.
+## 4.3. Development View - Layers
 
-| component | est. availability | data |
-| -- | -- | -- |
-| disk | 99.995% | SSD EVO 870 has 1.5e6 hours MTTF and 72 hours estimated to repair (ordering and installing) |
-| cpu board | 99.74% | 15 years estimated MTTF and 14 days to order, wait delivery and repair; not it already works over 10 years without issue |
-| ubuntu | 99.998% | estimated 1 crash every 6 months, 5 minutes restart|
-| domotic-a | 99.99% | estimated; see higher, failure every 5.8 days |
-| domotic-b | 99,997% | estimated; system hangs, cannot detect failure and hence not restart; happens once a year, 15 minutes on average to solve (terminal or switch off-on)|
-
-So the overall availability would be:
-$$Av = Av_{ubuntu} \times Av_{disk} \times Av_{cpu_board} \times Av_{domotic-a} \times Av_{domotic-b}$$
-
-$$Av = 99.995\% \times 99.74\% \times 99.9985\% \times 99.99\% \times 99.997\% = 99.72%$$
-
-The limiting factor is clearly the CPU board, which can be mitigated by having a spare CPU board.
-
-**TODO actual numbers from logs.**
-
------------
-
-
-
-
-
-## 4.4. Development View
-
-### 4.4.1. Modules and Layers 
+### 4.3.1. Model 
 
 There are 3 major layers:
 1. User Interfaces - Both the Web App and the physical switches / lamps etc.
@@ -376,7 +266,7 @@ There are 3 major layers:
 
 Below figure shows these layers and some of the modules relevant to the layers. 
 
-Legend: see UML Class Diagrams, with these specifics:
+Legend: follows UML Class Diagrams, with these specifics:
 - &lt;&lt;layer&gt;&gt; - Package defining a layer.
 - &lt;&lt;exe&gt;&gt; - Executable, basically contains a `main()` routine.
 
@@ -435,32 +325,48 @@ SwitchesAndLampsEtc ..> HwDriver : via-IO-boards
 | ReadWriteProtocol | This is a description of the text based and TCP/IP based protocol to communicate between the Java code and the HwDriver. It is specified as comments in specific `eu.dlvm.iohardware.diamondsys` classes and in the `HwDriver` code. |
 | HwDriver | C based program. See higher for its description. |
 
-> **To Improve**:  `IHardwareWriter` and `IHardwareReader` should not extend `IHardware` but instead should be members of it (delegation).
+
+### 4.3.2. Rationale and Alternatives
+
+This view addresses the HwLayout and UiLayout architectural drivers listed in chapter 3. The softwares in package `Home Automation Logic` have all the business functionality, including the configuration - via `DomoticConfig.xml` - for both webapp UI and the home sensors and actuators layout and functionality.
+
+>Note: UI configuration is not covered yet in this document.
+
+For the hardware, let's follow a scenario. 
 
 Suppose another hardware is used than Diamond Systems, what needs to change?
 1. Another Java implementation of the interfaces in `eu.dlvm.iohardware`.
 2. Depending on the hardware and its driver, another `HwDriver` is needed or perhaps another solution (who knows, that hardware might include a Java driver).
 3. Another configuration means replacing `DiamondBoardsConfig`,
 
-That should be it. Often a new kind of hardware might impact the interfaces in `eu.dlvm.iohardware` making them more generic so that they can handle more different types of hardware. But today's separation already makes it more easy.
+That should be it. Often a new kind of hardware might impact the interfaces in `eu.dlvm.iohardware` making them more generic so that they can handle more different types of hardware. But today's separation  should already make this more easy.
 
-### 4.4.2. Modules related to Configuration and Execution
+> **To Improve**:  `IHardwareWriter` and `IHardwareReader` should not extend `IHardware` but instead should be members of it (delegation over inheritance).
 
+
+## 4.4. Development View - Modules on Configuration and Execution
+
+### 4.4.1. Model
 The main classes related to a specific configuration of a home automation system, and how it is executed, are depicted below.
 
-> Note: it may be instructive to read this together - back and forth - with the example in the next chapter.
+> Note: it may be instructive to read this model together - back and forth - with the example following this chapter.
+
+Legend: classical UML Class diagram representing Java classes and interfaces.
 
 ```plantuml
 @startuml
+class Domotic <<singleton>> {
+    void loopOnce()
+}
 
 abstract class Block {
     string name
-    string uiGrouop
 }
 
 interface IDomoticLoop {
     void loop(long timeMs)
 }
+Domotic .> IDomoticLoop
 
 interface IEventListener {
     void onEvent(Block source, EventType event)
@@ -515,24 +421,23 @@ Actuator ..> IHardwareWriter
 
 IEventListener "*" <-- Block  : listeners <
 
-
 @enduml
 ```
 
 | element | description |
 |---|---|
-| Block | Supertype that just has a unique name and information for the UI (1). |
-| Sensor | Sensors sense input from hardware. They have at least one input channel, sometimes more. They transform simple hardware inputs into higher level events, such as DoubleClick or SingleClick or WindHigh.<br/> Only Sensors can read data from hardware. <br/>Sensors send events to Controllers or directly to Actuators.| 
-| Actuator | Actuators actuate output. They have at least one output channel like a switch, or multiple like up/down for screens. <br/>Only Actuators can change outputs of hardware. <br/> Actuators do not send events to other Blocks.
-| Controller | Controller typically contain functionally complex logic.<br/>Controllers have no access to hardware.<br/>Controllers send events to  Actuators or other Controllers. |
-| IEventListener | Blocks can send events o other Blocks, e.g. when a Switch is pressed (Sensor) it sends an event to a Lamp (Actuator) so it is switched on or off.<br/>For safety event propagation is limited (see previous rows, from Sensor to Controller to Actuator, never reverse) and state changes can only happen in `loop()`|
-| Connector | Used between Blocks to convert one event-type into another. Is fully stateless, and very lightweight. <br/>E.g. in earlier Switch/Lamp example a Switch sends `SingleClicked` events and Lamps expect `Toggle` events. So a `Connector` is placed in between to convert this event.
-| IDomoticLoop | All Blocks implement the `loop()` function called from `loopOnce()` described later. State changes of a Block, like 'on' or 'off' in an Actuator, must only occur from within a `loop()` function (not from an event). |
+| Block | Supertype that just has a unique name and is the supertype of the main elements of a Home Automation system.<br/>Blocks typically hold state. A Lamp - an Actuator - must know whether it is currently on or off, so that it knows what do do when a `Toggle` event is received. A Switch - a Sensor - only knows if it is a `Single Click`, `Double Click` or `Long Click` after it measured the times between input going up (button pressed) and input going down (button released). So state and times - see `loop(currentTime)` - are essential. |
+| Sensor | Sensors sense input from hardware, they read digital and analog input values. Examples are Switches, Wind Meter, Sun Meter.<br/>They have at least one input channel, sometimes more. <br/>They transform simple hardware inputs into higher level events, such as DoubleClick or SingleClick or WindHigh.<br/> Only Sensors can read data from hardware. <br/>Sensors send events to Controllers or directly to Actuators.| 
+| Actuator | Actuators actuate output, they set digital or analog output values. Examples are Lamps, Fans, Screen Motors.<br/>They have at least one output channel like a switch, or multiple like up/down for screens. <br/>Only Actuators can change outputs of hardware. <br/> Actuators do not send events to other Blocks.
+| Controller | Controller typically contain functionally complex logic. Examples include Sun-Wind Controller, Timers, Anti Burglary feature.<br/>Controllers have no access to hardware.<br/>Controllers send events to  Actuators or other Controllers. |
+| IEventListener | Blocks can send events to other Blocks, e.g. when a Switch is pressed (Sensor) it sends an event to a Lamp (Actuator) so it is switched on or off.|
+| Connector | Used between Blocks to convert one event-type into another. Is fully stateless - contrary to `Block`s - and very lightweight. <br/>E.g. in earlier Switch/Lamp example a Switch sends `SingleClicked` events and Lamps expect `Toggle` events. So a `Connector` is placed in between to convert this event.
+| Domotic | Singleton class implementing the `loopOnce()` function explained below this table. Essentially it evaluates all inputs, logic and outputs every 20 milliseconds (default parameter). |
+| IDomoticLoop | All Blocks implement the `loop()` function called from `loopOnce()` in a specific order - see details below this table. State changes of a Block, like 'on' or 'off' in an Actuator, must only occur from within a `loop()` function (not from an event). |
 | IHardwareReader IHardwareWriter | Sensors and Actuators respectively read from and write to the hardware via an implementation of this interface. This abstracts away the actual hardware used.|
 
-(1) The UI is completely dynamic, as it is built up from information in the configuration files. So no programming required when domotic configuration changes.
 
-Below code is the core driver of the domotic system.
+The `loopOnce(long currentTime)` function drives the home automation:
 
 ```java
 	public synchronized void loopOnce(long currentTime) {
@@ -547,28 +452,21 @@ Below code is the core driver of the domotic system.
 			a.loop(currentTime);
 		}
 		hw.refreshOutputs();
-
-        for (IStateChangedListener uiUpdator : stateChangeListeners)
-            uiUpdator.updateUi();
 	}
 
 ```
 
-This is what happens every 20 ms (configurable):
+This is what happens every 20 ms (default, configurable):
 
-- `IHardwareIO.refreshInputs()` is called, so that actual hardware inputs are read.
-- All Sensors have their `Sensor.loop()` run to process these inputs and update any state machines. State changes may lead to events being sent to Controllers or Actuators that are registered in the Sensor. These Controllers and Actuators must not yet change their state or send events themselves - they just have to 'remember' the event received.
-- Next `Controller.loop()` is run on all Controllers. Now it is the time to process any event information received and noted before, in the `loop()`. This may lead to a state change of the Controller, which in turn may lead to an event to another Controller or Actuator - which again just notes the information down sent by the event.
-- Finally Actuators have their `Actuator.loop()` executed, so they can update state and if applicable update hardware outputs. To actually update hardware output `IHardwareIO.refreshOutputs()` is called.
-- Finally any `IStateChangedListener`'s are called to update the modelstate of connected client UIs. _This is for UI only, not further explained in this document._
+- `IHardwareIO.refreshInputs()` is called, so that all actual hardware inputs are read and buffered. _Under the hood this sends a set of commands to `HwDriver` to read the values from the `IO Boards`._
+- All Sensors have their `Sensor.loop()` executed to process these inputs via `IHardwareReader` and update their state machines if appropriate. State changes may lead to events being sent to Controllers or Actuators. These Controllers and Actuators **must not yet evaluate this change, they must not yet change their state or send events elsewhere themselves** - they just have to 'remember' the event received.
+- Next `Controller.loop()` is run on all Controllers. Now it is the time to process any event information received and remembered. This may lead to a state change of the Controller itself, which in turn may lead to an event to another Controller or Actuator. Again, receivers of these events just note down the information sent by the event - they must not yet act upon it.
+- Finally Actuators have their `Actuator.loop()` executed, so they can update state and if applicable update hardware outputs. When output hardware needs to be updated an Actuator uses `IHardwareWriter` that buffers the output changes.
+- To actually update hardware output `IHardwareIO.refreshOutputs()` is called.
 
-The `currentTime` is a parameter passed on to each Block's `loop()` - it is forbidden in any Block to use `System.currentTimeMillis()` to get actual time. The reason for this is automated testing: the time is a parameter that can be manipulated at will, including in testing or - later - replay.
+This may all be very abstract, below example may be helpful.
 
-The separation of event notification and handling its' state changes in `loop()` ensures orderly execution of changes in that outputs are only changed when all sensor and intermediate logic has executed. It also helps the time simulation. 
-
-Safety is further improved by separating hardware access for Sensor, Controller and Actuator, and the fact that Sensors cannot be the target of events.
-
-### 4.4.3. Simple Example
+### 4.4.2. Simple Example
 
 Suppose the `DomoticConfig.xml` file contains the following configuration.
 ```xml
@@ -578,11 +476,11 @@ Suppose the `DomoticConfig.xml` file contains the following configuration.
 	</lamp>
 ```
 Functionally this means:
-- There is a switch at the house's entrance hall.
-- There is also a lamp, unsurprisingly, that toggles between on and off depdengin on the switch.
-- The lamp turns off automatically after 300 seconds - kids forget to switch it off. The lamp will shortly blink before going off, so you can quickly toggle the switch to prevent that - typically you're chatting at the door with your neighbour.
+- There is a switch at the house's entrance hall, named `SchakLichtInkom`.
+- There is also a lamp, named `LichtInkom`, that toggles between on and off depdending on the switch.
+- The lamp turns off automatically after 300 seconds - kids often forgot to switch it off so I added this feature. The lamp will shortly blink before going off, so you can quickly toggle the switch to prevent that - for example, you're chatting at the door with your neighbour for far too long.
 
-So how does this relate to the structure explained in the previous section? First let's see how Lamp and Switch fit in. Easy - but check also the other elements in previous section that are inherited. I included some of the methods we'll need later.
+So how does this relate to the structure explained in the previous section? First let's see how Lamp and Switch types fit in. I included some of the methods we'll need later.
 
 ```plantuml
 @startuml
@@ -608,7 +506,7 @@ Actuator <|-- Lamp
 @enduml
 ```
 
-Concretely the following object diagram translates the configuration. Note the listener link, the Lamp listens on events from the Switch.
+The following object diagram translates the configuration. Note the listener links, the Lamp listens on events from the Connector who listens in turn to events on Switch.
 
 ```plantuml
 @startuml
@@ -632,7 +530,7 @@ Next let's see at execution. Suppose the lamp is Off and a user just clicked the
 
 ```plantuml
 @startuml
-control ": Oscillator" as o
+control ": Domotic" as o
 participant ": IHardware" as h
 participant "SchakLichtInkom : Switch" as s
 participant "c1 : Connector" as c
@@ -643,8 +541,10 @@ activate o
 o --> h : refreshInputs()
 note right: all inputs are read and buffered
 o --> s : loop(100)
+note left: current time is 100ms
 activate s
 h <-- s : readDigitalInput()
+s --> s : set state
 note right : assume Switch detected single-click (using state machine)
 s -> c : notify("SingleClick")
 c -> l : notify("Toggle")
@@ -655,6 +555,8 @@ deactivate s
 
 o --> l : loop(100)
 activate l
+l -> l : check received event
+note left : current state is 'off', event is 'Toggle', so need to change output state to 'on'
 l -> l : setState(on)
 h <-- l : writeDigitalOutput()
 deactivate l
@@ -668,35 +570,215 @@ deactivate o
 More complex configurations exist, using multiple inputs or `Controller`s, but this gives the general flow.
 
 
+### 4.4.3. Rationale and Alternatives 
 
-### 4.4.4. Alternatives for Execution
-A pure reactive approach was first considered, see [Wikipedia's article on Reactive Programming](https://en.wikipedia.org/wiki/Reactive_programming#Change_propagation_algorithms). 
+A pure reactive approach was first considered, see [Wikipedia's article on Reactive Programming](https://en.wikipedia.org/wiki/Reactive_programming#Change_propagation_algorithms). In that article, chapter _Implementation challenges in reactive programming_  hints to problems I wanted to avoid. Since we are dealing with real lamps, screen motors and 230V. So safety is very important, and therefore predictability (and testability) are very important.
 
-But since we are dealing with real lamps, screen motors and 230V, safety is important. The downsides of Reactive Programming - see "Implementation challenges in reactive programming" in the article - I went for a more hybrid approach:
-- Events are still used, but they are just 'noted down' in the receiver.
-- Strict separation between `Sensor`, `Controller` and `Actuator`.
-- Handling the events is done during `loop()` which is first done for all `Sensor`s, then `Controller`s and only then `Actuator`s.
+Therefore I went for a more structured reactive approach that ensures predicatbility, avoids infinite loops, avoids race conditions:
+- Reactivity with Events is still used, but Events are just 'noted down' in the receiver.
+- Handling the event is not when the event is received, but during `loop()` only. 
+- Strict separation between `Sensor`, `Controller` and `Actuator` on what they can do with Events. 
+  - `Sensors` cannot receive Events, `Actuators` cannot emit Events.
+  - First  all `Sensors` are loop'ed, then `Controllers` and only then `Actuators`.
+
+The separation of event notification and handling its' state changes in `loop()` ensures orderly execution of changes in that outputs are only changed when all Sensors and intermediate logic (Controllers) have executed. 
+
+
+The `currentTime` is a parameter passed on to each Block's `loop()` - it is forbidden in any Block to use `System.currentTimeMillis()` to get actual time. The reason for this is automated testing: the time is a parameter that can be manipulated at will, including in testing or - later - replay.
+
+
+
+## 4.5. Availability & Reliability Perspective
+
+### 4.5.1.  Fault Detection & Restart Model
+
+The Home Automation system typically wil not have a skilled operator that knows what to do if something goes wrong. _Or that skilled operator, me in this particular situation, might be traveling for work, and the rest of the family should not be left in the dark (literaly) if something goes wrong in that period._ So a form of Automatic Self Healing is important, which this model describes.
+
+This model describes how the system restarts automatically after a fault is detected automatically. This information is used in the next chapter for the Availability calculations.
+
+This models builds further upon the earlier described _Deployment View_, adding a few additional elements.
+
+Legend:
+- dashed line: start or kill a process
+- dotted line: check a process
+- bold plain line: start as a sub-process
+
+```plantuml
+@startuml Availability
+
+node server <<linux>> {
+    component cron <<service>>
+    component init.d <<service>>
+    component domotic.sh <<script>>
+    component watchdog.sh <<script>>
+    component domotic <<java exe>>
+    component hwdriver <<c exe>>
+    file domotic.pid
+    file driver.pid
+
+    init.d ..> domotic.sh : 1_on_boot_start_domotic
+    domotic.sh ..> domotic : 1.1_start
+    domotic -[bold]-> hwdriver : 1.2_start_as_subprocess
+    cron ..> watchdog.sh : 2_run_every_60sec
+    watchdog.sh -[dotted]-> domotic : 2.1_check_process
+    domotic -> domotic : 3_self_check
+
+    domotic.sh <. watchdog.sh : 4_run_restart_if_dead
+    domotic.sh .> hwdriver : 4.1_kill
+    domotic.sh ..> domotic : 4.2_kill_and_start
+
+    domotic.pid <- domotic
+    driver.pid <- hwdriver
+}
+server -> server : 5_reboot_on_crash
+@enduml
+```
+| element | description |
+|---|---|
+| init.d | Ubuntu 16 service mechanism. |
+| domotic.sh | Script to start, stop or restart `domotic` as a service. The start command will automatically be executed at server boot.|
+| cron | Linux cron facility. |
+| watchdog.sh | Script that checks if `domotic` process still exists, using `domotic.pid`, and restart if needed. |
+
+| interaction | description |
+|---|---|
+| 1_on_boot_start_domotic | When the server starts, `init.d` will automatically call `domotic.sh start`. |
+| 1.1_start | The domotic system is started. Configuration parameters are in this script! |
+| 1.2_start_as_subprocess | `domotic` will start the `hwdriver` as a sub-process. |
+| 2_run_every_60sec | `cron` will execute `watchdog.sh` every 60 seconds, passing it the path to `domotic.pid`. |
+| 2.1_check_process | `watchdog.sh` checks if the `domotic` process still exists. If so, good, if not, see step 4. |
+| 3_self_check | If `loop()` (see Development View) did not execute 3 times, so typically after 60 ms., `domotic` will exit with code 1. This is checked by a separate thread. If this happens the system clearly cannot function anymore, so exiting is good.<br/>Note that if the `hwdriver` is gone or not responding anymore (e.g. memory leaks led to this) then `loop()` is blocked too, so this problem is also detected. |
+| 4_run_restart_if_dead | If `watchdog.sh` does not find a running `domotic` anymore it requests a restart via `domotic.sh`. |
+| 4.1_kill | To be sure, first the `hwdriver` is killed. |
+| 4.2_kill_and_start | Next, again to be sure, `domotic` is killed, and next started.|
+| 5_reboot_on_crash | If the Linux server crashes, the server is configured to automatically reboot (CPU board configuration). And back to 1.  |
+
+> Note: Better option may be to use `systemd` as a replacement for `init.d` which can restart services. The original Ubuntu version did not have that facility yet. Replacement is planned.
+
+> Lesson learned: keep it as simple as possible. When checking malfunctions - lik checking subprocesses, reads and writes between `domotic` and `hwdriver` which I tried - is complex, the overall availability decreases because the checking code does not work properly. Eventually I found out - thanks to logs - what the best way was to detect failure and act upon that. Turned out that if the `loop()` described earlier did not happen anymore, checked via a separate thread, the system needs restarting.
+
+
+### 4.5.2. Availability Calculation Model
+
+Calculations are split in two categories:
+1. Failures that do not need intervention of a technician; self-healing 
+2. Failures that do need a technician (basically the author today - perhaps my youngest son one day)
+
+The first category are the cases described higher, where the system detects a failure and restarts automatically.
+
+The MTTR (Mean Time To Repair) (similar to RTO or Restore Time Objective) consists of:
+1. `watchdog.sh` runs every 60 seconds, so 30 sec. on average
+2. `watchdog.sh` waits 10 seconds before restarting (_probably to avoid tcp issues_)
+3. restarting `domotic` and `hwdriver` takes max. 10 seconds
+
+This totals to 50 seconds on average. With the 99.99% availability requirement this means:
+$$ 99.99\% = {MTBF \over (MTBF + MTTR)} = {MTBF \over (MTBF + 50 sec)} $$
+
+Solving this: MTBF = 5.8 days minimal, which should be easily achievable.
+
+> Note: the actual state is written to disk every 5 seconds (default). This is ignored in the calculation - we loose maximally changes from last 5 seconds, which is considered not crucial for users anyway.
+
+Looking at the logs of the actual system, the system restarts once every 14 days on average. This gives for the self-healing part this availability:
+
+$$ {14 * 24 * 3600 \over {14 * 24 * 3600 + 50}} = 0,99995866572976 = 99,996\% $$
+
+The second category, where a technician is involved, typically has two causes:
+- The automatic self healing mechanism does not work
+- Hardware failure, temporary or permanent
+
+For the first a power cycle solves the issue. This is very seldom now; if it happens anyone can do this after consulting the technician.
+
+The second one might need between an hour of work (e.g. running `fdisk`) or replacing a hard disk ((happened twice over 10 years). Let's estimate availability with such hardware and software failures that cannot be repaired automatically.
+
+| component | est. availability | data |
+| -- | -- | -- |
+| disk | 99.995% | SSD EVO 870 has 1.5e6 hours MTTF and 72 hours estimated to repair (ordering and installing). <br/>Note that current SSD has much better MTBF than the magnetic hard disks we had before; we had 2 failures in 10 years with hard disk but this is basically no longer expected to happen.|
+| cpu board | 99.74% | 15 years estimated MTTF and 14 days to order, wait delivery and repair; not it already works over 10 years without issue |
+| ubuntu | 99.998% | estimated 1 crash every 6 months, 5 minutes restart|
+| domotic-a | 99.996% | self-healing automatic restart; see first part of this chapter, failure and restart every 14 days |
+| domotic-b | 99,997% | estimated; system hangs, cannot detect failure and hence not restart; happens once a year, 15 minutes on average to solve (power cycle)|
+
+So the overall availability would be:
+
+$$
+\begin{align}
+Av &= Av_{ubuntu} \times Av_{disk} \times Av_{cpu_board} \times Av_{domotic-a} \times Av_{domotic-b} \\
+   &= 99.995\% \times 99.74\% \times 99.9985\% \times 99.996\% \times 99.997\% = 99.73\%
+\end{align}
+$$
+
+So we identified an **architectural risk**: the CPU board  makes it impossible to reach 99.99% availability. Having a spare CPU board won't really solve the problem: it is impossible to replace the CPU board in 50 minutes because of the manual work involved, both replacing the hardware and installing all the software. Having two CPU boards is extremely complex, adding a sort of hot-standby but more importantly adding specific hardware to switch the stack of IO Boards between the two CPU's - far too costly and complex.
+
+After discussion with the stakeholders, basically my familly, we've chosen to accept this risk. A permanent hardware failure - disk or CPU - is serious, but happens less than once a year and candles are nice too. So the Availability, excluding permanent hardware failures, becomes:
+
+$$
+\begin{align}
+Av &= 99.995\% \times 99.9985\% \times 99.996\% \times 99.997\% = 99.986\% \\
+   &\approx 99.99\%
+\end{align}
+$$
+
+
+### 4.5.3. Rationale and Alternatives
+
+The availability requirement of 99,99% is influenced by many factors:
+1. faults that can be self healed, described in previous chapter
+2. software and hardware faults requiring technician involvement
+3. make hardware as robust as possible
+4. make software as robust as possible
+
+Point 1: Self healing was described earlier in this section, we achieved 99,996%.
+
+Point 2: Faults involving technician are thanks to self healing and improved hardware very rare (see also next point), and candles exist, so we accept the 99,73%. 
+
+Point 3: The hardware used from Diamond Systems and Atom is purposely built for industrial systems (PC104 systems), and has a high reliability. This has proven to be true over last 10 years. The only issue was magnetic drives, now replaced by much more reliable SDD.
+
+Point 4: Multiple approaches were used:
+1. Use a safe language as much as possible:
+   - Java & Scala were chosen for `domotic`, due to crash resistance
+   - C part for `HwDriver` is kept as small as possible
+   - ELM is far superior to Javascript in bug avoidance 
+2. Make the input/output processing deterministic, as explained in _Development View - Modules for Configuration and Execution_
+3. Automated testing. Thanks to the `loop(currentTime)` interface it is possible to simulate time. This allows for testing the most complex configurations end to end.
+  
+As explained in the Functional View the `hwdriver` needs direct memory access, which Java does not provide. We use Diamond Systems IO hardware, which comes with a C DMMAT library. So Java needed to access C code, which can be done in a number of ways:
+- JNI (Java Native Interface): the C library runs in the `domotic` process space; this gives best performance, but crashes in the C code crash the entire system
+- custom protocol on top of TCP: much more robust; also allows for easier development, having the `hwdriver` on the actual hardware but the `domotic` on a Mac talking remotely to the `hwdriver`.
+
+We choose for the latter solution, keeping the `hwdriver` as small as possible. 
 
 
 
 # 5. Architectural Evaluation & Risks
 
 ## 5.1. Evaluation
-So how does this design realizes the architectural requirements listed in the beginning of this document?
+So how does this design realizes the architectural requirements listed in the beginning of this document? Below table summarizes where the information can be found. 
 
-| Driver | Evaluation |
-| --- | --- |
-| Layout Config | The DomoticConfig XML file fully describes the layout, and is processed at re-start. See Deployment View and Layering View. |
-| UI Config | The DomoticConfig XML file includes the UI configuration. _Not yet described in design._ |
-| BugFree | Fully automated regression tests are provided. The ability to simulate time is fundamental here.<br/>Also a sound approach to how events are handled and state changes are separated from the events is fundamental. These concepts are explained in Class View.|
-| Safe | Only Actuators can change outputs so the issues is localized in specific code, improving safety by not scattering this functionality around. Further state changes are localized in Actuator's `loop()` and outputs must only change as a consequence of a state change, further localizing this functionality. Lastly in the Actuator's `loop()` a safeguard must be implemented ensuring that an output does not change too often, e.g. max 1 time per second.|
-| Available |The domotic and hwdriver processes run as a service, have a health check and a cron job restarts when no heartbeat is detected (not yet described in any view). Also automated tests contribute here.  |
-| HW Change | See Layering View. |
+Legend:
+- The number of \+ signs indicates how relevant a view or perspective explains the given Architecture Driver (typically in it's _Alternatives and Rationale_ section.):
+- \+ : some explanation, or supporting other views/perspectives
+- \++ : in between
+- \+++ : this view / perspective specifically addresses the given Architecture Driver
+
+| Driver | Functional<br/>View | Deployment<br/>View | Development<br/>Layers<br/>View| Development</br>Modules<br/>View| Availability<br/>Perspective|
+| --- | --- | --- | --- | --- | --- |
+| Layout Config |       | \++   |       | \+++  |       |
+| UI Config     |       |       |       |       |       |
+| Bug Free      |       | \+    |       | \++   |  \+   |
+| Safe          |       |       |       | \++   |  \+   |
+| Available     |       |       |       | \+    |  \+++ |
+| HW Change     |       |       | \+++  |       |       |
+| Explore       | \++   | \++   |       |       |  \+   |
+
 
 ## 5.2. Risks & Mitigation
 
-| Risk | Ref | Mitigation |
+| Risk | Addressed in | Mitigation |
 | -- | -- | -- |
-| CPU board broken | Availability Perspective | Accept the lower availability, so 99.72% instead of 99.99%. <br/>The extra cost of buying a spare CPU board is not worth it. | 
+| Permanent hardware failure gives only 99.72% where 99.99% is required. | Availability Perspective | Accept to exclude permanent hardware failures from the equation, which gives the required 99.99% availability. <br/>Permanent hardware failures require hours or days to repair, but only occur 1 or 2 times a decade, which the stakeholders are ok with. | 
+
+## 5.3. Future Work
+1. Views explaining UI Config
+2. Testability view
 
 # 6. End of Document

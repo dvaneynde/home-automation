@@ -60,12 +60,15 @@ $ java -jar domotica-1.0-jar-with-dependencies.jar -Dlogback.configurationFile=s
 # Outstanding TODOs
 
 1. `IHardwareWriter` and `IHardwareReader` should not extend `IHardware` but instead should be members of it (delegation).
-2. Listen on port 80, not 8080.
-3. REST API, herwerken, b.v. POST etc.
-4. `systemd` ipv `init.d`.
-5. Health check via REST api, bovenop interne check op loop().
-6. HardwareIO heeft al exit 1 !!!
-7. xml resources in src/main/resources, as default
-8. logging config in src/main/resources, as default
-9. logging.properties ook op bordje, en -D bij domotic.sh
+2. Better separation Domotic / Oscillator: the former only holds configuration, the latter holds loopOnce() and refers to Domotic for its configuration.
+3. Rename Domotic into HomeAutomation everywhere.
+4. Listen on port 80, not 8080.
+5. Review REST API, urls, POST etc.
+6. `systemd` instead of `init.d`.
+7. Health check via REST api, bovenop interne check op loop().
+8. HardwareIO heeft al exit 1 !!!
+9. xml resources in src/main/resources, as default
+10. logging config in src/main/resources, as default
+11. logging.properties ook op bordje, en -D bij domotic.sh
+12. testability view in DESIGN
 
