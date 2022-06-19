@@ -59,7 +59,7 @@ $ java -jar domotica-1.0-jar-with-dependencies.jar -Dlogback.configurationFile=s
 
 # Outstanding TODOs
 
-1. `IHardwareWriter` and `IHardwareReader` should not extend `IHardware` but instead should be members of it (delegation).
+1. [DONE] `IHardwareWriter` and `IHardwareReader` should not extend `IHardware` but instead should be members of it (delegation).
 2. Better separation Domotic / Oscillator: the former only holds configuration, the latter holds loopOnce() and refers to Domotic for its configuration.
 3. Rename Domotic into HomeAutomation everywhere.
 4. Listen on port 80, not 8080.

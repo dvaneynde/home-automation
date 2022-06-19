@@ -124,7 +124,7 @@ public class TestXmlHwConfigurator {
 		IHardware hw = new DiamondsysHardware(xhc, drv);
 
 		drv.responseFromDriverToUse0 = "INP_O 0x310 127\nINP_D 0x400 - 0 0\nINP_D 0x410 46 - -\nINP_D 0x420 255 0 0";
-		hw.refreshInputs();
+		hw.getReader().refreshInputs();
 		log.info("testComplexConfigurationAndMessagesOfInputStates, input state messages:\n" + drv.sentToDriver0);
 		Assert.assertEquals("REQ_INP 0x310 O\nREQ_INP 0x400 D NYY\nREQ_INP 0x410 D YNN\nREQ_INP 0x420 D YYY\n\n",
 				drv.sentToDriver0);
@@ -138,7 +138,7 @@ public class TestXmlHwConfigurator {
 		IHardware hw = new DiamondsysHardware(xhc, drv);
 
 		drv.responseFromDriverToUse0 = "";
-		hw.refreshOutputs();
+		hw.getWriter().refreshOutputs();
 		log.info("testComplexConfigurationAndOutputMessages, output messages:\n" + drv.sentToDriver0);
 		Assert.assertEquals(
 				"SET_OUT 0x300 O 0\nSET_OUT 0x400 D - 0 0\nSET_OUT 0x410 D 0 0 0\nSET_OUT 0x420 D 0 0 0\n\n",

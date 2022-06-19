@@ -4,11 +4,25 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.dlvm.iohardware.IHardware;
+import eu.dlvm.iohardware.IHardwareReader;
+import eu.dlvm.iohardware.IHardwareWriter;
+
 import org.junit.Assert;
 
-public abstract class BaseHardwareMock implements IHardware {
+public class BaseHardwareMock implements IHardware, IHardwareReader, IHardwareWriter {
 
 	static Logger log = LoggerFactory.getLogger(BaseHardwareMock.class);
+
+	@Override
+	public IHardwareReader getReader() {
+		return this;
+	}
+
+	@Override
+	public IHardwareWriter getWriter() {
+		return this;
+	}
+
 
 	@Override
 	public void writeDigitalOutput(String channel, boolean value) throws IllegalArgumentException {
@@ -53,5 +67,4 @@ public abstract class BaseHardwareMock implements IHardware {
 	public void stop() {
 		log.trace("stop() called, ignored because mock.");
 	}
-
 }

@@ -1,8 +1,15 @@
 package eu.dlvm.iohardware;
 
 /**
- * Hardware outputs.
- *
+ * Abstraction of hardware outputs, being digital (0/1) or analog (0..n).
+ * <p> Each output is identified by its channel ID, a {@link String}.
+ * <p> Input channels and output
+ * channels are different; so channel 'ABC' can be used twice, once for input
+ * and once for output.
+ * <p>
+ * To optimize interaction with the hardware inputs and outputs are buffered.
+ * Only when calling {@link #refreshOutputs()} the outputs are synchronized with the hardware.
+ * 
  * @author Dirk Vaneynde
  */
 

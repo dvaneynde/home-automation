@@ -8,6 +8,8 @@ import org.slf4j.Logger; import org.slf4j.LoggerFactory;
 
 import eu.dlvm.iohardware.ChannelFault;
 import eu.dlvm.iohardware.IHardware;
+import eu.dlvm.iohardware.IHardwareReader;
+import eu.dlvm.iohardware.IHardwareWriter;
 import eu.dlvm.iohardware.diamondsys.factories.IBoardFactory;
 import eu.dlvm.iohardware.diamondsys.messaging.GeneralMsg;
 import eu.dlvm.iohardware.diamondsys.messaging.IBoardMessaging;
@@ -19,7 +21,7 @@ import eu.dlvm.iohardware.diamondsys.messaging.IHwDriverChannel.Reason;
  * 
  * @author dirk vaneynde
  */
-public class DiamondsysHardware implements IHardware {
+public class DiamondsysHardware implements IHardware, IHardwareReader, IHardwareWriter {
 
 	static Logger log = LoggerFactory.getLogger(DiamondsysHardware.class);
 
@@ -40,6 +42,16 @@ public class DiamondsysHardware implements IHardware {
 		bf.configure(boards, channelMap);
 
 		this.driverChannel = hwDriverChannel;
+	}
+
+	@Override
+	public IHardwareReader getReader() {
+		return this;
+	}
+
+	@Override
+	public IHardwareWriter getWriter() {
+		return this;
 	}
 
 	@Override

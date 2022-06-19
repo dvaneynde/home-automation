@@ -284,16 +284,17 @@ package Home_Automation_Logic <<layer>> {
         }
 
         package eu.dlvm.iohardware <<java>>{
-            interface IHardwareBuilder
+            interface IHardwareBuilder 
             interface IHardware
             interface IHardwareReader
             interface IHardwareWriter
-            IHardware <|-- IHardwareReader
-            IHardware <|-- IHardwareWriter
+            IHardwareBuilder ..> IHardware
+            IHardware ..> IHardwareReader
+            IHardware ..> IHardwareWriter
         }
 
-        eu.dlvm.domotics ..> IHardwareBuilder
-        eu.dlvm.domotics ..> IHardware
+        eu.dlvm.domotics .> IHardwareBuilder
+        'eu.dlvm.domotics ..> IHardware
 }
 
 WebUI ..> RestAPI
@@ -320,8 +321,8 @@ SwitchesAndLampsEtc ..> HwDriver : via-IO-boards
 | element | description |
 |---|---|
 | eu.dlvm.domotics |  Main java program, the executable. All logic is hardware independent. It offers all its functionality, including UI specific information, via `RestAPI`. The actual configuration of switches, lamps, timers, dimmers etc. and how they should behave is defined in a hardware independent way in `DomoticConfig` XML file. |
-| eu.dlvm.iohardware | Imposes a generic interface onto hardware specific logic. Note that these interfaces are still part of the hardware-independent layer. <br/> Interface `IHardware` has an operation to start and stop the hardware, and includes interfaces `IHardwareReader` and `IHardwareWriter` to read inputs and write outputs respectively.<br/> Interface `IHardwareBuilder` is used at initialization to get an instance of `IHardware`. |
-| eu.dlvm.iohardware.diamondsys | Java classes `DiamondsysHardware` and `DiamondsysHardwareBuilder`realize the interfaces from `eu.dlvm.iohardware` for Diamond Systems specific boards. It also has an XML configuration file `DiamondBoardsConfig` that links the generic I/O addresses used in the higher layer to specific boards (via memory address) and board-specific input or output numbers.|
+| eu.dlvm.iohardware | Imposes a generic interface onto hardware specific logic. Note that these interfaces are still part of the hardware-independent layer. <br/> Interface `IHardware` has an operation to start and stop the hardware, and includes getters for interfaces `IHardwareReader` and `IHardwareWriter` to read inputs and write outputs respectively.<br/> Interface `IHardwareBuilder` is used at initialization to get an instance of `IHardware`. |
+| eu.dlvm.iohardware.diamondsys | Java classes `DiamondsysHardware` and `DiamondsysHardwareBuilder` realize the interfaces from `eu.dlvm.iohardware` for Diamond Systems specific boards. It also has an XML configuration file `DiamondBoardsConfig` that links the generic I/O addresses used in the higher layer to specific boards (via memory address) and board-specific input or output numbers.|
 | ReadWriteProtocol | This is a description of the text based and TCP/IP based protocol to communicate between the Java code and the HwDriver. It is specified as comments in specific `eu.dlvm.iohardware.diamondsys` classes and in the `HwDriver` code. |
 | HwDriver | C based program. See higher for its description. |
 
@@ -341,7 +342,6 @@ Suppose another hardware is used than Diamond Systems, what needs to change?
 
 That should be it. Often a new kind of hardware might impact the interfaces in `eu.dlvm.iohardware` making them more generic so that they can handle more different types of hardware. But today's separation  should already make this more easy.
 
-> **To Improve**:  `IHardwareWriter` and `IHardwareReader` should not extend `IHardware` but instead should be members of it (delegation over inheritance).
 
 
 ## 4.4. Development View - Modules on Configuration and Execution
@@ -434,7 +434,7 @@ IEventListener "*" <-- Block  : listeners <
 | Connector | Used between Blocks to convert one event-type into another. Is fully stateless - contrary to `Block`s - and very lightweight. <br/>E.g. in earlier Switch/Lamp example a Switch sends `SingleClicked` events and Lamps expect `Toggle` events. So a `Connector` is placed in between to convert this event.
 | Domotic | Singleton class implementing the `loopOnce()` function explained below this table. Essentially it evaluates all inputs, logic and outputs every 20 milliseconds (default parameter). |
 | IDomoticLoop | All Blocks implement the `loop()` function called from `loopOnce()` in a specific order - see details below this table. State changes of a Block, like 'on' or 'off' in an Actuator, must only occur from within a `loop()` function (not from an event). |
-| IHardwareReader IHardwareWriter | Sensors and Actuators respectively read from and write to the hardware via an implementation of this interface. This abstracts away the actual hardware used.|
+| IHardwareReader IHardwareWriter | Hardware independent abstracitons for hardware inputs and outputs respectviely. `Sensors` can only use `IHardwareReader` and `Actuators` can only use `IHardwareWriter`. |
 
 
 The `loopOnce(long currentTime)` function drives the home automation:
@@ -458,11 +458,11 @@ The `loopOnce(long currentTime)` function drives the home automation:
 
 This is what happens every 20 ms (default, configurable):
 
-- `IHardwareIO.refreshInputs()` is called, so that all actual hardware inputs are read and buffered. _Under the hood this sends a set of commands to `HwDriver` to read the values from the `IO Boards`._
+- `IHardwareReader.refreshInputs()` is called, so that all actual hardware inputs are read and buffered. _Under the hood this sends a set of commands to `HwDriver` to read the values from the `IO Boards`._
 - All Sensors have their `Sensor.loop()` executed to process these inputs via `IHardwareReader` and update their state machines if appropriate. State changes may lead to events being sent to Controllers or Actuators. These Controllers and Actuators **must not yet evaluate this change, they must not yet change their state or send events elsewhere themselves** - they just have to 'remember' the event received.
 - Next `Controller.loop()` is run on all Controllers. Now it is the time to process any event information received and remembered. This may lead to a state change of the Controller itself, which in turn may lead to an event to another Controller or Actuator. Again, receivers of these events just note down the information sent by the event - they must not yet act upon it.
 - Finally Actuators have their `Actuator.loop()` executed, so they can update state and if applicable update hardware outputs. When output hardware needs to be updated an Actuator uses `IHardwareWriter` that buffers the output changes.
-- To actually update hardware output `IHardwareIO.refreshOutputs()` is called.
+- To actually update hardware output `IHardwareWriter.refreshOutputs()` is called.
 
 This may all be very abstract, below example may be helpful.
 
@@ -470,14 +470,14 @@ This may all be very abstract, below example may be helpful.
 
 Suppose the `DomoticConfig.xml` file contains the following configuration.
 ```xml
-	<switch name="SchakLichtInkom" />
-	<lamp name="LichtInkom" desc="Inkom" autoOffSec="300" blink="true">
-		<toggle src="SchakLichtInkom" />
+	<switch name="SwitchDoor" />
+	<lamp name="LampDoor" desc="Entrance light" autoOffSec="300" blink="true">
+		<toggle src="SwitchDoor" />
 	</lamp>
 ```
 Functionally this means:
-- There is a switch at the house's entrance hall, named `SchakLichtInkom`.
-- There is also a lamp, named `LichtInkom`, that toggles between on and off depdending on the switch.
+- There is a switch at the house's entrance hall, named `SwitchDoor`.
+- There is also a lamp, named `LampDoor`, that toggles between on and off depdending on the switch.
 - The lamp turns off automatically after 300 seconds - kids often forgot to switch it off so I added this feature. The lamp will shortly blink before going off, so you can quickly toggle the switch to prevent that - for example, you're chatting at the door with your neighbour for far too long.
 
 So how does this relate to the structure explained in the previous section? First let's see how Lamp and Switch types fit in. I included some of the methods we'll need later.
@@ -510,15 +510,15 @@ The following object diagram translates the configuration. Note the listener lin
 
 ```plantuml
 @startuml
-object "SchakLichtInkom : Switch" as s
-s : name = SchakLichtInkom
+object "SwitchDoor : Switch" as s
+s : name = SwitchDoor
 s : listener = c1
 object "c1:Connector" as c
 c : fromEvent = SingleClick
 c : toEvent = Toggle
-c : listener = LichtInkom
-object "LichtInkom : Lamp" as l
-l : name = LichtInkom
+c : listener = LampDoor
+object "LampDoor : Lamp" as l
+l : name = LampDoor
 l : autoOffSec = 300
 l : blink = true
 s - c : listener >
@@ -531,19 +531,20 @@ Next let's see at execution. Suppose the lamp is Off and a user just clicked the
 ```plantuml
 @startuml
 control ": Domotic" as o
-participant ": IHardware" as h
-participant "SchakLichtInkom : Switch" as s
+participant ": IHardwareReader" as hi
+participant ": IHardwareWriter" as ho
+participant "SwitchDoor : Switch" as s
 participant "c1 : Connector" as c
-participant "LichtInkom : Lamp" as l
+participant "LampDoor : Lamp" as l
 o --> o : loopOnce()
 note left: every 20 ms.
 activate o
-o --> h : refreshInputs()
+o --> hi : refreshInputs()
 note right: all inputs are read and buffered
 o --> s : loop(100)
 note left: current time is 100ms
 activate s
-h <-- s : readDigitalInput()
+hi <-- s : readDigitalInput()
 s --> s : set state
 note right : assume Switch detected single-click (using state machine)
 s -> c : notify("SingleClick")
@@ -558,10 +559,10 @@ activate l
 l -> l : check received event
 note left : current state is 'off', event is 'Toggle', so need to change output state to 'on'
 l -> l : setState(on)
-h <-- l : writeDigitalOutput()
+ho <-- l : writeDigitalOutput()
 deactivate l
 
-o --> h : refreshOutputs()
+o --> ho : refreshOutputs()
 note right: outputs were buffered and now send to IO boards
 deactivate o
 @enduml

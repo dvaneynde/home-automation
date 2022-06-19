@@ -56,11 +56,11 @@ class XmlElementHandlers extends DefaultHandler2 {
 	}
 
 	private IHardwareReader getReader() {
-	    return hw;
+	    return hw.getReader();
 	}
 
     private IHardwareWriter getWriter() {
-        return hw;
+        return hw.getWriter();
     }
 
     public XmlElementHandlers(IDomoticBuilder builder, IHardware hardware) {

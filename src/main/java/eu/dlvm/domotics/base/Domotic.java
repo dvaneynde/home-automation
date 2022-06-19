@@ -193,7 +193,7 @@ public class Domotic implements IDomoticBuilder, IStateChangeRegistrar {
 			RememberedOutput ro = prevOuts.get(a.getName());
 			a.initializeOutput(ro);
 		}
-		hw.refreshOutputs();
+		hw.getWriter().refreshOutputs();
 		for (Block b : sensors)
 			registerIfUiCapable(b);
 		for (Block b : controllers)
@@ -367,7 +367,7 @@ public class Domotic implements IDomoticBuilder, IStateChangeRegistrar {
 		loopSequence++;
 		if (loopSequence % 100 == 0)
 			MON.info("loopOnce() start, loopSequence=" + loopSequence + ", currentTime=" + currentTime);
-		hw.refreshInputs();
+		hw.getReader().refreshInputs();
 		for (Sensor s : sensors) {
 			s.loop(currentTime);
 		}
@@ -377,7 +377,7 @@ public class Domotic implements IDomoticBuilder, IStateChangeRegistrar {
 		for (Actuator a : actuators) {
 			a.loop(currentTime);
 		}
-		hw.refreshOutputs();
+		hw.getWriter().refreshOutputs();
 
 		{
 			// TODO must be async in separate thread, since might take longer than 20 ms... and with timeout perhaps?
