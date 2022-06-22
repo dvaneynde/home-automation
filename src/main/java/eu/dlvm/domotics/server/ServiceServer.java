@@ -67,7 +67,7 @@ public class ServiceServer {
 	public void start(IStateChangeRegistrar stateChangeRegistrar) {
 		server = new Server();
 		ServerConnector connector = new ServerConnector(server);
-		connector.setPort(8080);
+		connector.setPort(80);
 		server.addConnector(connector);
 
 		try {
