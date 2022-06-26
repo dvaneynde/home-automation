@@ -4,9 +4,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.Assert;
 
+import eu.dlvm.domotics.BaseHardwareMock;
 import eu.dlvm.domotics.base.DomoticLayout;
-import eu.dlvm.domotics.base.IDomoticLayoutBuilder;
-import eu.dlvm.domotics.blocks.BaseHardwareMock;
 import eu.dlvm.iohardware.IHardware;
 
 public class TestLampWithAutoOff {
