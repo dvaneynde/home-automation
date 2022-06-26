@@ -4,8 +4,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.Assert;
 
+import eu.dlvm.domotics.base.DomoticLayout;
 import eu.dlvm.domotics.blocks.BaseHardwareMock;
-import eu.dlvm.domotics.blocks.DomoticMock;
 import eu.dlvm.iohardware.IHardware;
 
 // TODO werkt met 50ms sample, maar niet meer met 20ms sample; daarom loop() zoals bij WindSensor test.
@@ -26,7 +26,7 @@ public class TestDimmedLamp {
 	private static final String LAMP_CH = Integer.toString(10);
 	private DimmedLamp lamp;
 	private Hardware hw = new Hardware();
-	private DomoticMock dom = new DomoticMock();
+	private DomoticLayout dom = new DomoticLayout();
 
 
 	@Before

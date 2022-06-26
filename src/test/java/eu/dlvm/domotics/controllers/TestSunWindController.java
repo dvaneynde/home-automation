@@ -8,8 +8,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import eu.dlvm.domotics.base.Block;
-import eu.dlvm.domotics.base.IDomoticLayoutBuilder;
-import eu.dlvm.domotics.blocks.DomoticMock;
+import eu.dlvm.domotics.base.DomoticLayout;
 import eu.dlvm.domotics.events.EventType;
 import eu.dlvm.domotics.events.IEventListener;
 
@@ -34,7 +33,7 @@ public class TestSunWindController {
 
 	@Before
 	public void init() {
-		DomoticMock domoticContext = new DomoticMock();
+		DomoticLayout domoticContext = new DomoticLayout();
 		swc = new SunWindController("Test", "Test SunWindCtonroller", "Dummy UI", domoticContext);
 		swc.registerListener(new DummyScreen());
 
