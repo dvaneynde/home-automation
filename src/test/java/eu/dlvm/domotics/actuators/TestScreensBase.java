@@ -2,8 +2,8 @@ package eu.dlvm.domotics.actuators;
 
 import org.junit.Before;
 
+import eu.dlvm.domotics.BaseHardwareMock;
 import eu.dlvm.domotics.base.DomoticLayout;
-import eu.dlvm.domotics.blocks.BaseHardwareMock;
 import eu.dlvm.iohardware.IHardware;
 
 public class TestScreensBase {

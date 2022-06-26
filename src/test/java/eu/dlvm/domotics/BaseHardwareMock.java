@@ -1,4 +1,4 @@
-package eu.dlvm.domotics.blocks;
+package eu.dlvm.domotics;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

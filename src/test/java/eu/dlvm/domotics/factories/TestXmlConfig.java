@@ -2,8 +2,9 @@ package eu.dlvm.domotics.factories;
 
 import org.junit.Test;
 
+import eu.dlvm.domotics.BaseHardwareMock;
 import eu.dlvm.domotics.base.DomoticLayout;
-import eu.dlvm.domotics.blocks.BaseHardwareMock;
+
 import org.junit.Assert;
 
 public class TestXmlConfig {

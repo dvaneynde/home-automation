@@ -5,10 +5,10 @@ import static org.junit.Assert.fail;
 import org.junit.Assert;
 import org.junit.Test;
 
+import eu.dlvm.domotics.BaseHardwareMock;
 import eu.dlvm.domotics.base.Block;
 import eu.dlvm.domotics.base.ConfigurationException;
 import eu.dlvm.domotics.base.DomoticLayout;
-import eu.dlvm.domotics.blocks.BaseHardwareMock;
 import eu.dlvm.domotics.events.EventType;
 import eu.dlvm.domotics.events.IEventListener;
 import eu.dlvm.iohardware.IHardware;

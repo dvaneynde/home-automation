@@ -12,11 +12,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.Assert;
 
+import eu.dlvm.domotics.BaseHardwareMock;
 import eu.dlvm.domotics.actuators.Lamp;
 import eu.dlvm.domotics.base.Domotic;
 import eu.dlvm.domotics.base.DomoticLayout;
 import eu.dlvm.domotics.base.RememberedOutput;
-import eu.dlvm.domotics.blocks.BaseHardwareMock;
 import eu.dlvm.domotics.controllers.Timer;
 import eu.dlvm.domotics.events.EventType;
 import eu.dlvm.domotics.sensors.Switch;

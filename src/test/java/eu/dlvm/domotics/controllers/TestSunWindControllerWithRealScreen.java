@@ -4,9 +4,9 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import eu.dlvm.domotics.BaseHardwareMock;
 import eu.dlvm.domotics.actuators.Screen;
 import eu.dlvm.domotics.base.DomoticLayout;
-import eu.dlvm.domotics.blocks.BaseHardwareMock;
 import eu.dlvm.domotics.events.EventType;
 import eu.dlvm.iohardware.IHardware;
 
