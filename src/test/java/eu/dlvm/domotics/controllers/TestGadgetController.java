@@ -6,7 +6,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import eu.dlvm.domotics.base.Block;
-import eu.dlvm.domotics.base.IDomoticBuilder;
+import eu.dlvm.domotics.base.IDomoticLayoutBuilder;
 import eu.dlvm.domotics.blocks.DomoticMock;
 import eu.dlvm.domotics.controllers.gadgets.GadgetSet;
 import eu.dlvm.domotics.controllers.gadgets.IGadget;

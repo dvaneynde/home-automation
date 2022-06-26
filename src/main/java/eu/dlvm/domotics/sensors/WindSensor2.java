@@ -4,7 +4,7 @@ import eu.dlvm.iohardware.IHardwareReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import eu.dlvm.domotics.base.IDomoticBuilder;
+import eu.dlvm.domotics.base.IDomoticLayoutBuilder;
 import eu.dlvm.domotics.base.IUiCapableBlock;
 import eu.dlvm.domotics.base.Sensor;
 import eu.dlvm.domotics.events.EventType;
@@ -52,12 +52,12 @@ public class WindSensor2 extends Sensor implements IUiCapableBlock {
 	 * @param waitTimeToResetAlarm
 	 *            Unit is seconds.
 	 */
-	public WindSensor2(String name, String description, String channel, IHardwareReader reader, IDomoticBuilder builder, int freqThreshold,
+	public WindSensor2(String name, String description, String channel, IHardwareReader reader, IDomoticLayoutBuilder builder, int freqThreshold,
                        int waitTimeToResetAlarm, int waitTimeToRaiseAlarm) {
 		this(name, description, null, channel, reader, builder, freqThreshold, waitTimeToResetAlarm, waitTimeToRaiseAlarm);
 	}
 
-	public WindSensor2(String name, String description, String ui, String channel, IHardwareReader reader, IDomoticBuilder builder,
+	public WindSensor2(String name, String description, String ui, String channel, IHardwareReader reader, IDomoticLayoutBuilder builder,
 			int freqThreshold, int waittimeToResetAlarm, int waittimeToRaiseAlarm) {
 		super(name, description, ui,  channel, reader, builder);
 		this.freqThreshold = freqThreshold;

@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.actuators.Lamp;
 import eu.dlvm.domotics.base.Domotic;
+import eu.dlvm.domotics.base.DomoticLayout;
 import eu.dlvm.domotics.base.RememberedOutput;
 import eu.dlvm.domotics.events.EventType;
 import eu.dlvm.domotics.sensors.Switch;
@@ -32,9 +33,11 @@ public class TestSwitchDedicatedAllOff {
 		hw.out(10, false);
 
 		dom = Domotic.createSingleton(hw);
-		swLamp = new Switch("SwitchLamp", "Switch Lamp", Integer.toString(0), hw, dom);
-		swAllOff = new Switch("SwitchAllOff", "Switch All Off", Integer.toString(1), hw, dom);
-		lamp = new Lamp("Lamp1", "Lamp1", false, Integer.toString(10), hw, dom);
+		DomoticLayout layout = dom.getLayout();
+
+		swLamp = new Switch("SwitchLamp", "Switch Lamp", Integer.toString(0), hw, layout);
+		swAllOff = new Switch("SwitchAllOff", "Switch All Off", Integer.toString(1), hw, layout);
+		lamp = new Lamp("Lamp1", "Lamp1", false, Integer.toString(10), hw, layout);
 
 		//		swtch2toggle = new Switch2OnOffToggle("toggle", "toggle", null);
 		//		swtch2toggle.map(ClickType.SINGLE, ActionType.TOGGLE);

@@ -73,7 +73,8 @@ public class UiStateUpdatorSocket implements IStateChangedListener {
 
 	private List<UiInfo> createUiInfos() {
 		List<UiInfo> uiInfos = new ArrayList<>();
-		for (IUiCapableBlock ui : Domotic.singleton().getUiCapableBlocks()) {
+		// TODO must not be Domotic, but DomoticLayout
+		for (IUiCapableBlock ui : Domotic.singleton().getLayout().getUiCapableBlocks()) {
 			if (ui.getUiGroup() == null)
 				continue;
 			uiInfos.add(ui.getUiInfo());

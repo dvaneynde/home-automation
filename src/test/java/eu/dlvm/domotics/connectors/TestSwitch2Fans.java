@@ -10,6 +10,7 @@ import org.junit.Assert;
 import eu.dlvm.domotics.actuators.Fan;
 import eu.dlvm.domotics.actuators.Lamp;
 import eu.dlvm.domotics.base.Domotic;
+import eu.dlvm.domotics.base.DomoticLayout;
 import eu.dlvm.domotics.base.RememberedOutput;
 import eu.dlvm.domotics.blocks.BaseHardwareMock;
 import eu.dlvm.domotics.events.EventType;
@@ -67,14 +68,15 @@ public class TestSwitch2Fans {
 		hw.in(1, false);
 
 		dom = Domotic.createSingleton(hw);
-		sw1 = new Switch("Switch1", "Switch1", Integer.toString(0), hw, dom);
-		sw2 = new Switch("Switch2", "Switch2", Integer.toString(1), hw, dom);
-		l1 = new Lamp("Lamp1", "Lamp1", false, Integer.toString(LAMP1_OUT), hw, dom);
-		l2 = new Lamp("Lamp2", "Lamp2", false, Integer.toString(LAMP2_OUT), hw, dom);
-		f1 = new Fan("Fan1", "Fan1", Integer.toString(FAN1_OUT), hw, dom);
+		DomoticLayout layout = dom.getLayout();
+		sw1 = new Switch("Switch1", "Switch1", Integer.toString(0), hw, layout);
+		sw2 = new Switch("Switch2", "Switch2", Integer.toString(1), hw, layout);
+		l1 = new Lamp("Lamp1", "Lamp1", false, Integer.toString(LAMP1_OUT), hw, layout);
+		l2 = new Lamp("Lamp2", "Lamp2", false, Integer.toString(LAMP2_OUT), hw, layout);
+		f1 = new Fan("Fan1", "Fan1", Integer.toString(FAN1_OUT), hw, layout);
 		l1.registerListener(new Connector(EventType.ON, f1, EventType.DELAY_ON, "Test_Lamp"));
 		l1.registerListener(new Connector(EventType.OFF, f1, EventType.DELAY_OFF, "Test_Lamp"));
-		f2 = new Fan("Fan2", "Fan2", Integer.toString(FAN2_OUT), hw, dom);
+		f2 = new Fan("Fan2", "Fan2", Integer.toString(FAN2_OUT), hw, layout);
 		l2.registerListener(new Connector(EventType.ON, f2, EventType.DELAY_ON, "Test_Lamp"));
 		l2.registerListener(new Connector(EventType.OFF, f2, EventType.DELAY_OFF, "Test_Lamp"));
 

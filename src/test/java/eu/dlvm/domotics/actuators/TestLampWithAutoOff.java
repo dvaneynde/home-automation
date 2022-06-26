@@ -4,7 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.Assert;
 
-import eu.dlvm.domotics.base.IDomoticBuilder;
+import eu.dlvm.domotics.base.IDomoticLayoutBuilder;
 import eu.dlvm.domotics.blocks.BaseHardwareMock;
 import eu.dlvm.domotics.blocks.DomoticMock;
 import eu.dlvm.iohardware.IHardware;
@@ -27,7 +27,7 @@ public class TestLampWithAutoOff {
 	private static final String LAMP_OUT = Integer.toString(10);
 	private Lamp lamp;
 	private Hardware hw;
-	private IDomoticBuilder dom;
+	private IDomoticLayoutBuilder dom;
 	private long current;
 
 	@Before

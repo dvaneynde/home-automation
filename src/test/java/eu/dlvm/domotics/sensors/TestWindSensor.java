@@ -7,7 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.base.Block;
-import eu.dlvm.domotics.base.IDomoticBuilder;
+import eu.dlvm.domotics.base.IDomoticLayoutBuilder;
 import eu.dlvm.domotics.blocks.BaseHardwareMock;
 import eu.dlvm.domotics.blocks.DomoticMock;
 import eu.dlvm.domotics.events.EventType;
@@ -36,7 +36,7 @@ public class TestWindSensor implements IEventListener {
 
 	private static final Logger log = LoggerFactory.getLogger(TestWindSensor.class);
 	private Hardware hw;
-	private IDomoticBuilder dom;
+	private IDomoticLayoutBuilder dom;
 	private WindSensor ws;
 	private long time;
 	private EventType lastEvent;

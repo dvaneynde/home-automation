@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.actuators.DimmedLamp;
 import eu.dlvm.domotics.base.Domotic;
+import eu.dlvm.domotics.base.DomoticLayout;
 import eu.dlvm.domotics.base.RememberedOutput;
 import eu.dlvm.domotics.sensors.DimmerSwitch;
 import eu.dlvm.iohardware.ChannelType;
@@ -57,8 +58,9 @@ public class TestEnd2EndDimmer {
 		hw = new DiamondsysHardware(new TestConfigurator(), drv);
 		// Domotic
 		dom = Domotic.createSingleton(hw);
-		dsw = new DimmerSwitch("dsw1", "Dimmer Switches 1", SW_DN_1, SW_UP_1, hw, dom);
-		dl = new DimmedLamp("dl1", "Dimmed Lamp 1", 99, DIMMER1, hw, dom);
+		DomoticLayout layout = dom.getLayout();
+		dsw = new DimmerSwitch("dsw1", "Dimmer Switches 1", SW_DN_1, SW_UP_1, hw, layout);
+		dl = new DimmedLamp("dl1", "Dimmed Lamp 1", 99, DIMMER1, hw, layout);
 		dsw.registerListener(dl);
 	}
 

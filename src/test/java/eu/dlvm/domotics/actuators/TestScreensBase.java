@@ -2,7 +2,7 @@ package eu.dlvm.domotics.actuators;
 
 import org.junit.Before;
 
-import eu.dlvm.domotics.base.IDomoticBuilder;
+import eu.dlvm.domotics.base.IDomoticLayoutBuilder;
 import eu.dlvm.domotics.blocks.BaseHardwareMock;
 import eu.dlvm.domotics.blocks.DomoticMock;
 import eu.dlvm.iohardware.IHardware;

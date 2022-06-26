@@ -24,7 +24,7 @@ public class Main {
     public Domotic setupBlocksConfig(String cfgFilename, IHardware hw) {
         try {
             Domotic domotic = Domotic.createSingleton(hw);
-            XmlDomoticConfigurator.configure(cfgFilename, hw, domotic);
+            XmlDomoticConfigurator.configure(cfgFilename, hw, domotic.getLayout());
             return domotic;
         } catch (Exception e) {
             log.error("Cannot configure system, abort.", e);

@@ -14,6 +14,7 @@ import org.junit.Assert;
 
 import eu.dlvm.domotics.actuators.Lamp;
 import eu.dlvm.domotics.base.Domotic;
+import eu.dlvm.domotics.base.DomoticLayout;
 import eu.dlvm.domotics.base.RememberedOutput;
 import eu.dlvm.domotics.blocks.BaseHardwareMock;
 import eu.dlvm.domotics.controllers.Timer;
@@ -70,11 +71,12 @@ public class TestSwitchOrTimer2Lamp {
 		hw.out(11, false);
 
 		dom = Domotic.createSingleton(hw);
+		DomoticLayout layout = dom.getLayout();
 
-		sw1 = new Switch("Switch1", "Switch1", Integer.toString(0), hw, dom);
-		sw2 = new Switch("Switch2", "Switch2", Integer.toString(1), hw, dom);
-		o1 = new Lamp("Lamp1", "Lamp1", false, Integer.toString(10), hw,  dom);
-		o2 = new Lamp("Lamp2", "Lamp2", false, Integer.toString(11), hw, dom);
+		sw1 = new Switch("Switch1", "Switch1", Integer.toString(0), hw, layout);
+		sw2 = new Switch("Switch2", "Switch2", Integer.toString(1), hw, layout);
+		o1 = new Lamp("Lamp1", "Lamp1", false, Integer.toString(10), hw,  layout);
+		o2 = new Lamp("Lamp2", "Lamp2", false, Integer.toString(11), hw, layout);
 
 		//		SwitchClick2Toggle sct1 = new SwitchClick2Toggle("sct1", "");
 		//		sct1.registerListener(o1);
@@ -183,7 +185,7 @@ public class TestSwitchOrTimer2Lamp {
 
 	@Test
 	public void testTimer() {
-		Timer t = new Timer("timer", "timer", dom);
+		Timer t = new Timer("timer", "timer", dom.getLayout());
 		t.setOnTime(22, 0);
 		t.setOffTime(7, 30);
 		t.registerListener(o1);

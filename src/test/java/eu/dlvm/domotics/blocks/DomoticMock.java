@@ -5,7 +5,7 @@ import java.util.List;
 
 import eu.dlvm.domotics.base.*;
 
-public class DomoticMock implements IDomoticBuilder {
+public class DomoticMock implements IDomoticLayoutBuilder {
 
 	public List<Sensor> sensors = new ArrayList<Sensor>(64);
 	public List<Actuator> actuators = new ArrayList<Actuator>(32);
