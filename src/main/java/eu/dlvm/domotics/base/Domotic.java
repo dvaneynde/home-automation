@@ -28,19 +28,19 @@ import eu.dlvm.iohardware.IHardware;
  * <li>{@link #initialize(Map)} should then be called to do some one-time
  * initialization</li>
  * <li>{@link #runDomotic(int, String, File)} will then start the system by
- * calling {@link #loopOnce(long)} regularly, and monitor everything</li>
+ * calling {@link #loopOnceAllBlocks(long)} regularly, and monitor everything</li>
  * </ol>
  * <p>
  * {@link #requestStop()} will halt domotic system.
  * <p>
- * {@link #loopOnce(long)} is the key method that drives every input to an
+ * {@link #loopOnceAllBlocks(long)} is the key method that drives every input to an
  * output.
  * 
  * @author dirk vaneynde
  * 
  *         TODO monitoring en restart werkte niet, weggooien?
  */
-public class Domotic {
+public class Domotic implements ICanLoopAllBlocks {
 
 	public static final int MONITORING_INTERVAL_MS = 5000;
 
@@ -96,7 +96,7 @@ public class Domotic {
 	 * Specifically, hardware outputs are set correctly, and UI blocks are
 	 * gathered from allready registered blocks.
 	 * <p>
-	 * Must be called before {@link #loopOnce(long)} or {@link IHardware#stop()}.
+	 * Must be called before {@link #loopOnceAllBlocks(long)} or {@link IHardware#stop()}.
 	 * 
 	 * @param prevOuts
 	 *                 Map of actuator names and previous outputs. If not used must
@@ -249,25 +249,13 @@ public class Domotic {
 	}
 
 	/**
-	 * This is what happens:
-	 * <ol>
-	 * <li>{@link IHardware#refreshInputs()} is called, so that hardware layer
-	 * inputs are refreshed.</li>
-	 * <li>All registered Sensors have their {@link Sensor#loop(long)} run to read
-	 * input and/or check timeouts etc. This typically triggers Actuators. Same
-	 * happens for Controllers.</li>
-	 * <li>Then any registered Actuators have their {@link Actuator#loop(long)}
-	 * executed, so they can update hardware output state.</li>
-	 * <li>{@link IHardware#refreshOutputs()} is called, so that hardware
-	 * layer outputs are updated.</li>
-	 * <li>Finally any {@link IStateChangedListener}s are called to update model
-	 * state of connected client UIs.
-	 * </ol>
+	 * See {@link ICanLoopAllBlocks#loopOnceAllBlocks(long)}.
 	 * 
 	 * @param currentTime
-	 *                    Current time at loopOnce invocation.
+	 *                    Current time at invocation.
 	 */
-	public synchronized void loopOnce(long currentTime) {
+	@Override
+	public synchronized void loopOnceAllBlocks(long currentTime) {
 		loopSequence++;
 		if (loopSequence % 100 == 0)
 			MON.info("loopOnce() start, loopSequence=" + loopSequence + ", currentTime=" + currentTime);

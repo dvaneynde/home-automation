@@ -64,14 +64,14 @@ public class TestSwitchDedicatedAllOff {
 
 		Assert.assertEquals(false, hw.out(10));
 		hw.in(0, true);
-		dom.loopOnce(cur += 1);
+		dom.loopOnceAllBlocks(cur += 1);
 		hw.in(0, false);
-		dom.loopOnce(cur += 60);
+		dom.loopOnceAllBlocks(cur += 60);
 		Assert.assertEquals(true, hw.out(10));
 		hw.in(1, true);
-		dom.loopOnce(cur += 1);
+		dom.loopOnceAllBlocks(cur += 1);
 		hw.in(1, false);
-		dom.loopOnce(cur += 120);
+		dom.loopOnceAllBlocks(cur += 120);
 		Assert.assertEquals(false, hw.out(10));
 	}
 
@@ -87,14 +87,14 @@ public class TestSwitchDedicatedAllOff {
 
 		Assert.assertEquals(false, hw.out(10));
 		hw.in(0, true);
-		dom.loopOnce(cur += 1);
+		dom.loopOnceAllBlocks(cur += 1);
 		hw.in(0, false);
-		dom.loopOnce(cur += 60);
+		dom.loopOnceAllBlocks(cur += 60);
 		Assert.assertEquals(true, hw.out(10));
 		hw.in(1, true);
-		dom.loopOnce(cur += 1);
+		dom.loopOnceAllBlocks(cur += 1);
 		hw.in(1, false);
-		dom.loopOnce(cur += 99);
+		dom.loopOnceAllBlocks(cur += 99);
 		Assert.assertEquals(true, hw.out(10));
 	}
 
@@ -111,31 +111,31 @@ public class TestSwitchDedicatedAllOff {
 		// lamp on
 		Assert.assertEquals(false, hw.out(10));
 		hw.in(0, true);
-		dom.loopOnce(cur += 1);
+		dom.loopOnceAllBlocks(cur += 1);
 		hw.in(0, false);
-		dom.loopOnce(cur += 60);
+		dom.loopOnceAllBlocks(cur += 60);
 		Assert.assertEquals(true, hw.out(10));
 
 		// all off via normal switch
 		hw.in(0, true);
-		dom.loopOnce(cur += 1);
+		dom.loopOnceAllBlocks(cur += 1);
 		hw.in(0, false);
-		dom.loopOnce(cur += 120);
+		dom.loopOnceAllBlocks(cur += 120);
 		Assert.assertEquals(false, hw.out(10));
 
 		// lamp on again
 		Assert.assertEquals(false, hw.out(10));
 		hw.in(0, true);
-		dom.loopOnce(cur += 1);
+		dom.loopOnceAllBlocks(cur += 1);
 		hw.in(0, false);
-		dom.loopOnce(cur += 60);
+		dom.loopOnceAllBlocks(cur += 60);
 		Assert.assertEquals(true, hw.out(10));
 
 		// lamp off via dedicated switch
 		hw.in(1, true);
-		dom.loopOnce(cur += 1);
+		dom.loopOnceAllBlocks(cur += 1);
 		hw.in(1, false);
-		dom.loopOnce(cur += 120);
+		dom.loopOnceAllBlocks(cur += 120);
 		Assert.assertEquals(false, hw.out(10));
 	}
 
@@ -152,16 +152,16 @@ public class TestSwitchDedicatedAllOff {
 		// lamp on
 		Assert.assertEquals(false, hw.out(10));
 		hw.in(0, true);
-		dom.loopOnce(cur += 1);
+		dom.loopOnceAllBlocks(cur += 1);
 		hw.in(0, false);
-		dom.loopOnce(cur += 60);
+		dom.loopOnceAllBlocks(cur += 60);
 		Assert.assertEquals(true, hw.out(10));
 
 		// all off via normal switch
 		hw.in(0, true);
-		dom.loopOnce(cur += 1);
+		dom.loopOnceAllBlocks(cur += 1);
 		hw.in(0, false);
-		dom.loopOnce(cur += 120);
+		dom.loopOnceAllBlocks(cur += 120);
 		Assert.assertEquals(false, hw.out(10));
 	}
 

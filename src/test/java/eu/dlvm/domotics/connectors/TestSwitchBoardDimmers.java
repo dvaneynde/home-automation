@@ -99,27 +99,27 @@ public class TestSwitchBoardDimmers {
 		Assert.assertEquals(FULL_OUT_VAL / 2, hw.outputs.get(DIMMER1).intValue());
 		// Donker
 		dl1.on(0);
-		dom.loopOnce(cur += 1);
+		dom.loopOnceAllBlocks(cur += 1);
 		Assert.assertEquals(0, hw.outputs.get(DIMMER1).intValue());
 		// Volledig aan (links down, dan rechts klik)
 		hw.inputs.put(SW_DN_1, true);
-		dom.loopOnce(cur += 1);
+		dom.loopOnceAllBlocks(cur += 1);
 		hw.inputs.put(SW_UP_1, true);
-		dom.loopOnce(cur += 1);
+		dom.loopOnceAllBlocks(cur += 1);
 		hw.inputs.put(SW_UP_1, false);
-		dom.loopOnce(cur += 1);
+		dom.loopOnceAllBlocks(cur += 1);
 		Assert.assertEquals(FULL_OUT_VAL, hw.outputs.get(DIMMER1).intValue());
 		hw.inputs.put(SW_DN_1, false);
-		dom.loopOnce(cur += 1);
+		dom.loopOnceAllBlocks(cur += 1);
 		Assert.assertEquals(FULL_OUT_VAL, hw.outputs.get(DIMMER1).intValue());
 		// Alles uit
 		hw.inputs.put(SW_ALL, true);
-		dom.loopOnce(cur += 1);
+		dom.loopOnceAllBlocks(cur += 1);
 		Assert.assertEquals(FULL_OUT_VAL, hw.outputs.get(DIMMER1).intValue());
-		dom.loopOnce(cur += (swAllOnOff.getLongClickTimeout() + 1));
+		dom.loopOnceAllBlocks(cur += (swAllOnOff.getLongClickTimeout() + 1));
 		Assert.assertEquals(0, hw.outputs.get(DIMMER1).intValue());
 		hw.inputs.put(SW_ALL, false);
-		dom.loopOnce(cur += 1);
+		dom.loopOnceAllBlocks(cur += 1);
 		Assert.assertEquals(0, hw.outputs.get(DIMMER1).intValue());
 	}
 
@@ -130,30 +130,30 @@ public class TestSwitchBoardDimmers {
 		Assert.assertEquals(FULL_OUT_VAL / 2, hw.outputs.get(DIMMER1).intValue());
 		// Donker
 		dl1.on(0);
-		dom.loopOnce(cur += 1);
+		dom.loopOnceAllBlocks(cur += 1);
 		Assert.assertEquals(0, hw.outputs.get(DIMMER1).intValue());
 		// Dimmen
 		int level1, level2;
-		dom.loopOnce(cur += 1);
+		dom.loopOnceAllBlocks(cur += 1);
 		Assert.assertEquals(0, hw.outputs.get(DIMMER1).intValue());
-		dom.loopOnce(cur += 1);
+		dom.loopOnceAllBlocks(cur += 1);
 		// go up...
 		hw.inputs.put(SW_UP_1, true);
-		dom.loopOnce(cur += 1);
+		dom.loopOnceAllBlocks(cur += 1);
 		level1 = hw.outputs.get(DIMMER1).intValue();
 		Assert.assertEquals(0, level1);
-		dom.loopOnce(cur += (dsw1.getClickedTimeoutMS() + 1));
+		dom.loopOnceAllBlocks(cur += (dsw1.getClickedTimeoutMS() + 1));
 		level1 = hw.outputs.get(DIMMER1).intValue();
 		log.debug("level1 = " + level1); // TODO zou toch bijna 0 moeten zijn?
-		dom.loopOnce(cur += (dl1.getMsTimeFullDim() / 3));
+		dom.loopOnceAllBlocks(cur += (dl1.getMsTimeFullDim() / 3));
 		level2 = hw.outputs.get(DIMMER1).intValue();
 		log.debug("level 1=" + level1 + ", level2=" + level2);
 		Assert.assertTrue(level2 > level1);
 		// stop going up
 		hw.inputs.put(SW_UP_1, false);
-		dom.loopOnce(cur += 1);
+		dom.loopOnceAllBlocks(cur += 1);
 		level1 = hw.outputs.get(DIMMER1).intValue();
-		dom.loopOnce(cur += (dl1.getMsTimeFullDim() / 3));
+		dom.loopOnceAllBlocks(cur += (dl1.getMsTimeFullDim() / 3));
 		level2 = hw.outputs.get(DIMMER1).intValue();
 		log.debug("should be equal: level 1=" + level1 + ", level2=" + level2);
 		Assert.assertTrue(level1 == level2);

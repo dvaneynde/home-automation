@@ -110,25 +110,25 @@ public class TestSwitchOrTimer2Lamp {
 		// switch 1, single click
 		Assert.assertEquals(false, hw.out(10));
 		Assert.assertEquals(false, hw.out(11));
-		dom.loopOnce(cur += 10);
+		dom.loopOnceAllBlocks(cur += 10);
 		Assert.assertEquals(false, hw.out(10));
 		Assert.assertEquals(false, hw.out(11));
 		hw.in(0, true);
-		dom.loopOnce(cur += 10);
+		dom.loopOnceAllBlocks(cur += 10);
 		Assert.assertEquals(false, hw.out(10));
 		Assert.assertEquals(false, hw.out(11));
 		hw.in(0, false);
-		dom.loopOnce(cur += 10);// hier loopt het mis
-		dom.loopOnce(cur += 10);
+		dom.loopOnceAllBlocks(cur += 10);// hier loopt het mis
+		dom.loopOnceAllBlocks(cur += 10);
 		Assert.assertEquals(true, hw.out(10));
 		Assert.assertEquals(false, hw.out(11));
 
 		// switch 2, single click
 		hw.in(1, true);
-		dom.loopOnce(cur += 10);
+		dom.loopOnceAllBlocks(cur += 10);
 		hw.in(1, false);
-		dom.loopOnce(cur += (sw2.getDoubleClickTimeout() + 10));
-		dom.loopOnce(cur += 1);
+		dom.loopOnceAllBlocks(cur += (sw2.getDoubleClickTimeout() + 10));
+		dom.loopOnceAllBlocks(cur += 1);
 		Assert.assertEquals(true, hw.out(10));
 		Assert.assertEquals(true, hw.out(11));
 	}
@@ -146,19 +146,19 @@ public class TestSwitchOrTimer2Lamp {
 		// First put both on
 		hw.in(0, true);
 		hw.in(1, true);
-		dom.loopOnce(cur += 10);
+		dom.loopOnceAllBlocks(cur += 10);
 		hw.in(0, false);
 		hw.in(1, false);
-		dom.loopOnce(cur += 10); // detecteer single click, maar wacht nog op
+		dom.loopOnceAllBlocks(cur += 10); // detecteer single click, maar wacht nog op
 									// dubbel click
-		dom.loopOnce(cur += 60); // vermijd dubbel-klik detectie
+		dom.loopOnceAllBlocks(cur += 60); // vermijd dubbel-klik detectie
 		Assert.assertEquals(true, hw.out(10));
 		Assert.assertEquals(true, hw.out(11));
 		// Now, all off with Switch 2
 		hw.in(1, true);
-		dom.loopOnce(cur += 10);
+		dom.loopOnceAllBlocks(cur += 10);
 		hw.in(1, false);
-		dom.loopOnce(cur += (sw2.getLongClickTimeout() + 10));
+		dom.loopOnceAllBlocks(cur += (sw2.getLongClickTimeout() + 10));
 		Assert.assertEquals(false, hw.out(10));
 		Assert.assertEquals(false, hw.out(11));
 	}
@@ -174,11 +174,11 @@ public class TestSwitchOrTimer2Lamp {
 		Assert.assertEquals(false, hw.out(10));
 		Assert.assertEquals(false, hw.out(11));
 		hw.in(1, true);
-		dom.loopOnce(cur += 10);
+		dom.loopOnceAllBlocks(cur += 10);
 		hw.in(1, false);
-		dom.loopOnce(cur += 10);
+		dom.loopOnceAllBlocks(cur += 10);
 		hw.in(1, true);
-		dom.loopOnce(cur += 10);
+		dom.loopOnceAllBlocks(cur += 10);
 		Assert.assertEquals(true, hw.out(10));
 		Assert.assertEquals(true, hw.out(11));
 	}

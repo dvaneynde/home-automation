@@ -102,25 +102,25 @@ public class TestSwitch2Fans {
 		sw2.setLongClickTimeout(100);
 		Assert.assertEquals(false, hw.out(FAN1_OUT));
 		Assert.assertEquals(false, hw.out(FAN2_OUT));
-		dom.loopOnce(cur += 10);
+		dom.loopOnceAllBlocks(cur += 10);
 		Assert.assertEquals(false, hw.out(FAN1_OUT));
 		Assert.assertEquals(false, hw.out(FAN2_OUT));
 
 		hw.in(0, true);
-		dom.loopOnce(cur += 10);
+		dom.loopOnceAllBlocks(cur += 10);
 		Assert.assertEquals(false, hw.out(FAN1_OUT));
 		Assert.assertEquals(false, hw.out(FAN2_OUT));
 		hw.in(0, false);
-		dom.loopOnce(cur += 10);
-		dom.loopOnce(cur += 10);
+		dom.loopOnceAllBlocks(cur += 10);
+		dom.loopOnceAllBlocks(cur += 10);
 		Assert.assertEquals(true, hw.out(FAN1_OUT));
 		Assert.assertEquals(false, hw.out(FAN2_OUT));
 
 		// switch 2, single click
 		hw.in(1, true);
-		dom.loopOnce(cur += 10);
+		dom.loopOnceAllBlocks(cur += 10);
 		hw.in(1, false);
-		dom.loopOnce(cur += 10);
+		dom.loopOnceAllBlocks(cur += 10);
 		Assert.assertEquals(true, hw.out(FAN1_OUT));
 		Assert.assertEquals(true, hw.out(FAN2_OUT));
 	}

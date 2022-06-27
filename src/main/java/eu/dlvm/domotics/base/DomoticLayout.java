@@ -17,7 +17,7 @@ public class DomoticLayout implements IDomoticLayoutBuilder {
 
 
     /**
-     * Add Sensor to loop set (see {@link #loopOnce(long)}.
+     * Add Sensor to loop set (see {@link #loopOnceAllBlocks(long)}.
      * 
      * @param domotic TODO
      * @param sensor
@@ -39,12 +39,11 @@ public class DomoticLayout implements IDomoticLayoutBuilder {
     }
 
     /**
-     * Add Actuator to loop set (see {@link #loopOnce(long)}.
+     * Add Actuator to loop set (see {@link #loopOnceAllBlocks(long)}.
      * 
      * @param actuator
      *                 Added, if not already present. Each Actuator can be present
-     *                 no
-     *                 more than once.
+     *                 no more than once.
      */
     public void addActuator(Actuator actuator) {
         if (actuators.contains(actuator)) {

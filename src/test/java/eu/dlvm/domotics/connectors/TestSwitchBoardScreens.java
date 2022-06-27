@@ -154,10 +154,10 @@ public class TestSwitchBoardScreens {
 	 *            must remain false
 	 */
 	private void activateOne(int switchCh, int relChOfSwitch, int relChOther) {
-		dom.loopOnce(cur += 1);
+		dom.loopOnceAllBlocks(cur += 1);
 		Assert.assertEquals(false, hw.out(relChOfSwitch));
 		Assert.assertEquals(false, hw.out(relChOther));
-		dom.loopOnce(cur += 1);
+		dom.loopOnceAllBlocks(cur += 1);
 
 		click(switchCh);
 		Assert.assertEquals(true, hw.out(relChOfSwitch));
@@ -170,16 +170,16 @@ public class TestSwitchBoardScreens {
 
 	private void click(int switchChannel) {
 		hw.in(switchChannel, true);
-		dom.loopOnce(cur += 1);
+		dom.loopOnceAllBlocks(cur += 1);
 		hw.in(switchChannel, false);
-		dom.loopOnce(cur += 1);
+		dom.loopOnceAllBlocks(cur += 1);
 	}
 
 	@Test
 	public void AllDown() {
-		dom.loopOnce(cur += 1);
+		dom.loopOnceAllBlocks(cur += 1);
 		Assert.assertTrue(!hw.out(REL_DN_1) && !hw.out(REL_UP_1) && !hw.out(REL_DN_2) && !hw.out(REL_UP_2));
-		dom.loopOnce(cur += 1);
+		dom.loopOnceAllBlocks(cur += 1);
 
 		longClick(SW_DN_1);
 		Assert.assertTrue(hw.out(REL_DN_1) && !hw.out(REL_UP_1) && hw.out(REL_DN_2) && !hw.out(REL_UP_2));
@@ -187,9 +187,9 @@ public class TestSwitchBoardScreens {
 
 	@Test
 	public void AllUp() {
-		dom.loopOnce(cur += 1);
+		dom.loopOnceAllBlocks(cur += 1);
 		Assert.assertTrue(!hw.out(REL_DN_1) && !hw.out(REL_UP_1) && !hw.out(REL_DN_2) && !hw.out(REL_UP_2));
-		dom.loopOnce(cur += 1);
+		dom.loopOnceAllBlocks(cur += 1);
 
 		longClick(SW_UP_1);
 		Assert.assertTrue(!hw.out(REL_DN_1) && hw.out(REL_UP_1) && !hw.out(REL_DN_2) && hw.out(REL_UP_2));
@@ -197,14 +197,14 @@ public class TestSwitchBoardScreens {
 
 	@Test
 	public void AllDownOneUp() {
-		dom.loopOnce(cur += 10);
+		dom.loopOnceAllBlocks(cur += 10);
 		Assert.assertFalse(hw.out(REL_DN_1));
 		Assert.assertFalse(hw.out(REL_UP_1));
 		Assert.assertFalse(hw.out(REL_DN_2));
 		Assert.assertFalse(hw.out(REL_UP_2));
 
 		longClick(SW_DN_1);
-		dom.loopOnce(cur += 10);
+		dom.loopOnceAllBlocks(cur += 10);
 		Assert.assertTrue(hw.out(REL_DN_1));
 		Assert.assertFalse(hw.out(REL_UP_1));
 		Assert.assertTrue(hw.out(REL_DN_2));
@@ -216,7 +216,7 @@ public class TestSwitchBoardScreens {
 		Assert.assertFalse(hw.out(REL_DN_2));
 		Assert.assertFalse(hw.out(REL_UP_2));
 
-		dom.loopOnce(cur += (Screen.MOTOR_SWITCH_DELAY_PROTECTION + 10));
+		dom.loopOnceAllBlocks(cur += (Screen.MOTOR_SWITCH_DELAY_PROTECTION + 10));
 		Assert.assertTrue(hw.out(REL_DN_1));
 		Assert.assertFalse(hw.out(REL_UP_1));
 		Assert.assertFalse(hw.out(REL_DN_2));
@@ -225,8 +225,8 @@ public class TestSwitchBoardScreens {
 
 	private void longClick(int switchChannel) {
 		hw.in(switchChannel, true);
-		dom.loopOnce(cur += 1);
+		dom.loopOnceAllBlocks(cur += 1);
 		hw.in(switchChannel, false);
-		dom.loopOnce(cur += (LONGCLICKTIMEOUT + 1));
+		dom.loopOnceAllBlocks(cur += (LONGCLICKTIMEOUT + 1));
 	}
 }

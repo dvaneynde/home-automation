@@ -86,7 +86,7 @@ public class TestEnd2EndSwitchLamp {
 		try {
 			drv.responseFromDriverToUse0 = "";
 			drv.responseFromDriverToUse1 = "";
-			dom.loopOnce(current += 10);
+			dom.loopOnceAllBlocks(current += 10);
 			Assert.fail("Not initialized, and therefore Domotic should have thrown RuntimeException.");
 		} catch (RuntimeException e) {
 			Assert.assertEquals("Domotic not initialized.",e.getMessage());
@@ -103,7 +103,7 @@ public class TestEnd2EndSwitchLamp {
 		Assert.assertEquals("SET_OUT 0x380 O 0\n\n", drv.sentToDriver1);
 		
 		drv.reset("INP_O 0x380 0\n\n","");
-		dom.loopOnce(current += 10);
+		dom.loopOnceAllBlocks(current += 10);
 		log.debug("testSwitch: pushdown, sendInputUsed:\n"+drv.sentToDriver0+"---");
 		log.debug("                     sendOutputUsed:\n"+drv.sentToDriver1+"---");
 		Assert.assertEquals("REQ_INP 0x380 O\n\n", drv.sentToDriver0);
@@ -111,7 +111,7 @@ public class TestEnd2EndSwitchLamp {
 		Assert.assertEquals(true, hw.readDigitalInput(IO.S_KEUKENLICHT.ch()));
 
 		drv.reset("INP_O 0x380 255\n\n","");
-		dom.loopOnce(current += 10);
+		dom.loopOnceAllBlocks(current += 10);
 		log.debug("testSwitch: pushdown, sendInputUsed:\n"+drv.sentToDriver0+"---");
 		log.debug("                     sendOutputUsed:\n"+drv.sentToDriver1+"---");
 		Assert.assertEquals("REQ_INP 0x380 O\n\n", drv.sentToDriver0);

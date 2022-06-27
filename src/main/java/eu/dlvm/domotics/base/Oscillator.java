@@ -1,6 +1,7 @@
 package eu.dlvm.domotics.base;
 
-import org.slf4j.Logger; import org.slf4j.LoggerFactory;
+import org.slf4j.Logger; 
+import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.utils.AverageLong;
 
@@ -8,13 +9,13 @@ public class Oscillator extends Thread {
 
 	static Logger log = LoggerFactory.getLogger(Oscillator.class);
 	
-	private Domotic dom;
+	private ICanLoopAllBlocks dom;
 	private long tickTimeMs;
 	private boolean goOn;
 	private long currentTime;
 	private AverageLong avgLong;	// for quality only
 	
-	public Oscillator(Domotic dom, long tickTimeMs) {
+	public Oscillator(ICanLoopAllBlocks dom, long tickTimeMs) {
 		super("Oscillator");
 		this.dom = dom;
 		this.tickTimeMs = tickTimeMs;
@@ -34,7 +35,7 @@ public class Oscillator extends Thread {
 		}
 		while (localGoOn) {
 			currentTime = System.currentTimeMillis();
-			dom.loopOnce(currentTime);
+			dom.loopOnceAllBlocks(currentTime);
 			avgLong.add(System.currentTimeMillis() - currentTime);
 			if (avgLong.enoughSamples())
 				avgLong.avgAndClear();
