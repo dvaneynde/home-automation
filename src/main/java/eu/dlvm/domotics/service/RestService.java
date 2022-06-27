@@ -84,10 +84,10 @@ public class RestService {
 	public List<UiInfo> updateActuator(@PathParam("name") String name, @PathParam("action") String action) {
 		// TODO debug
 		Log.info("Domotic API: got update actuator '" + name + "' action='" + action + "'");
-		IUiCapableBlock act = Domotic.singleton().getStateChangeRegistrar().findUiCapable(name);
+		IUiCapableBlock act = Domotic.singleton().getLayout().findUiCapable(name);
 		if (act == null) {
 			// TODO iets terugsturen?
-			Log.warn("Could not find actuator " + name);
+			Log.warn("updateActuator(): could not find actuator " + name);
 		} else {
 			act.update(action);
 		}

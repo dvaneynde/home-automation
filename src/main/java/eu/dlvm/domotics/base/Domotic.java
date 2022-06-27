@@ -2,6 +2,8 @@ package eu.dlvm.domotics.base;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -56,7 +58,7 @@ public class Domotic {
 	private int nrNoResponsesFromDriver;
 
 	private DomoticLayout layout = new DomoticLayout();
-	private StateChangeRegistrar stateChangeRegistrar;
+	private List<IStateChangedListener> stateChangeListeners;
 	// protected access for test cases only
 	protected IHardware hw = null;
 	protected long loopSequence = -1L;
@@ -80,8 +82,8 @@ public class Domotic {
 		return layout;
 	}
 
-	public StateChangeRegistrar getStateChangeRegistrar() {
-		return stateChangeRegistrar;
+	public List<IStateChangedListener> getStateChangeListeners() {
+		return stateChangeListeners;
 	}
 
 	public IHardware getHw() {
@@ -175,8 +177,8 @@ public class Domotic {
 		ServiceServer server = null;
 		if (htmlRootFile != null) {
 			server = new ServiceServer(htmlRootFile);
-			stateChangeRegistrar = new StateChangeRegistrar(getLayout());
-			server.start(stateChangeRegistrar);
+			stateChangeListeners = new LinkedList<IStateChangedListener>();
+			server.start(stateChangeListeners);
 		} else
 			log.warn("HTTP server not started as there is no html root file given.");
 
@@ -286,7 +288,7 @@ public class Domotic {
 			// and with timeout perhaps?
 			long startTimeWs = System.currentTimeMillis();
 			if (loopSequence % 10 == 0) {
-				for (IStateChangedListener uiUpdator : getStateChangeRegistrar().getStateChangeListeners())
+				for (IStateChangedListener uiUpdator : getStateChangeListeners())
 					uiUpdator.updateUi();
 			}
 			long tookMs = System.currentTimeMillis() - startTimeWs;

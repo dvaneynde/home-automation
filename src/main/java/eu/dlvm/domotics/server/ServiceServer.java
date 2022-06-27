@@ -5,11 +5,13 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.EnumSet;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.servlet.DispatcherType;
 
-import eu.dlvm.domotics.base.IStateChangeRegistrar;
+import eu.dlvm.domotics.base.IStateChangedListener;
+
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.servlet.DefaultServlet;
@@ -49,22 +51,22 @@ public class ServiceServer {
 	}
 
 	public static class UiSocketCreator implements WebSocketCreator {
-		private IStateChangeRegistrar registrar;
-		
-		public UiSocketCreator(IStateChangeRegistrar registrar) {
-			this.registrar = registrar;
+		private List<IStateChangedListener>  stateChangeListeners;
+
+		public UiSocketCreator(List<IStateChangedListener> listeners) {
+			this.stateChangeListeners = listeners;
 		}
 
 		@Override
 		public Object createWebSocket(ServletUpgradeRequest req, ServletUpgradeResponse resp) {
 			InetSocketAddress remoteAddress = req.getRemoteSocketAddress();
-			log.debug("Creating websocket connection, remote address="+remoteAddress.toString());
-			UiStateUpdatorSocket uiStateUpdatorSocket = new UiStateUpdatorSocket(registrar);
+			log.debug("Creating websocket connection, remote address=" + remoteAddress.toString());
+			UiStateUpdatorSocket uiStateUpdatorSocket = new UiStateUpdatorSocket(stateChangeListeners);
 			return uiStateUpdatorSocket;
 		}
 	}
 
-	public void start(IStateChangeRegistrar stateChangeRegistrar) {
+	public void start(List<IStateChangedListener> stateChangeListeners) {
 		server = new Server();
 		ServerConnector connector = new ServerConnector(server);
 		connector.setPort(80);
@@ -75,25 +77,27 @@ public class ServiceServer {
 			// This is also known as the handler tree (in jetty speak)
 			ServletContextHandler contextHandler = new ServletContextHandler(ServletContextHandler.SESSIONS);
 			contextHandler.setContextPath("/");
-			//Resource staticRoot = Resource.newClassPathResource("static-root");
+			// Resource staticRoot = Resource.newClassPathResource("static-root");
 			Resource staticRoot = Resource.newResource(rootHtmlFile);
 			contextHandler.setBaseResource(staticRoot);
 			contextHandler.setWelcomeFiles(new String[] { "index.html" });
 			server.setHandler(contextHandler);
 
 			// Add the filter, and then use the provided FilterHolder to configure it
-			FilterHolder cors = contextHandler.addFilter(CrossOriginFilter.class,"/*",EnumSet.of(DispatcherType.REQUEST));
+			FilterHolder cors = contextHandler.addFilter(CrossOriginFilter.class, "/*",
+					EnumSet.of(DispatcherType.REQUEST));
 			cors.setInitParameter(CrossOriginFilter.ALLOWED_ORIGINS_PARAM, "*");
 			cors.setInitParameter(CrossOriginFilter.ACCESS_CONTROL_ALLOW_ORIGIN_HEADER, "*");
 			cors.setInitParameter(CrossOriginFilter.ALLOWED_METHODS_PARAM, "GET,POST,HEAD");
-			cors.setInitParameter(CrossOriginFilter.ALLOWED_HEADERS_PARAM, "X-Requested-With,Content-Type,Accept,Origin");
+			cors.setInitParameter(CrossOriginFilter.ALLOWED_HEADERS_PARAM,
+					"X-Requested-With,Content-Type,Accept,Origin");
 
 			// Add the websocket filter
 			WebSocketUpgradeFilter wsfilter = WebSocketUpgradeFilter.configureContext(contextHandler);
 			// Configure websocket behavior
 			wsfilter.getFactory().getPolicy().setIdleTimeout(5000);
 			// Add websocket mapping
-			wsfilter.addMapping(new ServletPathSpec("/status/"), new UiSocketCreator(stateChangeRegistrar));
+			wsfilter.addMapping(new ServletPathSpec("/status/"), new UiSocketCreator(stateChangeListeners));
 
 			// Add REST interface handler
 			// https://www.acando.no/thedailypassion/200555/a-rest-service-with-jetty-and-jersey
@@ -112,9 +116,9 @@ public class ServiceServer {
 			// TODO
 			// https://stackoverflow.com/questions/28190198/cross-origin-filter-with-embedded-jetty
 			// Lijkt erop dat ik 9.4 nodig heb ipv 9.3?
-				
+
 			server.start();
-			//server.join();
+			// server.join();
 		} catch (Throwable t) {
 			log.error("Error starting server.", t);
 		}

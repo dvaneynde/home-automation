@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import eu.dlvm.domotics.base.Domotic;
-import eu.dlvm.domotics.base.IStateChangeRegistrar;
 import eu.dlvm.domotics.base.IStateChangedListener;
 import eu.dlvm.domotics.base.IUiCapableBlock;
 import org.eclipse.jetty.websocket.api.Session;
@@ -29,11 +28,11 @@ public class UiStateUpdatorSocket implements IStateChangedListener {
 	private static int COUNT = 0;
 	private ObjectMapper objectMapper;
 	private int id;
-	private IStateChangeRegistrar registrar;
+	private List<IStateChangedListener>  stateChangeListeners;
 	private Session savedSession;
 
-	public UiStateUpdatorSocket(IStateChangeRegistrar registrar) {
-		this.registrar = registrar;
+	public UiStateUpdatorSocket(List<IStateChangedListener>  stateChangeListeners) {
+		this.stateChangeListeners = stateChangeListeners;
 		this.objectMapper= new ObjectMapper();
 		this.id = COUNT++;
 		LOG.debug("Created UiStateUpdatorSocket, id=" + id);
@@ -42,14 +41,14 @@ public class UiStateUpdatorSocket implements IStateChangedListener {
 	@OnWebSocketConnect
 	public void onOpen(Session session) {
 		this.savedSession = session;
-		registrar.addStateChangedListener(this);
+		stateChangeListeners.add(this);
 		LOG.debug("Opened websocket session (id=" + id + ") for remote " + this.savedSession.getRemoteAddress());
 	}
 
 	@OnWebSocketClose
 	public void onClose(int closeCode, String closeReasonPhrase) {
 		this.savedSession = null;
-		registrar.removeStateChangedListener(this);
+		stateChangeListeners.remove(this);
 		LOG.debug("Closed websocket session (id=" + id + "), reason=" + closeReasonPhrase);
 	}
 

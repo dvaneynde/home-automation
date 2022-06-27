@@ -75,6 +75,8 @@ public class DomoticLayout implements IDomoticLayoutBuilder {
         return controllers;
     }
 
+    // ----------- UI Support -------------
+
     /**
      * @return all registered {@link Actuator} and {@link Controller} blocks
      *         that implement {@link IUiCapableBlock}, or those blocks
@@ -85,6 +87,15 @@ public class DomoticLayout implements IDomoticLayoutBuilder {
             registerUiCapables();
         return uiblocks;
     }
+
+    public IUiCapableBlock findUiCapable(String name) {
+        for (IUiCapableBlock ui : getUiCapableBlocks()) {
+            if (ui.getUiInfo().getName().equals(name))
+                return ui;
+        }
+        return null;
+    }
+
 
     private void registerUiCapables() {
         uiblocks = new ArrayList<IUiCapableBlock>(64);
