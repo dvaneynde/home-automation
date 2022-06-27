@@ -1,15 +1,14 @@
 package eu.dlvm.domotics.base;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class DomoticLayout implements IDomoticLayoutBuilder, IStateChangeRegistrar {
+public class DomoticLayout implements IDomoticLayoutBuilder {
 
-    static Logger log = LoggerFactory.getLogger(Domotic.class);
+    static Logger log = LoggerFactory.getLogger(DomoticLayout.class);
 
     private List<Sensor> sensors = new ArrayList<Sensor>(64);
     private List<Actuator> actuators = new ArrayList<Actuator>(64);
@@ -116,35 +115,5 @@ public class DomoticLayout implements IDomoticLayoutBuilder, IStateChangeRegistr
             uiblocks.add(uiblock0);
             log.debug("Add UiCapableBlock " + uiblock0.getUiInfo().getName());
         }
-    }
-
-    // ========================================================
-
-    // TODO put in separate class, UI/websockets dependent only.
-
-    protected List<IStateChangedListener> stateChangeListeners = new LinkedList<>();
-
-    @Override
-    public void addStateChangedListener(IStateChangedListener updator) {
-        stateChangeListeners.add(updator);
-        log.info("Add new UI updator id=" + updator.getId());
-    }
-
-    @Override
-    public void removeStateChangedListener(IStateChangedListener updator) {
-        boolean removed = stateChangeListeners.remove(updator);
-        log.info("Removing updator id=" + updator.getId() + " (listener was found and thus removed: " + removed + ")");
-    }
-
-    public List<IStateChangedListener> getStateChangeListeners() {
-        return stateChangeListeners;
-    }
-
-    public IUiCapableBlock findUiCapable(String name) {
-        for (IUiCapableBlock ui : uiblocks) {
-            if (ui.getUiInfo().getName().equals(name))
-                return ui;
-        }
-        return null;
     }
 }

@@ -2,9 +2,6 @@ package eu.dlvm.domotics.base;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -59,6 +56,7 @@ public class Domotic {
 	private int nrNoResponsesFromDriver;
 
 	private DomoticLayout layout = new DomoticLayout();
+	private StateChangeRegistrar stateChangeRegistrar;
 	// protected access for test cases only
 	protected IHardware hw = null;
 	protected long loopSequence = -1L;
@@ -68,13 +66,13 @@ public class Domotic {
 	}
 
 	public static synchronized Domotic createSingleton(IHardware hw) {
-		singleton = new Domotic();
-		singleton.setHw(hw);
+		singleton = new Domotic(hw);
 		return singleton;
 	}
 
-	private Domotic() {
+	private Domotic(IHardware hw) {
 		super();
+		this.hw = hw;
 		saveState = new OutputStateSaver();
 	}
 
@@ -82,8 +80,8 @@ public class Domotic {
 		return layout;
 	}
 
-	private void setHw(IHardware hw) {
-		this.hw = hw;
+	public StateChangeRegistrar getStateChangeRegistrar() {
+		return stateChangeRegistrar;
 	}
 
 	public IHardware getHw() {
@@ -177,7 +175,8 @@ public class Domotic {
 		ServiceServer server = null;
 		if (htmlRootFile != null) {
 			server = new ServiceServer(htmlRootFile);
-			server.start(layout);
+			stateChangeRegistrar = new StateChangeRegistrar(getLayout());
+			server.start(stateChangeRegistrar);
 		} else
 			log.warn("HTTP server not started as there is no html root file given.");
 
@@ -287,7 +286,7 @@ public class Domotic {
 			// and with timeout perhaps?
 			long startTimeWs = System.currentTimeMillis();
 			if (loopSequence % 10 == 0) {
-				for (IStateChangedListener uiUpdator : layout.getStateChangeListeners())
+				for (IStateChangedListener uiUpdator : getStateChangeRegistrar().getStateChangeListeners())
 					uiUpdator.updateUi();
 			}
 			long tookMs = System.currentTimeMillis() - startTimeWs;
