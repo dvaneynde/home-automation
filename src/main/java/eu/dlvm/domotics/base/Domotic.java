@@ -283,8 +283,9 @@ public class Domotic {
 		}
 		hw.getWriter().refreshOutputs();
 
-		{
-			// TODO must be async in separate thread, since might take longer than 20 ms...
+		if (getStateChangeListeners() != null) {
+			// TODO should be async in separate thread, since might take longer than 20
+			// ms...
 			// and with timeout perhaps?
 			long startTimeWs = System.currentTimeMillis();
 			if (loopSequence % 10 == 0) {
