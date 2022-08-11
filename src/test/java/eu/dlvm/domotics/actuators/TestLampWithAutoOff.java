@@ -4,9 +4,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.Assert;
 
-import eu.dlvm.domotics.base.IDomoticBuilder;
-import eu.dlvm.domotics.blocks.BaseHardwareMock;
-import eu.dlvm.domotics.blocks.DomoticMock;
+import eu.dlvm.domotics.BaseHardwareMock;
+import eu.dlvm.domotics.base.DomoticLayout;
 import eu.dlvm.iohardware.IHardware;
 
 public class TestLampWithAutoOff {
@@ -27,13 +26,12 @@ public class TestLampWithAutoOff {
 	private static final String LAMP_OUT = Integer.toString(10);
 	private Lamp lamp;
 	private Hardware hw;
-	private IDomoticBuilder dom;
 	private long current;
 
 	@Before
 	public void init() {
 		hw = new Hardware();
-		dom = new DomoticMock();
+		DomoticLayout dom = new DomoticLayout();
 		lamp = new Lamp("TestLamp", "TestLamp", true, LAMP_OUT, hw, dom);
 		current = 0L;
 	}

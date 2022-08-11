@@ -5,10 +5,10 @@ import static org.junit.Assert.fail;
 import org.junit.Assert;
 import org.junit.Test;
 
+import eu.dlvm.domotics.BaseHardwareMock;
 import eu.dlvm.domotics.base.Block;
 import eu.dlvm.domotics.base.ConfigurationException;
-import eu.dlvm.domotics.blocks.BaseHardwareMock;
-import eu.dlvm.domotics.blocks.DomoticMock;
+import eu.dlvm.domotics.base.DomoticLayout;
 import eu.dlvm.domotics.events.EventType;
 import eu.dlvm.domotics.events.IEventListener;
 import eu.dlvm.iohardware.IHardware;
@@ -28,7 +28,7 @@ public class TestLightSensor implements IEventListener {
 	private static final long SAMPLE_TIME = 500;
 	private static final String LIGHTSENSOR_CH = Integer.toString(10);
 	private Hardware hw = new Hardware();
-	private DomoticMock dom = new DomoticMock();
+	private DomoticLayout dom = new DomoticLayout();
 	private LightSensor ls;
 	private EventType lastEvent;
 	private int nrEvents;

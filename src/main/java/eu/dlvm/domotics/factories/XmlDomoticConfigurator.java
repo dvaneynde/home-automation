@@ -14,13 +14,13 @@ import org.xml.sax.SAXException;
 import org.xml.sax.ext.DefaultHandler2;
 
 import eu.dlvm.domotics.base.ConfigurationException;
-import eu.dlvm.domotics.base.IDomoticBuilder;
+import eu.dlvm.domotics.base.IDomoticLayoutBuilder;
 
 public class XmlDomoticConfigurator {
 
 	private static Logger logger = LoggerFactory.getLogger(XmlDomoticConfigurator.class);
 
-	public static void configure(String cfgFilepath,  IHardware hardware, IDomoticBuilder builder) {
+	public static void configure(String cfgFilepath,  IHardware hardware, IDomoticLayoutBuilder builder) {
 		try {
 			File cfgFile = convertCfgFilepath(cfgFilepath);
 

@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.base.Actuator;
 import eu.dlvm.domotics.base.Block;
-import eu.dlvm.domotics.base.IDomoticBuilder;
+import eu.dlvm.domotics.base.IDomoticLayoutBuilder;
 import eu.dlvm.domotics.base.IUiCapableBlock;
 import eu.dlvm.domotics.base.RememberedOutput;
 import eu.dlvm.domotics.events.EventType;
@@ -62,7 +62,7 @@ public class Fan extends Actuator implements IEventListener, IUiCapableBlock {
 	/**
 	 * Constructor.
 	 */
-	public Fan(String name, String description, String channel, IHardwareWriter writer, IDomoticBuilder builder) {
+	public Fan(String name, String description, String channel, IHardwareWriter writer, IDomoticLayoutBuilder builder) {
 		super(name, description, null, channel, writer, builder);
 		statemachine = new FanStatemachine(this);
 	}

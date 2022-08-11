@@ -2,7 +2,6 @@ package eu.dlvm.domotics.base;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -29,23 +28,23 @@ import eu.dlvm.iohardware.IHardware;
  * <li>{@link #initialize(Map)} should then be called to do some one-time
  * initialization</li>
  * <li>{@link #runDomotic(int, String, File)} will then start the system by
- * calling {@link #loopOnce(long)} regularly, and monitor everything</li>
+ * calling {@link #loopOnceAllBlocks(long)} regularly, and monitor everything</li>
  * </ol>
  * <p>
  * {@link #requestStop()} will halt domotic system.
  * <p>
- * {@link #loopOnce(long)} is the key method that drives every input to an output.
+ * {@link #loopOnceAllBlocks(long)} is the key method that drives every input to an
+ * output.
  * 
  * @author dirk vaneynde
  * 
- *         TODO veel te veel methodes, opsplitsen - maar hoe? TODO monitoring en
- *         restart werkte niet, weggooien?
+ *         TODO monitoring en restart werkte niet, weggooien?
  */
-public class Domotic implements IDomoticBuilder, IStateChangeRegistrar {
+public class Domotic implements ICanLoopAllBlocks {
 
 	public static final int MONITORING_INTERVAL_MS = 5000;
 
-	private static Logger log = LoggerFactory.getLogger(Domotic.class);
+	static Logger log = LoggerFactory.getLogger(Domotic.class);
 	private static Logger MON = LoggerFactory.getLogger("MONITOR");
 	private static Domotic singleton;
 
@@ -58,115 +57,37 @@ public class Domotic implements IDomoticBuilder, IStateChangeRegistrar {
 	private AtomicBoolean errorStopRequested = new AtomicBoolean();
 	private int nrNoResponsesFromDriver;
 
+	private DomoticLayout layout = new DomoticLayout();
+	private List<IStateChangedListener> stateChangeListeners;
 	// protected access for test cases only
 	protected IHardware hw = null;
-	protected List<Sensor> sensors = new ArrayList<Sensor>(64);
-	protected List<Actuator> actuators = new ArrayList<Actuator>(64);
-	protected List<Controller> controllers = new ArrayList<Controller>(64);
-	protected List<IStateChangedListener> stateChangeListeners;
 	protected long loopSequence = -1L;
-
-	private List<IUiCapableBlock> uiblocks = new ArrayList<IUiCapableBlock>(64);
 
 	public static synchronized Domotic singleton() {
 		return singleton;
 	}
 
 	public static synchronized Domotic createSingleton(IHardware hw) {
-		singleton = new Domotic();
-		singleton.setHw(hw);
+		singleton = new Domotic(hw);
 		return singleton;
 	}
 
-	private Domotic() {
+	private Domotic(IHardware hw) {
 		super();
+		this.hw = hw;
 		saveState = new OutputStateSaver();
-		stateChangeListeners = new LinkedList<>();
 	}
 
-	private void setHw(IHardware hw) {
-		this.hw = hw;
+	public DomoticLayout getLayout() {
+		return layout;
+	}
+
+	public List<IStateChangedListener> getStateChangeListeners() {
+		return stateChangeListeners;
 	}
 
 	public IHardware getHw() {
 		return hw;
-	}
-
-	/**
-	 * Add Sensor to loop set (see {@link #loopOnce(long)}.
-	 * 
-	 * @param sensor
-	 *            Added, if not already present. Each Sensor can be present no
-	 *            more than once.
-	 */
-	public void addSensor(Sensor sensor) {
-		if (sensors.contains(sensor)) {
-			log.warn("Sensor already added, ignored: " + sensor);
-			assert (false);
-			return;
-		}
-		sensors.add(sensor);
-		//log.info("Add sensor '" + sensor.getName()+"' - "+sensor.toString());
-	}
-
-	/*	public List<Sensor> getSensors() {
-			return sensors;
-		}
-	*/
-	/**
-	 * Add Actuator to loop set (see {@link #loopOnce(long)}.
-	 * 
-	 * @param actuator
-	 *            Added, if not already present. Each Actuator can be present no
-	 *            more than once.
-	 */
-	public void addActuator(Actuator actuator) {
-		if (actuators.contains(actuator)) {
-			log.warn("Actuator already added, ignored: " + actuator);
-			assert (false);
-			return;
-		}
-		actuators.add(actuator);
-		//log.info("Add actuator '" + actuator.getName()+"' - "+actuator.toString());
-	}
-
-	public void addController(Controller controller) {
-		if (controllers.contains(controller)) {
-			log.warn("Controller already added, ignored: " + controller);
-			assert (false);
-			return;
-		}
-		controllers.add(controller);
-		//log.info("Add controller '" + controller.getName()+"' - "+controller.toString());
-	}
-
-	public IUiCapableBlock findUiCapable(String name) {
-		for (IUiCapableBlock ui : uiblocks) {
-			if (ui.getUiInfo().getName().equals(name))
-				return ui;
-		}
-		return null;
-	}
-
-	/**
-	 * @return all registered {@link Actuator} and {@link Controller} blocks
-	 *         that implement {@link IUiCapableBlock}, or those blocks
-	 *         registered explicitly...
-	 */
-	public List<IUiCapableBlock> getUiCapableBlocks() {
-		return uiblocks;
-	}
-
-	@Override
-	public void addStateChangedListener(IStateChangedListener updator) {
-		stateChangeListeners.add(updator);
-		log.info("Add new UI updator id=" + updator.getId());
-	}
-
-	@Override
-	public void removeStateChangedListener(IStateChangedListener updator) {
-		boolean removed = stateChangeListeners.remove(updator);
-		log.info("Removing updator id=" + updator.getId() + " (listener was found and thus removed: " + removed + ")");
 	}
 
 	/**
@@ -175,11 +96,11 @@ public class Domotic implements IDomoticBuilder, IStateChangeRegistrar {
 	 * Specifically, hardware outputs are set correctly, and UI blocks are
 	 * gathered from allready registered blocks.
 	 * <p>
-	 * Must be called before {@link #loopOnce(long)} or {@link IHardware#stop()}.
+	 * Must be called before {@link #loopOnceAllBlocks(long)} or {@link IHardware#stop()}.
 	 * 
 	 * @param prevOuts
-	 *            Map of actuator names and previous outputs. If not used must
-	 *            be empty map (not <code>null</code>).
+	 *                 Map of actuator names and previous outputs. If not used must
+	 *                 be empty map (not <code>null</code>).
 	 */
 	public void initialize(Map<String, RememberedOutput> prevOuts) {
 		loopSequence++;
@@ -189,57 +110,35 @@ public class Domotic implements IDomoticBuilder, IStateChangeRegistrar {
 			log.error("Cannot start Domotic, cannot communicate with driver.");
 			throw new RuntimeException("Problem communicating with driver.");
 		}
-		for (Actuator a : actuators) {
+		for (Actuator a : layout.getActuators()) {
 			RememberedOutput ro = prevOuts.get(a.getName());
 			a.initializeOutput(ro);
 		}
 		hw.getWriter().refreshOutputs();
-		for (Block b : sensors)
-			registerIfUiCapable(b);
-		for (Block b : controllers)
-			registerIfUiCapable(b);
-		for (Block b : actuators)
-			registerIfUiCapable(b);
-
 	}
 
-	private void registerIfUiCapable(Block b) {
-		if (b instanceof IUiCapableBlock) {
-			IUiCapableBlock uiblock0 = ((IUiCapableBlock) b);
-
-			if (uiblock0.getUiInfo() == null) {
-				log.warn("Not adding UI info for " + ((Block) uiblock0).getName() + ". BlockInfo is null - is a bug, refactor code.");
-				return;
-			}
-			for (IUiCapableBlock uiblock : uiblocks) {
-				if (uiblock.getUiInfo().getName().equals(uiblock0.getUiInfo().getName())) {
-					log.warn("addUiCapableBlock(): incoming UiCapable '" + uiblock0.getUiInfo().getName() + "' already registered - ignored.");
-					return;
-				}
-			}
-			uiblocks.add(uiblock0);
-			log.debug("Add UiCapableBlock " + uiblock0.getUiInfo().getName());
-		}
-	}
-
-	/*	TODO does not work, especially not with websockets. All threads should stop gracefully upon normalStopRequested, but that is not yet implemented.
+	/*
+	 * TODO does not work, especially not with websockets. All threads should stop
+	 * gracefully upon normalStopRequested, but that is not yet implemented.
 	 * private void addShutdownHook(Domotic dom) {
-			final Thread mainThread = Thread.currentThread();
-			Runtime.getRuntime().addShutdownHook(new Thread("DomoticShutdownHook") {
-				@Override
-				public void run() {
-					log.info("Inside Shutdown Hook");
-					normalStopRequested.set(true);
-					log.warn("Stop requested - may take up to 5 seconds...");
-					try {
-						mainThread.join();
-					} catch (InterruptedException e) {
-					}
-				}
-			});
-			log.info("Shutdown hook attached.");
-		}
-	*/
+	 * final Thread mainThread = Thread.currentThread();
+	 * Runtime.getRuntime().addShutdownHook(new Thread("DomoticShutdownHook") {
+	 * 
+	 * @Override
+	 * public void run() {
+	 * log.info("Inside Shutdown Hook");
+	 * normalStopRequested.set(true);
+	 * log.warn("Stop requested - may take up to 5 seconds...");
+	 * try {
+	 * mainThread.join();
+	 * } catch (InterruptedException e) {
+	 * }
+	 * }
+	 * });
+	 * log.info("Shutdown hook attached.");
+	 * }
+	 */
+
 	/**
 	 * Domotic will stop running asap and gracefully. No guarantee...
 	 */
@@ -260,13 +159,16 @@ public class Domotic implements IDomoticBuilder, IStateChangeRegistrar {
 	 * 
 	 * @param looptime
 	 * @param pathToDriver
-	 *            If non-null, attempts to start the HwDriver executable at that
-	 *            path. Note that this driver must be on the same host, since
-	 *            'localhost' is passed to it as an argument. Otherwise that
-	 *            driver should be started separately, after this one shows
-	 *            "START" in the logger.
+	 *                     If non-null, attempts to start the HwDriver executable at
+	 *                     that
+	 *                     path. Note that this driver must be on the same host,
+	 *                     since
+	 *                     'localhost' is passed to it as an argument. Otherwise
+	 *                     that
+	 *                     driver should be started separately, after this one shows
+	 *                     "START" in the logger.
 	 * @param htmlRootFile
-	 *            index.html of web app UI
+	 *                     index.html of web app UI
 	 */
 	public void runDomotic(int looptime, String pathToDriver, File htmlRootFile) {
 		// TODO see addShutdownHook(this);
@@ -275,9 +177,10 @@ public class Domotic implements IDomoticBuilder, IStateChangeRegistrar {
 		ServiceServer server = null;
 		if (htmlRootFile != null) {
 			server = new ServiceServer(htmlRootFile);
-			server.start(this);
+			stateChangeListeners = new LinkedList<IStateChangedListener>();
+			server.start(stateChangeListeners);
 		} else
-		    log.warn("HTTP server not started as there is no html root file given.");
+			log.warn("HTTP server not started as there is no html root file given.");
 
 		// TODO see
 		// http://www.javaworld.com/javaworld/jw-12-2000/jw-1229-traps.html?page=4
@@ -307,13 +210,14 @@ public class Domotic implements IDomoticBuilder, IStateChangeRegistrar {
 			while (!normalStopRequested.get() && !errorStopRequested.get()) {
 				// TODO deze sleep moet interrupted ! Of heb ik dat al gedaan?
 				sleepSafe(MONITORING_INTERVAL_MS);
-				saveState.writeRememberedOutputs(actuators);
+				saveState.writeRememberedOutputs(layout.getActuators());
 
 				long currentLoopSequence = loopSequence;
 				if (currentLoopSequence <= lastLoopSequence) {
 					nrNoResponsesFromDriver++;
 					if (nrNoResponsesFromDriver < 3) {
-						log.warn("Domotic does not seem to be looping anymore, last recorded loopsequence=" + lastLoopSequence + ", current="
+						log.warn("Domotic does not seem to be looping anymore, last recorded loopsequence="
+								+ lastLoopSequence + ", current="
 								+ currentLoopSequence + ". Trying again...");
 					} else {
 						log.error("Domotic did not loop for " + nrNoResponsesFromDriver + " times, exiting domotic.");
@@ -345,45 +249,35 @@ public class Domotic implements IDomoticBuilder, IStateChangeRegistrar {
 	}
 
 	/**
-	 * This is what happens:
-	 * <ol>
-	 * <li>{@link IHardware#refreshInputs()} is called, so that hardware layer
-	 * inputs are refreshed.</li>
-	 * <li>All registered Sensors have their {@link Sensor#loop(long)} run to read
-	 * input and/or check timeouts etc. This typically triggers Actuators. Same
-	 * happens for Controllers.</li>
-	 * <li>Then any registered Actuators have their {@link Actuator#loop(long)}
-	 * executed, so they can update hardware output state.</li>
-	 * <li>{@link IHardware#refreshOutputs()} is called, so that hardware
-	 * layer outputs are updated.</li>
-	 * <li>Finally any {@link IStateChangedListener}s are called to update model
-	 * state of connected client UIs.
-	 * </ol>
+	 * See {@link ICanLoopAllBlocks#loopOnceAllBlocks(long)}.
 	 * 
 	 * @param currentTime
-	 *            Current time at loopOnce invocation.
+	 *                    Current time at invocation.
 	 */
-	public synchronized void loopOnce(long currentTime) {
+	@Override
+	public synchronized void loopOnceAllBlocks(long currentTime) {
 		loopSequence++;
 		if (loopSequence % 100 == 0)
 			MON.info("loopOnce() start, loopSequence=" + loopSequence + ", currentTime=" + currentTime);
 		hw.getReader().refreshInputs();
-		for (Sensor s : sensors) {
+		for (Sensor s : layout.getSensors()) {
 			s.loop(currentTime);
 		}
-		for (Controller c : controllers) {
+		for (Controller c : layout.getControllers()) {
 			c.loop(currentTime);
 		}
-		for (Actuator a : actuators) {
+		for (Actuator a : layout.getActuators()) {
 			a.loop(currentTime);
 		}
 		hw.getWriter().refreshOutputs();
 
-		{
-			// TODO must be async in separate thread, since might take longer than 20 ms... and with timeout perhaps?
+		if (getStateChangeListeners() != null) {
+			// TODO should be async in separate thread, since might take longer than 20
+			// ms...
+			// and with timeout perhaps?
 			long startTimeWs = System.currentTimeMillis();
 			if (loopSequence % 10 == 0) {
-				for (IStateChangedListener uiUpdator : stateChangeListeners)
+				for (IStateChangedListener uiUpdator : getStateChangeListeners())
 					uiUpdator.updateUi();
 			}
 			long tookMs = System.currentTimeMillis() - startTimeWs;
@@ -433,11 +327,13 @@ public class Domotic implements IDomoticBuilder, IStateChangeRegistrar {
 				driverProcess.destroy();
 				sleepSafe(500);
 				if (driverMonitor.getProcessWatch().isRunning()) {
-					log.error("Could not destroy driver process, pid=" + driverMonitor.getProcessWatch().getPid() + ". Ignored, you'll see what happens.");
+					log.error("Could not destroy driver process, pid=" + driverMonitor.getProcessWatch().getPid()
+							+ ". Ignored, you'll see what happens.");
 					// TODO stop domotic?
 				}
 			} else {
-				log.info("Driver stopped, exit code=" + driverMonitor.getProcessWatch().getExitcode() + ". Now Stopping driver monitor.");
+				log.info("Driver stopped, exit code=" + driverMonitor.getProcessWatch().getExitcode()
+						+ ". Now Stopping driver monitor.");
 			}
 			driverMonitor.terminate();
 		}

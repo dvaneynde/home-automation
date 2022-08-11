@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.base.Domotic;
+import eu.dlvm.domotics.base.IDomoticLayoutBuilder;
 import eu.dlvm.domotics.factories.XmlDomoticConfigurator;
 import eu.dlvm.iohardware.IHardware;
 
@@ -21,11 +22,9 @@ public class Main {
 
     private static final Logger log = LoggerFactory.getLogger(Main.class);
 
-    public Domotic setupBlocksConfig(String cfgFilename, IHardware hw) {
+    public void setupBlocksConfig(String cfgFilename, IHardware hw, IDomoticLayoutBuilder layoutBuilder) {
         try {
-            Domotic domotic = Domotic.createSingleton(hw);
-            XmlDomoticConfigurator.configure(cfgFilename, hw, domotic);
-            return domotic;
+            XmlDomoticConfigurator.configure(cfgFilename, hw, layoutBuilder);
         } catch (Exception e) {
             log.error("Cannot configure system, abort.", e);
             throw new RuntimeException("Abort. Cannot configure system.", e);
@@ -41,7 +40,8 @@ public class Main {
 
         // See coments in IHardwareBuilder, this is not yet generic enough
         IHardware hw = (new DiamondsysHardwareBuilder()).build(hwCfgFile, hostname, port, looptime * 9 / 10, simulation);
-        Domotic dom = setupBlocksConfig(blocksCfgFile, hw);
+        Domotic dom = Domotic.createSingleton(hw);
+        setupBlocksConfig(blocksCfgFile, hw, dom.getLayout());
 
         dom.runDomotic(looptime, path2Driver, htmlRootFile);
     }

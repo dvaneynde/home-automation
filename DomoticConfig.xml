@@ -196,7 +196,7 @@
 	<windSensor name="Windmeter" highFreq="15" lowFreq="2" lowTimeToResetAlert="600" channel="Windmeter" ui="ScreensZ:-2" />
 
 	<!-- threshold was 3500 maar te donker; filter nodig !-->
-	<lightGauge name="LichtZonZuid" threshold="3540" low2highTime="60" high2lowTime="300" channel="AnalogIn" ui="ScreensZ:-1" />
+	<lightGauge name="LichtZonZuid" threshold="1250" low2highTime="60" high2lowTime="300" channel="AnalogIn" ui="ScreensZ:-1" />
 	<sunWindController name="ZonAutoZuid" desc="Zon/Wind Automaat Tuin" ui="ScreensZ:0">
 		<!-- TODO zon en wind, afhankelijk van groep andere parameters rond lichtsterkte, ook rekening houdende met zonnestand. Dus hier moeten 
 			groepen kunnen gedefinieerd worden, met verschillende parameters, b.v. ook alarm etc. moeten hier bij wind en sun. -->
@@ -208,7 +208,7 @@
 		<screen name="ScreenKeuken" />
 	</sunWindController>
 
-	<lightGauge name="LichtZonWest" threshold="3450" low2highTime="60" high2lowTime="300" channel="AnalogIn" ui="ScreensW:-1" />
+	<lightGauge name="LichtZonWest" threshold="1250" low2highTime="60" high2lowTime="300" channel="AnalogIn" ui="ScreensW:-1" />
 	<sunWindController name="ZonAutoWest" desc="Zon/Wind Automaat Opzij" ui="ScreensW:0">
 		<!-- TODO zon en wind, afhankelijk van groep andere parameters rond lichtsterkte, ook rekening houdende met zonnestand. Dus hier moeten 
 			groepen kunnen gedefinieerd worden, met verschillende parameters, b.v. ook alarm etc. moeten hier bij wind en sun. -->
@@ -239,7 +239,7 @@
 	</timer>
 	-->
 
-	<lightGauge name="LichtmeterSchemering" threshold="2000" low2highTime="180" high2lowTime="180" channel="AnalogIn" ui="SPECIAAL:4" />
+	<lightGauge name="LichtmeterSchemering" threshold="50" low2highTime="180" high2lowTime="180" channel="AnalogIn" ui="SPECIAAL:4" />
 	<lamp name="LichtTerras" desc="Licht terras en zijkant" ui="Buiten:0">
 		<toggle src="SchakBuitenTuin" />
 

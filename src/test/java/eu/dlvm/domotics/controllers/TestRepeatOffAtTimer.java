@@ -11,9 +11,8 @@ import org.junit.Test;
 
 import eu.dlvm.domotics.base.Actuator;
 import eu.dlvm.domotics.base.Block;
-import eu.dlvm.domotics.base.IDomoticBuilder;
+import eu.dlvm.domotics.base.DomoticLayout;
 import eu.dlvm.domotics.base.RememberedOutput;
-import eu.dlvm.domotics.blocks.DomoticMock;
 import eu.dlvm.domotics.events.EventType;
 
 public class TestRepeatOffAtTimer {
@@ -21,9 +20,9 @@ public class TestRepeatOffAtTimer {
 
 	@Test
 	public void testTypicalDay() {
-        DomoticMock domoticContext = new DomoticMock();
-		RepeatOffAtTimer t = new RepeatOffAtTimer("timer", "timer test", domoticContext, 60);
-		t.registerListener(new Actuator("test", "test", null, null, null, domoticContext) {
+        DomoticLayout layout = new DomoticLayout();
+		RepeatOffAtTimer t = new RepeatOffAtTimer("timer", "timer test", layout, 60);
+		t.registerListener(new Actuator("test", "test", null, null, null, layout) {
 
 			public void onEvent(Block source, EventType event) {
 				if (event == EventType.OFF)

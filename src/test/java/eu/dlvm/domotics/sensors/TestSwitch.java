@@ -4,9 +4,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.Assert;
 
+import eu.dlvm.domotics.BaseHardwareMock;
 import eu.dlvm.domotics.base.Block;
-import eu.dlvm.domotics.blocks.BaseHardwareMock;
-import eu.dlvm.domotics.blocks.DomoticMock;
+import eu.dlvm.domotics.base.DomoticLayout;
 import eu.dlvm.domotics.events.EventType;
 import eu.dlvm.domotics.events.IEventListener;
 import eu.dlvm.iohardware.IHardware;
@@ -23,7 +23,7 @@ public class TestSwitch {
 	};
 
 	private Hardware hw = new Hardware();
-	private DomoticMock dom = new DomoticMock();
+	private DomoticLayout dom = new DomoticLayout();
 	private long cur;
 	private Switch sw;
 	private EventType lastClick;

@@ -12,10 +12,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.Assert;
 
+import eu.dlvm.domotics.BaseHardwareMock;
 import eu.dlvm.domotics.actuators.Lamp;
 import eu.dlvm.domotics.base.Domotic;
+import eu.dlvm.domotics.base.DomoticLayout;
 import eu.dlvm.domotics.base.RememberedOutput;
-import eu.dlvm.domotics.blocks.BaseHardwareMock;
 import eu.dlvm.domotics.controllers.Timer;
 import eu.dlvm.domotics.events.EventType;
 import eu.dlvm.domotics.sensors.Switch;
@@ -70,11 +71,12 @@ public class TestSwitchOrTimer2Lamp {
 		hw.out(11, false);
 
 		dom = Domotic.createSingleton(hw);
+		DomoticLayout layout = dom.getLayout();
 
-		sw1 = new Switch("Switch1", "Switch1", Integer.toString(0), hw, dom);
-		sw2 = new Switch("Switch2", "Switch2", Integer.toString(1), hw, dom);
-		o1 = new Lamp("Lamp1", "Lamp1", false, Integer.toString(10), hw,  dom);
-		o2 = new Lamp("Lamp2", "Lamp2", false, Integer.toString(11), hw, dom);
+		sw1 = new Switch("Switch1", "Switch1", Integer.toString(0), hw, layout);
+		sw2 = new Switch("Switch2", "Switch2", Integer.toString(1), hw, layout);
+		o1 = new Lamp("Lamp1", "Lamp1", false, Integer.toString(10), hw,  layout);
+		o2 = new Lamp("Lamp2", "Lamp2", false, Integer.toString(11), hw, layout);
 
 		//		SwitchClick2Toggle sct1 = new SwitchClick2Toggle("sct1", "");
 		//		sct1.registerListener(o1);
@@ -108,25 +110,25 @@ public class TestSwitchOrTimer2Lamp {
 		// switch 1, single click
 		Assert.assertEquals(false, hw.out(10));
 		Assert.assertEquals(false, hw.out(11));
-		dom.loopOnce(cur += 10);
+		dom.loopOnceAllBlocks(cur += 10);
 		Assert.assertEquals(false, hw.out(10));
 		Assert.assertEquals(false, hw.out(11));
 		hw.in(0, true);
-		dom.loopOnce(cur += 10);
+		dom.loopOnceAllBlocks(cur += 10);
 		Assert.assertEquals(false, hw.out(10));
 		Assert.assertEquals(false, hw.out(11));
 		hw.in(0, false);
-		dom.loopOnce(cur += 10);// hier loopt het mis
-		dom.loopOnce(cur += 10);
+		dom.loopOnceAllBlocks(cur += 10);// hier loopt het mis
+		dom.loopOnceAllBlocks(cur += 10);
 		Assert.assertEquals(true, hw.out(10));
 		Assert.assertEquals(false, hw.out(11));
 
 		// switch 2, single click
 		hw.in(1, true);
-		dom.loopOnce(cur += 10);
+		dom.loopOnceAllBlocks(cur += 10);
 		hw.in(1, false);
-		dom.loopOnce(cur += (sw2.getDoubleClickTimeout() + 10));
-		dom.loopOnce(cur += 1);
+		dom.loopOnceAllBlocks(cur += (sw2.getDoubleClickTimeout() + 10));
+		dom.loopOnceAllBlocks(cur += 1);
 		Assert.assertEquals(true, hw.out(10));
 		Assert.assertEquals(true, hw.out(11));
 	}
@@ -144,19 +146,19 @@ public class TestSwitchOrTimer2Lamp {
 		// First put both on
 		hw.in(0, true);
 		hw.in(1, true);
-		dom.loopOnce(cur += 10);
+		dom.loopOnceAllBlocks(cur += 10);
 		hw.in(0, false);
 		hw.in(1, false);
-		dom.loopOnce(cur += 10); // detecteer single click, maar wacht nog op
+		dom.loopOnceAllBlocks(cur += 10); // detecteer single click, maar wacht nog op
 									// dubbel click
-		dom.loopOnce(cur += 60); // vermijd dubbel-klik detectie
+		dom.loopOnceAllBlocks(cur += 60); // vermijd dubbel-klik detectie
 		Assert.assertEquals(true, hw.out(10));
 		Assert.assertEquals(true, hw.out(11));
 		// Now, all off with Switch 2
 		hw.in(1, true);
-		dom.loopOnce(cur += 10);
+		dom.loopOnceAllBlocks(cur += 10);
 		hw.in(1, false);
-		dom.loopOnce(cur += (sw2.getLongClickTimeout() + 10));
+		dom.loopOnceAllBlocks(cur += (sw2.getLongClickTimeout() + 10));
 		Assert.assertEquals(false, hw.out(10));
 		Assert.assertEquals(false, hw.out(11));
 	}
@@ -172,18 +174,18 @@ public class TestSwitchOrTimer2Lamp {
 		Assert.assertEquals(false, hw.out(10));
 		Assert.assertEquals(false, hw.out(11));
 		hw.in(1, true);
-		dom.loopOnce(cur += 10);
+		dom.loopOnceAllBlocks(cur += 10);
 		hw.in(1, false);
-		dom.loopOnce(cur += 10);
+		dom.loopOnceAllBlocks(cur += 10);
 		hw.in(1, true);
-		dom.loopOnce(cur += 10);
+		dom.loopOnceAllBlocks(cur += 10);
 		Assert.assertEquals(true, hw.out(10));
 		Assert.assertEquals(true, hw.out(11));
 	}
 
 	@Test
 	public void testTimer() {
-		Timer t = new Timer("timer", "timer", dom);
+		Timer t = new Timer("timer", "timer", dom.getLayout());
 		t.setOnTime(22, 0);
 		t.setOffTime(7, 30);
 		t.registerListener(o1);

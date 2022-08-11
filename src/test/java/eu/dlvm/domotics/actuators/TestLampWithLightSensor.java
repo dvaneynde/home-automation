@@ -4,8 +4,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.Assert;
 
-import eu.dlvm.domotics.blocks.BaseHardwareMock;
-import eu.dlvm.domotics.blocks.DomoticMock;
+import eu.dlvm.domotics.BaseHardwareMock;
+import eu.dlvm.domotics.base.DomoticLayout;
 import eu.dlvm.domotics.connectors.Connector;
 import eu.dlvm.domotics.events.EventType;
 import eu.dlvm.domotics.sensors.LightSensor;
@@ -38,13 +38,12 @@ public class TestLampWithLightSensor {
 	private Lamp lamp;
 	private LightSensor lightSensor;
 	private Hardware hw;
-	private DomoticMock dom;
 	private long current;
 
 	@Before
 	public void init() {
 		hw = new Hardware();
-		dom = new DomoticMock();
+		DomoticLayout dom = new DomoticLayout();
 		lamp = new Lamp("TestLamp", "TestLamp", false, LAMP_OUT, hw, dom);
 		lightSensor = new LightSensor("TestLightSensor", "", "", LIGHT_IN, hw, dom, 2000, 2, 3);
 		Connector c0 = new Connector(EventType.LIGHT_HIGH, lamp, EventType.OFF, "HIGH_to_OFF");

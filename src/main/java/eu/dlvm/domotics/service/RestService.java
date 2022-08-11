@@ -49,7 +49,7 @@ public class RestService {
 	@Produces(MediaType.TEXT_PLAIN)
 	public String listActuatorsTxt() {
 		StringBuffer sb = new StringBuffer();
-		for (IUiCapableBlock a : Domotic.singleton().getUiCapableBlocks())
+		for (IUiCapableBlock a : Domotic.singleton().getLayout().getUiCapableBlocks())
 			sb.append(a.getUiInfo().getName()).append(" - ").append(a.getUiInfo().getDescription()).append('\n');
 		return sb.toString();
 	}
@@ -60,7 +60,7 @@ public class RestService {
 	public List<UiInfo> listActuators() {
 		List<UiInfo> list = new ArrayList<>();
 		try {
-			for (IUiCapableBlock a : Domotic.singleton().getUiCapableBlocks()) {
+			for (IUiCapableBlock a : Domotic.singleton().getLayout().getUiCapableBlocks()) {
 				UiInfo aj = a.getUiInfo();
 				if (aj != null)
 					list.add(aj);
@@ -84,10 +84,10 @@ public class RestService {
 	public List<UiInfo> updateActuator(@PathParam("name") String name, @PathParam("action") String action) {
 		// TODO debug
 		Log.info("Domotic API: got update actuator '" + name + "' action='" + action + "'");
-		IUiCapableBlock act = Domotic.singleton().findUiCapable(name);
+		IUiCapableBlock act = Domotic.singleton().getLayout().findUiCapable(name);
 		if (act == null) {
 			// TODO iets terugsturen?
-			Log.warn("Could not find actuator " + name);
+			Log.warn("updateActuator(): could not find actuator " + name);
 		} else {
 			act.update(action);
 		}

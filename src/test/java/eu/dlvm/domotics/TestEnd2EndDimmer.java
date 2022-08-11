@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.actuators.DimmedLamp;
 import eu.dlvm.domotics.base.Domotic;
+import eu.dlvm.domotics.base.DomoticLayout;
 import eu.dlvm.domotics.base.RememberedOutput;
 import eu.dlvm.domotics.sensors.DimmerSwitch;
 import eu.dlvm.iohardware.ChannelType;
@@ -57,8 +58,9 @@ public class TestEnd2EndDimmer {
 		hw = new DiamondsysHardware(new TestConfigurator(), drv);
 		// Domotic
 		dom = Domotic.createSingleton(hw);
-		dsw = new DimmerSwitch("dsw1", "Dimmer Switches 1", SW_DN_1, SW_UP_1, hw, dom);
-		dl = new DimmedLamp("dl1", "Dimmed Lamp 1", 99, DIMMER1, hw, dom);
+		DomoticLayout layout = dom.getLayout();
+		dsw = new DimmerSwitch("dsw1", "Dimmer Switches 1", SW_DN_1, SW_UP_1, hw, layout);
+		dl = new DimmedLamp("dl1", "Dimmed Lamp 1", 99, DIMMER1, hw, layout);
 		dsw.registerListener(dl);
 	}
 
@@ -82,7 +84,7 @@ public class TestEnd2EndDimmer {
 		// Start long-click up
 		// Negative logic ! Input channel 1 must go up.
 		drv.reset("INP_O 0x380 253\n\n", "\n");
-		dom.loopOnce(current += 10);
+		dom.loopOnceAllBlocks(current += 10);
 		log.debug("testDimmer: 1, sendInputUsed:\n" + drv.sentToDriver0 + "\nsendOutputUsed:\n" + drv.sentToDriver1
 				+ "---");
 		Assert.assertEquals("REQ_INP 0x380 O\nREQ_INP 0x300 D YYY\n\n", drv.sentToDriver0);
@@ -93,7 +95,7 @@ public class TestEnd2EndDimmer {
 
 		// Just loop...
 		drv.reset("\n", "\n");
-		dom.loopOnce(current += 10);
+		dom.loopOnceAllBlocks(current += 10);
 		log.debug("testDimmer: 2, sendInputUsed:\n" + drv.sentToDriver0 + "\nsendOutputUsed:\n" + drv.sentToDriver1
 				+ "---");
 		Assert.assertEquals(DimmerSwitch.States.DOWN_SHORT, dsw.getState());
@@ -103,7 +105,7 @@ public class TestEnd2EndDimmer {
 		// Wait long enough to make it a long click
 		// Should go up now
 		drv.reset("\n", "\n");
-		dom.loopOnce(current += (dsw.getClickedTimeoutMS() + 1));
+		dom.loopOnceAllBlocks(current += (dsw.getClickedTimeoutMS() + 1));
 		// Note that output value has not changed yet, we start at 0 with first loop.
 		log.debug("testDimmer: 3, sendInputUsed:\n" + drv.sentToDriver0 + "\nsendOutputUsed:\n" + drv.sentToDriver1
 				+ "---");
@@ -112,7 +114,7 @@ public class TestEnd2EndDimmer {
 
 		// Continue let it go up...
 		drv.reset("\n", "\n");
-		dom.loopOnce(current += (dl.getMsTimeFullDim() / 10));
+		dom.loopOnceAllBlocks(current += (dl.getMsTimeFullDim() / 10));
 		log.debug("testDimmer: 4, sendInputUsed:\n" + drv.sentToDriver0 + "\nsendOutputUsed:\n" + drv.sentToDriver1
 				+ "---");
 		Assert.assertEquals("SET_OUT 0x380 O 0\nSET_OUT 0x300 D 0 9 0\n\n", drv.sentToDriver1);
@@ -124,7 +126,7 @@ public class TestEnd2EndDimmer {
 
 		// Wait a bit and see if it counts up
 		drv.reset("\n", "\n");
-		dom.loopOnce(current += (dl.getMsTimeFullDim() / 10));
+		dom.loopOnceAllBlocks(current += (dl.getMsTimeFullDim() / 10));
 		log.debug("testDimmer: 5, sendInputUsed:\n" + drv.sentToDriver0 + "\nsendOutputUsed:\n" + drv.sentToDriver1
 				+ "---");
 		Assert.assertEquals("SET_OUT 0x380 O 0\nSET_OUT 0x300 D 0 19 0\n\n", drv.sentToDriver1);
@@ -137,7 +139,7 @@ public class TestEnd2EndDimmer {
 
 		// All inputs off
 		drv.reset("INP_O 0x380 255\n\n", "\n");
-		dom.loopOnce(current += 1);
+		dom.loopOnceAllBlocks(current += 1);
 		log.debug("testDimmer: 6, sendInputUsed:\n" + drv.sentToDriver0 + "\nsendOutputUsed:\n" + drv.sentToDriver1
 				+ "---");
 		Assert.assertEquals(DimmerSwitch.States.REST, dsw.getState());

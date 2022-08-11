@@ -26,7 +26,7 @@ So I bought an Advantech Atom processor and DMMAT I/O boards, and another I/O bo
 
 The complete system was installed and operational on August 25 2013, finally replacing the PLC version. 
 
-![v2](images/domo-v2-c.png)
+![v2](images/domo-v2-c.jpg)
 
 It was time, my wife was fed up with me spending so much time on this...
 

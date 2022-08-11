@@ -58,7 +58,7 @@ Here is a view of the hardware I currently use.
 At the bottom is an Advantech Atom CPU based motherboard, on top of which stack multiple I/O boards from Diamond Systems. The I/O boards provide digital and analog inputs and outputs, which connect to switches, lamps, screens, fans, voltage controlled dimmers or a weather station that measures wind and light.
 
 This hardware is connected to many many wires, relays, dimmers, power supplies in below closet.
-![The Closet](./images/closet.png)
+![The Closet](./images/closet.jpg)
 
 At the far left, left from the CPU and stacked I/O boards, there is an extra PCB with extra buffers and analog in/out amplifiers. Reason is that this was cheaper than buying extra Diamond Boards.
 

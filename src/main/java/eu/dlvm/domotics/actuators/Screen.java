@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.base.Actuator;
 import eu.dlvm.domotics.base.Block;
-import eu.dlvm.domotics.base.IDomoticBuilder;
+import eu.dlvm.domotics.base.IDomoticLayoutBuilder;
 import eu.dlvm.domotics.base.IUiCapableBlock;
 import eu.dlvm.domotics.base.RememberedOutput;
 import eu.dlvm.domotics.events.EventType;
@@ -55,7 +55,7 @@ public class Screen extends Actuator implements IEventListener, IUiCapableBlock 
 	/*
 	 * Public API
 	 */
-	public Screen(String name, String description, String ui, String chDown, String chUp, IHardwareWriter writer, IDomoticBuilder builder) {
+	public Screen(String name, String description, String ui, String chDown, String chUp, IHardwareWriter writer, IDomoticLayoutBuilder builder) {
 		super(name, description, ui, chDown, writer, builder);
 		this.chUp = chUp;
 	}
