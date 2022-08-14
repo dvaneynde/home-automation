@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.inject.Singleton;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -31,10 +32,11 @@ public class RestService {
 		qSvc = new QuickieService();
 	}
 
+	@Path("health")
 	@GET
-	@Produces(MediaType.TEXT_PLAIN)
-	public String getIt() {
-		return "Got it! This is the prefix for all REST functions.";
+	@Produces(MediaType.APPLICATION_JSON)
+	public String heatlh() {
+		return "{'health':'ok'}";
 	}
 
 	@Path("shutdown")
@@ -42,16 +44,6 @@ public class RestService {
 	public void shutdown() {
 		Domotic.singleton().requestStop();
 		Log.info("Shutdown of domotic requested.");
-	}
-
-	@Path("statuses_txt")
-	@GET
-	@Produces(MediaType.TEXT_PLAIN)
-	public String listActuatorsTxt() {
-		StringBuffer sb = new StringBuffer();
-		for (IUiCapableBlock a : Domotic.singleton().getLayout().getUiCapableBlocks())
-			sb.append(a.getUiInfo().getName()).append(" - ").append(a.getUiInfo().getDescription()).append('\n');
-		return sb.toString();
 	}
 
 	@Path("statuses")
@@ -73,17 +65,35 @@ public class RestService {
 		return list;
 	}
 
+	@Path("statuses/{name}")
+	@Produces(MediaType.APPLICATION_JSON)
+	@GET
+	public UiInfo getActuatorStatus(@PathParam("name") String name) {
+		try {
+			IUiCapableBlock uiCapable = Domotic.singleton().getLayout().findUiCapable(name);
+			if (uiCapable == null) {
+				Log.debug("getActuatorStatus() cannot find actuator with name: " + name);
+				return null;
+			} else {
+				UiInfo info = uiCapable.getUiInfo();
+				Log.debug("getActuatorStatus() returns: " + info);
+				return info;
+			}
+		} catch (Throwable e) {
+			Log.warn("getActuatorStatus() failed with name: "+name, e);
+			return null;
+		}
+	}
+
 	/**
 	 * @param name
 	 * @param action
-	 *            on, off or integer which is level
+	 *               on, off or integer which is level
 	 */
-	@Path("act/{name}/{action}")
-	@Produces(MediaType.APPLICATION_JSON)
-	@GET
-	public List<UiInfo> updateActuator(@PathParam("name") String name, @PathParam("action") String action) {
-		// TODO debug
-		Log.info("Domotic API: got update actuator '" + name + "' action='" + action + "'");
+	@Path("actuators/{name}/{action}")
+	@POST
+	public void updateActuator(@PathParam("name") String name, @PathParam("action") String action) {
+		Log.info("Domotic API: got update actuator '" + name + "' action='" + action + "' (POST)");
 		IUiCapableBlock act = Domotic.singleton().getLayout().findUiCapable(name);
 		if (act == null) {
 			// TODO iets terugsturen?
@@ -91,7 +101,6 @@ public class RestService {
 		} else {
 			act.update(action);
 		}
-		return listActuators();
 	}
 
 	@Path("quickies")
@@ -113,5 +122,4 @@ public class RestService {
 		} else
 			Log.warn("Domotic API: quickie '" + name + "' not found.");
 	}
-
 }

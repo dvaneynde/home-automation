@@ -53,7 +53,7 @@ Domotica Main
 To run in simulation mode, make sure subfolder `static` has the javascript (from elm) code. Then:
 
 ```bash
-$ java -jar domotica-1.0-jar-with-dependencies.jar -Dlogback.configurationFile=src/main/resources/logback-dev.xml \
+$ java -Dlogback.configurationFile=src/main/resources/logback-dev.xml -jar target/domotica-1.0-jar-with-dependencies.jar  \
     domo -s -c DiamondBoardsConfig.xml -b DomoticConfig.xml -w static
 ```
 
