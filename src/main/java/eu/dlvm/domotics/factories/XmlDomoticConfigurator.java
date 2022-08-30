@@ -30,6 +30,7 @@ public class XmlDomoticConfigurator {
 			SAXParser p = f.newSAXParser();
 			DefaultHandler2 h = new XmlElementHandlers(builder, hardware);
 			p.parse(cfgFile, h);
+			logger.info("Configured domotic system from file="+cfgFilepath);
 		} catch (ParserConfigurationException | SAXException | IOException e) {
 			logger.error("Configuration Failed: ", e);
 			throw new ConfigurationException(e.getMessage());

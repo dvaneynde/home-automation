@@ -198,8 +198,7 @@ class XmlElementHandlers extends DefaultHandler2 {
 				parseBaseBlock(atts);
 				int start = converHourMinToMsOnDay(atts.getValue("start"));
 				int end = converHourMinToMsOnDay(atts.getValue("end"));
-				GadgetController gc = AntiBurglarBuilder.build(blocksSoFar, name, start, end, builder);
-				currentBlock = gc;
+				currentBlock = AntiBurglarBuilder.build(blocksSoFar, name, start, end, builder);
 
 				// ===== Actuators
 
@@ -284,6 +283,11 @@ class XmlElementHandlers extends DefaultHandler2 {
 		return Timer.timeInDayMillis(hours, minutes);
 	}
 
+	/**
+	 * Creates connector from "src" Block to currentBlock, translating "event" to targetEventType
+	 * @param atts
+	 * @param targetEventType event for target
+	 */
 	private void connectEvent2Action(Attributes atts, EventType targetEventType) {
 		ActionEvent ae = parseActionEvent(atts);
 		Connector c = new Connector(ae.srcEvent, (IEventListener) currentBlock, targetEventType,
@@ -293,6 +297,11 @@ class XmlElementHandlers extends DefaultHandler2 {
 		ae.srcBlock.registerListener(c);
 	}
 
+	/**
+	 * Looks for attributes "src" and optionally "event" in parameter atts, and returns corresponding Block and Event. If no "evebt" then SingleClick is default.
+	 * @param atts
+	 * @return ActionEvent
+	 */
 	private ActionEvent parseActionEvent(Attributes atts) {
 		ActionEvent ae = new ActionEvent();
 		String srcName = atts.getValue("src");
@@ -301,16 +310,14 @@ class XmlElementHandlers extends DefaultHandler2 {
 			eventAlias = EventType.SINGLE_CLICK.getAlias();
 
 		Block src = blocksSoFar.get(srcName);
-		if (src != null) {
-			ae.srcBlock = src;
-			ae.srcEvent = EventType.fromAlias(eventAlias);
-			if (ae.srcEvent == null)
-				throw new ConfigurationException(
-						"Unknown event '" + eventAlias + "' on block '" + currentBlock.getName() + "'.");
-		} else {
+		if (src == null)
 			throw new ConfigurationException(
-					"Could not find srcBlock =" + srcName + ". Check config of " + currentBlock.getName());
-		}
+				"Could not find srcBlock =" + srcName + ". Check config of " + currentBlock.getName());
+		ae.srcBlock = src;
+		ae.srcEvent = EventType.fromAlias(eventAlias);
+		if (ae.srcEvent == null)
+			throw new ConfigurationException(
+					"Unknown event '" + eventAlias + "' on block '" + currentBlock.getName() + "'.");
 		return ae;
 	}
 

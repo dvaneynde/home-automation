@@ -135,7 +135,7 @@
 
 	<!-- New Year -->
 	<newyear name="newyear" start="2018-12-31T22:59:50" end="2019-01-01T00:01:00">
-		<toggle src="SchakLichtBureau" event="DoubleClick" />
+		<on src="SchakLichtBureau" event="DoubleClick" />
 	</newyear>
 
 	<!-- Screens -->
