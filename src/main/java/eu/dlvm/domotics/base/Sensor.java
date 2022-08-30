@@ -27,11 +27,11 @@ public abstract class Sensor extends Block implements IDomoticLoop {
 	 * @param name
 	 * @param description
 	 */
-	public Sensor(String name, String description, String channel, IHardwareReader reader, IDomoticLayoutBuilder builder) {
+	public Sensor(String name, String description, String channel, IHardwareReader reader, IBlockRegistrar builder) {
 		this(name, description, null, channel, reader, builder);
 	}
 
-	public Sensor(String name, String description, String ui, String channel, IHardwareReader reader, IDomoticLayoutBuilder builder) {
+	public Sensor(String name, String description, String ui, String channel, IHardwareReader reader, IBlockRegistrar builder) {
 		super(name, description, ui);
 		this.reader = reader;
 		this.channel = channel;

@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.base.Block;
 import eu.dlvm.domotics.base.Controller;
-import eu.dlvm.domotics.base.IDomoticLayoutBuilder;
+import eu.dlvm.domotics.base.IBlockRegistrar;
 import eu.dlvm.domotics.events.EventType;
 
 /**
@@ -72,7 +72,7 @@ public class Timer extends Controller {
 	}
 
 	// timer usage interface
-	public Timer(String name, String description, IDomoticLayoutBuilder ctx) {
+	public Timer(String name, String description, IBlockRegistrar ctx) {
 		super(name, description, null, ctx);
 		state = false;
 		onTimeMs = offTimeMs = 0;

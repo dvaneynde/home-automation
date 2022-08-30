@@ -1,13 +1,13 @@
 package eu.dlvm.domotics.base;
 
 /**
- * Methods to build a domotic layout.
+ * Methods to register a {@link Block}.
  * <p>Typically passed to a {@link Block} subtype so that it can register itself in {@link DomoticLayout}.
  * 
  * @author dirk
  * 
  */
-public interface IDomoticLayoutBuilder {
+public interface IBlockRegistrar {
 
 	/**
 	 * Add Sensor. 

@@ -6,7 +6,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class DomoticLayout implements IDomoticLayoutBuilder {
+public class DomoticLayout implements IBlockRegistrar {
 
     static Logger log = LoggerFactory.getLogger(DomoticLayout.class);
 

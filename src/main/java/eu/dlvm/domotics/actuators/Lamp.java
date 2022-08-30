@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.base.Actuator;
 import eu.dlvm.domotics.base.Block;
-import eu.dlvm.domotics.base.IDomoticLayoutBuilder;
+import eu.dlvm.domotics.base.IBlockRegistrar;
 import eu.dlvm.domotics.base.IUiCapableBlock;
 import eu.dlvm.domotics.base.RememberedOutput;
 import eu.dlvm.domotics.events.EventType;
@@ -64,11 +64,11 @@ public class Lamp extends Actuator implements IEventListener, IUiCapableBlock {
 		ON, OFF, GOING_OFF_BLINK, GOING_OFF_UNLESS_CLICK;
 	}
 
-	public Lamp(String name, String description, boolean isEcoEnabled, String channel, IHardwareWriter writer, IDomoticLayoutBuilder builder) {
+	public Lamp(String name, String description, boolean isEcoEnabled, String channel, IHardwareWriter writer, IBlockRegistrar builder) {
 		this(name, description, isEcoEnabled, null, channel, writer, builder);
 	}
 
-	public Lamp(String name, String description, boolean isEcoEnabled, String ui, String channel, IHardwareWriter writer, IDomoticLayoutBuilder builder) {
+	public Lamp(String name, String description, boolean isEcoEnabled, String ui, String channel, IHardwareWriter writer, IBlockRegistrar builder) {
 		super(name, description, ui, channel, writer, builder);
 		ecoEnabled = isEcoEnabled;
 		state = States.OFF;

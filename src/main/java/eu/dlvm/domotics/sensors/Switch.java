@@ -4,7 +4,7 @@ import eu.dlvm.iohardware.IHardwareReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import eu.dlvm.domotics.base.IDomoticLayoutBuilder;
+import eu.dlvm.domotics.base.IBlockRegistrar;
 import eu.dlvm.domotics.base.ConfigurationException;
 import eu.dlvm.domotics.base.Sensor;
 import eu.dlvm.domotics.events.EventType;
@@ -47,12 +47,12 @@ public class Switch extends Sensor {
 		return state;
 	}
 
-	public Switch(String name, String description, String channel, IHardwareReader reader, IDomoticLayoutBuilder builder) {
+	public Switch(String name, String description, String channel, IHardwareReader reader, IBlockRegistrar builder) {
 		super(name, description, channel, reader, builder);
 	}
 
 	public Switch(String name, String description, String channel, boolean singleClickEnabled, boolean longClickEnabled,
-			boolean doubleClickEnabled, IHardwareReader reader, IDomoticLayoutBuilder builder) {
+			boolean doubleClickEnabled, IHardwareReader reader, IBlockRegistrar builder) {
 		super(name, description, channel, reader, builder);
 		this.singleClickEnabled = singleClickEnabled;
 		this.longClickEnabled = longClickEnabled;

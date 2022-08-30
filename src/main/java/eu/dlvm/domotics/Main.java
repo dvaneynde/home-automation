@@ -7,7 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.base.Domotic;
-import eu.dlvm.domotics.base.IDomoticLayoutBuilder;
+import eu.dlvm.domotics.base.IBlockRegistrar;
 import eu.dlvm.domotics.factories.XmlDomoticConfigurator;
 import eu.dlvm.iohardware.IHardware;
 
@@ -22,7 +22,7 @@ public class Main {
 
     private static final Logger log = LoggerFactory.getLogger(Main.class);
 
-    public void setupBlocksConfig(String cfgFilename, IHardware hw, IDomoticLayoutBuilder layoutBuilder) {
+    public void setupBlocksConfig(String cfgFilename, IHardware hw, IBlockRegistrar layoutBuilder) {
         try {
             XmlDomoticConfigurator.configure(cfgFilename, hw, layoutBuilder);
         } catch (Exception e) {

@@ -4,7 +4,7 @@ import eu.dlvm.iohardware.IHardwareReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import eu.dlvm.domotics.base.IDomoticLayoutBuilder;
+import eu.dlvm.domotics.base.IBlockRegistrar;
 import eu.dlvm.domotics.base.IUiCapableBlock;
 import eu.dlvm.domotics.base.Sensor;
 import eu.dlvm.domotics.events.EventType;
@@ -56,12 +56,12 @@ public class WindSensor extends Sensor implements IUiCapableBlock {
 	 * @param lowTimeToResetAlert
 	 *            Unit is seconds.
 	 */
-	public WindSensor(String name, String description, String channel, IHardwareReader reader, IDomoticLayoutBuilder builder, int highFreqThreshold,
+	public WindSensor(String name, String description, String channel, IHardwareReader reader, IBlockRegistrar builder, int highFreqThreshold,
                       int lowFreqThreshold, int lowTimeToResetAlert) {
 		this(name, description, null, channel, reader, builder, highFreqThreshold, lowFreqThreshold, lowTimeToResetAlert);
 	}
 
-	public WindSensor(String name, String description, String ui, String channel, IHardwareReader reader, IDomoticLayoutBuilder builder,
+	public WindSensor(String name, String description, String ui, String channel, IHardwareReader reader, IBlockRegistrar builder,
                       int highFreqThreshold, int lowFreqThreshold, int lowTimeToResetAlert) {
 		super(name, description, ui, channel, reader, builder);
 		if (highFreqThreshold < lowFreqThreshold) // TODO higfreq must be 'far'

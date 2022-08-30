@@ -37,7 +37,7 @@ public abstract class Actuator extends Block implements IDomoticLoop, IEventList
 	 * @param channel
 	 *            Output channel in Hardware that corresponds to this Actuator.
 	 */
-	public Actuator(String name, String description, String uiGroup, String channel, IHardwareWriter writer, IDomoticLayoutBuilder builder) {
+	public Actuator(String name, String description, String uiGroup, String channel, IHardwareWriter writer, IBlockRegistrar builder) {
 		super(name, description, uiGroup);
 		this.writer = writer;
 		this.channel = channel;

@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.base.Actuator;
 import eu.dlvm.domotics.base.Block;
-import eu.dlvm.domotics.base.IDomoticLayoutBuilder;
+import eu.dlvm.domotics.base.IBlockRegistrar;
 import eu.dlvm.domotics.base.IUiCapableBlock;
 import eu.dlvm.domotics.base.RememberedOutput;
 import eu.dlvm.domotics.events.EventType;
@@ -53,7 +53,7 @@ public class DimmedLamp extends Actuator implements IEventListener, IUiCapableBl
 	 * @param writer
 	 *            Link to underlying hardware layer.
 	 */
-	public DimmedLamp(String name, String description, String ui, int outputValueHardwareIfFull, String channel, IHardwareWriter writer, IDomoticLayoutBuilder builder) {
+	public DimmedLamp(String name, String description, String ui, int outputValueHardwareIfFull, String channel, IHardwareWriter writer, IBlockRegistrar builder) {
 		super(name, description, ui, channel, writer, builder);
 		this.factorHwOut = outputValueHardwareIfFull;
 		state = States.OFF;
@@ -61,7 +61,7 @@ public class DimmedLamp extends Actuator implements IEventListener, IUiCapableBl
 		prevOnLevel = 100;
 	}
 
-	public DimmedLamp(String name, String description, int outputValueHardwareIfFull, String channel, IHardwareWriter writer, IDomoticLayoutBuilder builder) {
+	public DimmedLamp(String name, String description, int outputValueHardwareIfFull, String channel, IHardwareWriter writer, IBlockRegistrar builder) {
 		this(name, description, null, outputValueHardwareIfFull, channel, writer, builder);
 	}
 
@@ -80,7 +80,7 @@ public class DimmedLamp extends Actuator implements IEventListener, IUiCapableBl
 	 *            Link to underlying hardware layer.
 	 * @deprecated
 	 */
-	public DimmedLamp(String name, String description, int outputValueHardwareIfFull, int channel, IHardwareWriter writer, IDomoticLayoutBuilder builder) {
+	public DimmedLamp(String name, String description, int outputValueHardwareIfFull, int channel, IHardwareWriter writer, IBlockRegistrar builder) {
 		this(name, description, null, outputValueHardwareIfFull, Integer.toString(channel), writer, builder);
 	}
 

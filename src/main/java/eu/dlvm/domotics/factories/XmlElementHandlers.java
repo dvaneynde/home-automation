@@ -22,7 +22,7 @@ import eu.dlvm.domotics.actuators.Screen;
 import eu.dlvm.domotics.base.Block;
 import eu.dlvm.domotics.base.ConfigurationException;
 import eu.dlvm.domotics.base.Controller;
-import eu.dlvm.domotics.base.IDomoticLayoutBuilder;
+import eu.dlvm.domotics.base.IBlockRegistrar;
 import eu.dlvm.domotics.base.Sensor;
 import eu.dlvm.domotics.connectors.Connector;
 import eu.dlvm.domotics.controllers.GadgetController;
@@ -41,7 +41,7 @@ class XmlElementHandlers extends DefaultHandler2 {
 
 	static Logger logger = LoggerFactory.getLogger(XmlElementHandlers.class);
 
-	private IDomoticLayoutBuilder builder;
+	private IBlockRegistrar builder;
 	private IHardware hw;
 	private int depth = -1; // -1 because domotic startelement makes it start
 							// and that is really 0
@@ -63,7 +63,7 @@ class XmlElementHandlers extends DefaultHandler2 {
         return hw.getWriter();
     }
 
-    public XmlElementHandlers(IDomoticLayoutBuilder builder, IHardware hardware) {
+    public XmlElementHandlers(IBlockRegistrar builder, IHardware hardware) {
 		super();
 		this.builder = builder;
 		this.hw = hardware;
