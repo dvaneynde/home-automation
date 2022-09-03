@@ -111,7 +111,7 @@ ls -l /etc/rc?.d/*domo*				# check
 $ sudo crontab -u root -e
 # m h  dom mon dow   command
 # Every minute run watchdog for domotic
-* * * * *	/home/dirk/domotic/watchdog.sh >/home/dirk/domotic/cron.out
+* * * * *	/home/dirk/domotic/watchdog.sh >>/home/dirk/domotic/watchdog.log
 
 $ sudo crontab -l
 ```
