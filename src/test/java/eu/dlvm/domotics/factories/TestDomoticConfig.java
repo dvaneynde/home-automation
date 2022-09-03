@@ -7,7 +7,7 @@ import eu.dlvm.domotics.base.DomoticLayout;
 
 import org.junit.Assert;
 
-public class TestXmlConfig {
+public class TestDomoticConfig {
 
 	@Test
 	public void testConfigure() {
@@ -17,5 +17,15 @@ public class TestXmlConfig {
 		Assert.assertEquals(15, dom.getSensors().size());
 		Assert.assertEquals(8, dom.getActuators().size());
 		Assert.assertEquals(2, dom.getControllers().size());
+	}
+
+	@Test
+	public void testCurrentConfig() {
+		DomoticLayout dom = new DomoticLayout();
+		BaseHardwareMock hw = new BaseHardwareMock();
+		XmlDomoticConfigurator.configure("./DomoticConfig.xml", hw, dom);
+		Assert.assertEquals(41, dom.getSensors().size());
+		Assert.assertEquals(31, dom.getActuators().size());
+		Assert.assertEquals(5, dom.getControllers().size());
 	}
 }
