@@ -79,7 +79,7 @@
 		<off src="SchakLichtInkom" event="LongClick" />
 	</dimmedLamp>
 
-	<switch name="SchakLichtBureau" doubleClick="true" />
+	<switch name="SchakLichtBureau" longClick="true" />
 	<lamp name="LichtBureau" desc="Bureau" ui="Beneden:5">
 		<toggle src="SchakLichtBureau" />
 		<off src="SchakLichtInkom" event="LongClick" />
@@ -134,8 +134,8 @@
 	</lamp>
 
 	<!-- New Year -->
-	<newyear name="newyear" start="2018-12-31T22:59:50" end="2019-01-01T00:01:00">
-		<on src="SchakLichtBureau" event="DoubleClick" />
+	<newyear name="newyear" start="2018-12-31T22:59:50" end="2023-01-01T00:01:00">
+		<toggle src="SchakLichtBureau" event="LongClick" />
 	</newyear>
 
 	<!-- Screens -->
@@ -239,7 +239,7 @@
 	</timer>
 	-->
 
-	<lightGauge name="LichtmeterSchemering" threshold="50" low2highTime="180" high2lowTime="180" channel="AnalogIn" ui="SPECIAAL:4" />
+	<lightGauge name="LichtmeterSchemering" threshold="25" low2highTime="180" high2lowTime="180" channel="AnalogIn" ui="SPECIAAL:4" />
 	<lamp name="LichtTerras" desc="Licht terras en zijkant" ui="Buiten:0">
 		<toggle src="SchakBuitenTuin" />
 
