@@ -1,0 +1,21 @@
+@startuml
+
+[*] --> INACTIF
+
+state notInactif {
+    INACTIF --> WAITING_TRIGGER : [withinTime & !actOnStart]
+    INACTIF --> ACTIF : [withinTime & actOnStart]
+
+    WAITING_TRIGGER -> ACTIF : [triggered | manualStart]
+    WAITING_TRIGGER --> WAITING_END : [manualStop]
+    state ACTIF : Looping all\ngadget-sets\nsequentially
+    ACTIF --> WAITING_END : [manualStop \n| all-gadgetsets-done]
+    note right of ACTIF : Each gadget in gadgetSet\nrun on each loop(),\nso in parallel
+    ACTIF <-- WAITING_END : [manualStart & actOnStart]
+    WAITING_TRIGGER <-- WAITING_END : [manualStart & !actOnStart]
+
+}
+INACTIF <-- notInactif : [!withinTime]
+
+
+@enduml

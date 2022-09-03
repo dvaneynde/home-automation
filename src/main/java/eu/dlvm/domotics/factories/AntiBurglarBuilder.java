@@ -6,6 +6,7 @@ import eu.dlvm.domotics.actuators.Lamp;
 import eu.dlvm.domotics.base.Actuator;
 import eu.dlvm.domotics.base.Block;
 import eu.dlvm.domotics.base.IBlockRegistrar;
+import eu.dlvm.domotics.controllers.GadgetControllerBuilder;
 import eu.dlvm.domotics.controllers.GadgetController;
 import eu.dlvm.domotics.controllers.gadgets.GadgetSet;
 import eu.dlvm.domotics.controllers.gadgets.OnOff;
@@ -24,8 +25,8 @@ import eu.dlvm.domotics.controllers.gadgets.RandomOnOff;
  */
 public class AntiBurglarBuilder {
 
-	public static GadgetController build(Map<String, Block> blocksSoFar, String name, int onTime, int offTime, IBlockRegistrar ctx) {
-		GadgetController.Builder builder = new GadgetController.Builder(name, true, ctx);
+	public static GadgetController build(Map<String, Block> blocksSoFar, String name, int onTime, int offTime, IBlockRegistrar blockRegistrar) {
+		GadgetControllerBuilder builder = new GadgetControllerBuilder(name, true, blockRegistrar);
 		GadgetController ab = builder.activateOnStart(false).repeat(true).setOnOffTime(onTime, offTime).build();
 
 		GadgetSet gs = new GadgetSet(600*1000);

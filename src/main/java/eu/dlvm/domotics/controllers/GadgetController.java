@@ -28,15 +28,14 @@ import eu.dlvm.domotics.service.uidata.UiInfo;
  * <ol>
  * <li>via TRIGGER event, when it occurs in the enabled period</li>
  * <li>when start time has arrived of enabled period</li>
- * <li>via ON or TOGGLE event, manual on/off; this does not work outside enabled
+ * <li>via ON or TOGGLE event, manual on/off; <b>Note:</b>this does not work outside enabled
  * period</li>
  * </ol>
  * <p>
- * Whenever end time has arrived the gadgets stop (if it did not already stop
- * because all gadgets played and no repeat is set).
+ * Whenever end time has arrived the gadgets stop. It can also be that gadgets stop because they are done.
  * <p>
- * Enabled period is inclusive as in [onTime..offTime], whereas Gadgets are
- * [start..start+duration[.
+ * This object holds a number of {@link GadgetSet} objects that will 'run' sequentially. A {@link GadgetSet} has itself a duration (relative to start in this Controller), when passed that duration the next {@link GadgetSet} if any is processed.
+ * A GadgetS has multiple {@link eu.dlvm.domotics.controllers.gadgets.IGadget} implementations that run in parallel. See also {@see Gadgets.puml} for state transitions.
  * 
  * @author dirk
  *
@@ -73,28 +72,27 @@ public class GadgetController extends Controller implements IEventListener, IUiC
 	}
 
 	/**
-	 * One-shot version.
+	 * One-shot version, so not daily.
 	 * 
 	 * @param name
 	 * @param startTimeMs
-	 *            absolute start time when not daily, otherwise ms since
-	 *            midnight to start
+	 *            absolute start time since epoch  
 	 * @param durationMs
-	 *            duration, [start .. end] really is [startTimeMs ..
-	 *            (startTimeMs+durationMs)]
+	 *            duration, [startTimeMs ..(startTimeMs+durationMs)]
 	 * @param activateOnStartTme
 	 *            if true becomes ACTIVE right at start time, otherwise only
 	 *            after TRIGGERED event
 	 * @param repeat
 	 *            whether to repeat changesets indefinitely (until end time that
 	 *            is)
-	 * @param ctx
+	 * @param blockRegistrar
 	 */
-	public GadgetController(String name, long startTimeMs, long durationMs, boolean activateOnStartTme, boolean repeat, IBlockRegistrar ctx) {
-		this(name, activateOnStartTme, repeat, ctx);
+	public GadgetController(String name, long startTimeMs, long durationMs, boolean activateOnStartTme, boolean repeat, IBlockRegistrar blockRegistrar) {
+		this(name, activateOnStartTme, repeat, blockRegistrar);
 		this.startTimeMs = startTimeMs;
 		this.durationMs = durationMs;
 		this.daily = false;
+		logger.info("Registered non-daily Gadget Controller '"+name+"'");
 	}
 
 	/**
@@ -102,16 +100,21 @@ public class GadgetController extends Controller implements IEventListener, IUiC
 	 * 
 	 * @param name
 	 * @param activateOnStartTme
+	 *            if true becomes ACTIVE right at start time, otherwise only
+	 *            after TRIGGERED event
 	 * @param repeat
-	 * @param onTime
-	 * @param offTime
-	 * @param ctx
+	 *            whether to repeat changesets indefinitely (until end time that
+	 *            is)
+	 * @param onTime ms since midnight to start
+	 * @param offTime ms since midnight to end
+	 * @param blockRegistrar
 	 */
-	public GadgetController(String name, boolean activateOnStartTme, boolean repeat, int onTime, int offTime, IBlockRegistrar ctx) {
-		this(name, activateOnStartTme, repeat, ctx);
+	public GadgetController(String name, boolean activateOnStartTme, boolean repeat, int onTime, int offTime, IBlockRegistrar blockRegistrar) {
+		this(name, activateOnStartTme, repeat, blockRegistrar);
 		this.onTime = onTime;
 		this.offTime = offTime;
 		this.daily = true;
+		logger.info("Registered daily Gadget Controller '"+name+"'");
 	}
 
 	public void addGadgetSet(GadgetSet e) {
@@ -119,14 +122,14 @@ public class GadgetController extends Controller implements IEventListener, IUiC
 	}
 
 	public synchronized void requestManualStart() {
-		if (state != States.INACTIF && state != States.ACTIF) {
+		if (state == States.INACTIF || state == States.WAITING_END) {
 			logger.info(getName() + " manual start requested.");
 			manualStartRequested = true;
 		}
 	}
 
 	public synchronized void requestManualStop() {
-		if (state != States.INACTIF && state != States.WAITING_END) {
+		if (state == States.ACTIF || state == States.WAITING_TRIGGER) {
 			manualStopRequested = true;
 			logger.info(getName() + " manual stop requested.");
 		}
@@ -253,6 +256,7 @@ public class GadgetController extends Controller implements IEventListener, IUiC
 
 		if (state == States.ACTIF) {
 			if (startOfSequenceMs == -1) {
+				// Initialize
 				startOfSequenceMs = currentTime;
 				idxInSequence = 0;
 				runtimePastGadgets = 0;
@@ -263,10 +267,13 @@ public class GadgetController extends Controller implements IEventListener, IUiC
 			GadgetSet gadgetSet = gadgetSets.get(idxInSequence);
 
 			if (relativeTimeWithinSequence >= runtimePastGadgets + gadgetSet.getDurationMs()) {
+				// Current gadgetSet end time reached, go for next one if any.
 				gadgetSet.onDone();
 				idxInSequence++;
 				if (idxInSequence >= gadgetSets.size()) {
+					// All gadgetSets done
 					if (repeat) {
+						// Re-initialize
 						startOfSequenceMs = currentTime;
 						relativeTimeWithinSequence = currentTime - startOfSequenceMs;
 						idxInSequence = 0;
@@ -275,10 +282,12 @@ public class GadgetController extends Controller implements IEventListener, IUiC
 						gadgetSet = gadgetSets.get(idxInSequence);
 						gadgetSet.onBefore();
 					} else {
+						// Done. As long we are still within time bounds we do not go INACTIF (don't remember why)
 						state = States.WAITING_END;
 						logger.info(getName() + " all gadget sets done, go to " + state + " at time " + relativeTimeWithinSequence + "ms.");
 					}
 				} else {
+					// Next gadgetSet
 					runtimePastGadgets += gadgetSet.getDurationMs();
 					gadgetSet = gadgetSets.get(idxInSequence);
 					gadgetSet.onBefore();
@@ -307,60 +316,4 @@ public class GadgetController extends Controller implements IEventListener, IUiC
 		else
 			logger.warn("update on GadgetController '" + getName() + "' got unsupported action '" + action + ".");
 	}
-
-	// ===== Builder =====
-
-	public static class Builder {
-		private String name;
-		private long startTimeMs, durationMs = -1L;
-		private int onTime, offTime = -1;
-		private boolean activateOnStartTime, repeat, daily;
-		private IBlockRegistrar ctx;
-
-		public Builder(final String name, final boolean daily, final IBlockRegistrar ctx) {
-			this.name = name;
-			this.daily = daily;
-			this.ctx = ctx;
-		}
-
-		public Builder repeat() {
-			return repeat(true);
-		}
-
-		public Builder repeat(boolean value) {
-			repeat = value;
-			return this;
-		}
-
-		public Builder activateOnStart() {
-			return activateOnStart(true);
-		}
-
-		public Builder activateOnStart(boolean value) {
-			activateOnStartTime = value;
-			return this;
-		}
-
-		public Builder setOnOffTime(int onTime, int offTime) {
-			this.onTime = onTime;
-			this.offTime = offTime;
-			return this;
-		}
-
-		public Builder setStartAndDuration(long startTimeMs, long durationMs) {
-			this.startTimeMs = startTimeMs;
-			this.durationMs = durationMs;
-			return this;
-		}
-
-		public GadgetController build() {
-			// TODO check juiste dingen gezet
-			if (daily) {
-				return new GadgetController(name, activateOnStartTime, repeat, onTime, offTime, ctx);
-			} else {
-				return new GadgetController(name, startTimeMs, durationMs, activateOnStartTime, repeat, ctx);
-			}
-		}
-	}
-
 }

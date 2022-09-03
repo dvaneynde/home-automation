@@ -2,7 +2,7 @@ package eu.dlvm.domotics.controllers.gadgets;
 
 /**
  * Base interface for gadgets, which do things with Actuators, like blinking or
- * change as a sine wave.
+ * change as a sine wave. To be added to a {@link GadgetSet}.
  * 
  * @author dirk
  */

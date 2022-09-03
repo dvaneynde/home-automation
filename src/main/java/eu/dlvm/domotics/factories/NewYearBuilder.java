@@ -26,9 +26,9 @@ import eu.dlvm.domotics.controllers.gadgets.Sinus;
  */
 public class NewYearBuilder {
 
-	public static GadgetController build(Map<String, Block> blocks, long startTimeMs, long endTimeMs, IBlockRegistrar ctx) {
+	public static GadgetController build(Map<String, Block> blocks, long startTimeMs, long endTimeMs, IBlockRegistrar blockRegistrar) {
 
-		GadgetController ny = new GadgetController("newyear", startTimeMs, endTimeMs - startTimeMs, true, false, ctx);
+		GadgetController ny = new GadgetController("newyear", startTimeMs, endTimeMs - startTimeMs, true, false, blockRegistrar);
 
 		/*
 		 * <sine lamp="LichtZithoek" cycle-ms="5000" cycle-start-deg="0" />
