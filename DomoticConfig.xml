@@ -219,10 +219,10 @@
 	</sunWindController>
 
 	<!-- Ter vervanging van schemer sensor, of extra beveiliging dat het aan/uit gaat. -->
-	<timerDayNight name="TimerNacht">
+	<sunSetOnSunRiseOff name="ZonOnderAanZonOpUit">
 		<on hour="23" minute="0" />
 		<off hour="8" minute="0" />
-	</timerDayNight>
+	</sunSetOnSunRiseOff>
 
 	<!-- Terras en stopcontacten buiten -->
 	<switch name="SchakBuitenTuin" singleClick="true" longClick="true" />
@@ -248,14 +248,14 @@
 		<off src="LichtmeterSchemering" event="LightHigh" />
 		<on src="LichtmeterSchemering" event="LightLow" />
 
-		<on src="TimerNacht" event="on" />
-		<off src="TimerNacht" event="off" />
+		<on src="ZonOnderAanZonOpUit" event="on" />
+		<off src="ZonOnderAanZonOpUit" event="off" />
 	</lamp>
 
 	<!-- Lampen overhang -->
 	<lamp name="LichtNacht" desc="Nachtlichten">
-		<on src="TimerNacht" event="on" />
-		<off src="TimerNacht" event="off" />
+		<on src="ZonOnderAanZonOpUit" event="on" />
+		<off src="ZonOnderAanZonOpUit" event="off" />
 	</lamp>
 
 	<!-- Burglar -->

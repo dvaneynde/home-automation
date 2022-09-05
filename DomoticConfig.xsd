@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://dlvmechanografie.eu/DomoticConfig" xmlns:tns="http://dlvmechanografie.eu/DomoticConfig"
-	elementFormDefault="qualified">
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://dlvmechanografie.eu/DomoticConfig" xmlns:tns="http://dlvmechanografie.eu/DomoticConfig" elementFormDefault="qualified">
 	<element name="domotic">
 		<complexType>
 			<choice maxOccurs="unbounded">
@@ -18,8 +17,12 @@
 					</complexType>
 				</element>
 				<element name="dimmerSwitches" type="tns:BlockWithChannelUpDownStruct" minOccurs="0" maxOccurs="1" />
-				<element name="timer" type="tns:timerType" />
-				<element name="timerDayNight" type="tns:timerType" />
+				<element name="timerOnOff" type="tns:timerType" />
+				<element name="sunSetOnSunRiseOff" type="tns:timerType">
+					<annotation>
+						<documentation>Embedded on and off times are defaults, that are overridden by OpenWeathermap sunset and sunrise times.</documentation>
+					</annotation>
+				</element>
 				<element name="repeatOff" type="tns:repeatOffType" />
 				<element name="windSensor" type="tns:windSensorType" />
 				<element name="lightGauge" type="tns:lightGaugeType" />
@@ -153,8 +156,8 @@
 						</complexType>
 					</element>
 				</sequence>
-				<attribute name="azimuthStart" type="double" use="optional"/>
-				<attribute name="azimuthEnd" type="double" use="optional"/>
+				<attribute name="azimuthStart" type="double" use="optional" />
+				<attribute name="azimuthEnd" type="double" use="optional" />
 			</extension>
 		</complexContent>
 	</complexType>

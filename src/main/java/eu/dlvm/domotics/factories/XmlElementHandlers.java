@@ -29,7 +29,7 @@ import eu.dlvm.domotics.controllers.GadgetController;
 import eu.dlvm.domotics.controllers.RepeatOffAtTimer;
 import eu.dlvm.domotics.controllers.SunWindController;
 import eu.dlvm.domotics.controllers.TimerOnOff;
-import eu.dlvm.domotics.controllers.TimerDayNight;
+import eu.dlvm.domotics.controllers.SunSetOnSunRiseOff;
 import eu.dlvm.domotics.events.EventType;
 import eu.dlvm.domotics.events.IEventListener;
 import eu.dlvm.domotics.sensors.DimmerSwitch;
@@ -166,13 +166,13 @@ class XmlElementHandlers extends DefaultHandler2 {
 
 				// ===== Controllers
 
-			} else if (localName.equals("timer")) {
+			} else if (localName.equals("timerOnOff")) {
 				parseBaseBlock(atts);
 				currentBlock = new TimerOnOff(name, desc, builder);
 
 			} else if (localName.equals("timerDayNight")) {
 				parseBaseBlock(atts);
-				currentBlock = new TimerDayNight(name, desc, builder);
+				currentBlock = new SunSetOnSunRiseOff(name, desc, builder);
 
 			} else if (localName.equals("repeatOff")) {
 				parseBaseBlock(atts);

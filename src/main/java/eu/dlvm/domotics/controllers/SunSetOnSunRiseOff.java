@@ -19,9 +19,9 @@ import eu.dlvm.domotics.utils.OpenWeatherMap.Info;
  * 
  * @author dirk
  */
-public class TimerDayNight extends TimerOnOff {
+public class SunSetOnSunRiseOff extends TimerOnOff {
 
-	private static Logger log = LoggerFactory.getLogger(TimerDayNight.class);
+	private static Logger log = LoggerFactory.getLogger(SunSetOnSunRiseOff.class);
 
 	public static long TIME_BETWEEN_TIMEPROVIDER_CONTACTS_MS = 5 * 60 * 1000;
 	/**
@@ -40,7 +40,7 @@ public class TimerDayNight extends TimerOnOff {
 	private OpenWeatherMap openWeatherMap;
 	private Future<Info> asyncCheckWeather;
 
-	public TimerDayNight(String name, String description, IDomoticLayoutBuilder ctx) {
+	public SunSetOnSunRiseOff(String name, String description, IDomoticLayoutBuilder ctx) {
 		super(name, description, ctx);
 		setOpenWeatherMap(new OpenWeatherMap());
 	}
@@ -96,7 +96,7 @@ public class TimerDayNight extends TimerOnOff {
 			} else if (lastContactTimeProviderMs + TIME_BETWEEN_TIMEPROVIDER_CONTACTS_MS <= currentTime) {
 				// Not checking, start one if grace period expired
 				lastContactTimeProviderMs = currentTime;
-				Callable<Info> worker = new TimerDayNight.WheatherInfoCallable();
+				Callable<Info> worker = new SunSetOnSunRiseOff.WheatherInfoCallable();
 				asyncCheckWeather = Executors.newSingleThreadExecutor().submit(worker);
 			}
 		}

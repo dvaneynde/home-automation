@@ -94,7 +94,7 @@ public class TimerOnOff extends Controller {
 		return state;
 	}
 
-	public String getHoursMinutesInDayAsString(long time) {
+	public static String getHoursMinutesInDayAsString(long time) {
 		int[] times = hourMinute(time);
 		return String.format("%02d:%02d", times[0], times[1]);
 	}
