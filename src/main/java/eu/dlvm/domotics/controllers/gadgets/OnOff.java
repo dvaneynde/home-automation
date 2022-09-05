@@ -58,7 +58,7 @@ public class OnOff implements IGadget {
 		commands.add(e);
 	}
 
-	private Command findCurrentEntry(long time) {
+	private Command findCurrentCommand(long time) {
 		Command currentEntry = null;
 		for (Command e : commands) {
 			if (time >= (e.timeSec * 1000))
@@ -71,7 +71,7 @@ public class OnOff implements IGadget {
 
 	@Override
 	public void onBusy(long time) {
-		Command currentCommand = findCurrentEntry(time);
+		Command currentCommand = findCurrentCommand(time);
 		if (currentCommand != lastCommand) {
 			for (Actuator lamp : actuators)
 				lamp.onEvent(null, currentCommand.state ? EventType.ON : EventType.OFF);

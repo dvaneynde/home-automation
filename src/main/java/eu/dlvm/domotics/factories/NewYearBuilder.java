@@ -26,9 +26,11 @@ import eu.dlvm.domotics.controllers.gadgets.Sinus;
  */
 public class NewYearBuilder {
 
-	public static GadgetController build(Map<String, Block> blocks, long startTimeMs, long endTimeMs, IBlockRegistrar blockRegistrar) {
+	public static GadgetController build(Map<String, Block> blocks, long startTimeMs, long endTimeMs,
+			IBlockRegistrar blockRegistrar) {
 
-		GadgetController ny = new GadgetController("newyear", startTimeMs, endTimeMs - startTimeMs, true, false, blockRegistrar);
+		GadgetController ny = new GadgetController("newyear", startTimeMs, endTimeMs - startTimeMs, true, false,
+				blockRegistrar);
 
 		/*
 		 * <sine lamp="LichtZithoek" cycle-ms="5000" cycle-start-deg="0" />
@@ -43,7 +45,16 @@ public class NewYearBuilder {
 			ny.addGadgetSet(gs);
 			OnOff oo = new OnOff();
 			oo.add(oo.new Command(0, false));
-			addLamps2OnOff(blocks, oo, false);
+
+			oo.add((Lamp) blocks.get("LichtCircante"));
+			oo.add((Lamp) blocks.get("LichtKeuken"));
+			oo.add((Lamp) blocks.get("LichtBureau"));
+			oo.add((Lamp) blocks.get("LichtInkom"));
+			oo.add((Lamp) blocks.get("LichtGangBoven"));
+			oo.add((DimmedLamp) blocks.get("LichtZithoek"));
+			oo.add((DimmedLamp) blocks.get("LichtCircanteRondom"));
+			oo.add((DimmedLamp) blocks.get("LichtVeranda"));
+
 			gs.getGadgets().add(oo);
 		}
 		{
@@ -67,9 +78,9 @@ public class NewYearBuilder {
 			GadgetSet gs = new GadgetSet(30 * 1000);
 			ny.addGadgetSet(gs);
 			// Zet Dimmers terug aan
-			//			OnOff oo = new OnOff();
-			//			addLamps2OnOff(blocks, oo, true);
-			//			gs.gadgets.add(oo);
+			// OnOff oo = new OnOff();
+			// addLamps2OnOff(blocks, oo, true);
+			// gs.gadgets.add(oo);
 			// Start show
 			Lamp lamp;
 			lamp = (Lamp) blocks.get("LichtCircante");
@@ -92,19 +103,6 @@ public class NewYearBuilder {
 		}
 
 		return ny;
-	}
-
-	private static void addLamps2OnOff(Map<String, Block> blocks, OnOff oo, boolean dimmersOnly) {
-		if (!dimmersOnly) {
-			oo.add((Lamp) blocks.get("LichtCircante"));
-			oo.add((Lamp) blocks.get("LichtKeuken"));
-			oo.add((Lamp) blocks.get("LichtBureau"));
-			oo.add((Lamp) blocks.get("LichtInkom"));
-			oo.add((Lamp) blocks.get("LichtGangBoven"));
-		}
-		oo.add((DimmedLamp) blocks.get("LichtZithoek"));
-		oo.add((DimmedLamp) blocks.get("LichtCircanteRondom"));
-		oo.add((DimmedLamp) blocks.get("LichtVeranda"));
 	}
 
 }

@@ -279,4 +279,37 @@
 		<sun sensor="LichtmeterSchemering" />
 	</antiBurglar>
 
+	<gadget-once name="newyear" startTime="TODO" duration="1000.0" activateOnStart="true" repeat="false">
+		<gadget-set duration="0.1">
+			<!-- switch lamps off -->
+			<gadget-onoff commands="0.0,off">
+				<actuator ref="LichtCircante" />
+				<actuator ref="LichtKeuken" />
+				<actuator ref="LichtBureau" />
+				<actuator ref="LichtInkom" />
+				<actuator ref="LichtGangBoven" />
+				<actuator ref="LichtZithoek" />
+				<actuator ref="LichtCircanteRondom" />
+				<actuator ref="LichtVeranda" />
+			</gadget-onoff>
+		</gadget-set>
+		<gadget-set duration="10.0">
+			<!-- count down... -->
+			<gadget-blink freq="1.0" actuator="LichtCircante"/>
+			<gadget-blink freq="1.0" actuator="LichtKeuken"/>
+			<gadget-blink freq="1.0" actuator="LichtBureau"/>
+			<gadget-blink freq="1.0" actuator="LichtInkom"/>
+		</gadget-set>
+		<gadget-set duration="30.0">
+			<!-- big show! -->
+			<gadget-random-onoff minimum="0.5" multiplier="1.0" actuator="LichtCircante"/>
+			<gadget-random-onoff minimum="0.5" multiplier="1.0" actuator="LichtKeuken"/>
+			<gadget-random-onoff minimum="0.5" multiplier="1.0" actuator="LichtBureau"/>
+			<gadget-random-onoff minimum="0.5" multiplier="1.0" actuator="LichtInkom"/>
+			<gadget-sine cycleTime="3.0" cycleStart="0.0" actuator="LichtZithoek"/>>
+			<gadget-sine cycleTime="3.0" cycleStart="120.0" actuator="LichtCircanteRondom"/>>
+			<gadget-sine cycleTime="3.0" cycleStart="240.0" actuator="LichtVeranda"/>>
+		</gadget-set>
+	</gadget-once>
+
 </domotic>

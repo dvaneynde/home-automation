@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://dlvmechanografie.eu/DomoticConfig" xmlns:tns="http://dlvmechanografie.eu/DomoticConfig"
-	elementFormDefault="qualified">
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://dlvmechanografie.eu/DomoticConfig" xmlns:tns="http://dlvmechanografie.eu/DomoticConfig" elementFormDefault="qualified">
 	<element name="domotic">
 		<complexType>
 			<choice maxOccurs="unbounded">
@@ -129,6 +128,7 @@
 					</complexType>
 
 				</element>
+				<element name="gadget-once" type="tns:gadget-onceType"/>
 			</choice>
 		</complexType>
 	</element>
@@ -153,8 +153,8 @@
 						</complexType>
 					</element>
 				</sequence>
-				<attribute name="azimuthStart" type="double" use="optional"/>
-				<attribute name="azimuthEnd" type="double" use="optional"/>
+				<attribute name="azimuthStart" type="double" use="optional" />
+				<attribute name="azimuthEnd" type="double" use="optional" />
 			</extension>
 		</complexContent>
 	</complexType>
@@ -296,4 +296,63 @@
 		</complexContent>
 	</complexType>
 
+	<!-- Gadgets -->
+	<complexType name="actuatorType">
+		<simpleContent>
+			<extension base="string">
+				<attribute type="IDREF" name="ref" use="required" />
+			</extension>
+		</simpleContent>
+	</complexType>
+	<complexType name="gadget-onoffType">
+		<sequence>
+			<element type="tns:actuatorType" name="actuator" maxOccurs="unbounded" minOccurs="0" />
+		</sequence>
+		<attribute type="string" name="commands" />
+	</complexType>
+	<complexType name="gadget-setType" mixed="true">
+		<sequence>
+			<element type="tns:gadget-onoffType" name="gadget-onoff" minOccurs="0"/>
+			<element type="tns:gadget-blinkType" name="gadget-blink" maxOccurs="unbounded" minOccurs="0"/>
+			<element type="tns:gadget-random-onoffType" name="gadget-random-onoff" maxOccurs="unbounded" minOccurs="0"/>
+			<element type="tns:gadget-sineType" name="gadget-sine" maxOccurs="unbounded" minOccurs="0" />
+		</sequence>
+		<attribute type="float" name="duration" use="required" />
+	</complexType>
+	<complexType name="gadget-blinkType">
+		<simpleContent>
+			<extension base="string">
+				<attribute type="float" name="freq" use="required" />
+				<attribute type="IDREF" name="actuator" use="required" />
+			</extension>
+		</simpleContent>
+	</complexType>
+	<complexType name="gadget-random-onoffType">
+		<simpleContent>
+			<extension base="string">
+				<attribute type="float" name="minimum" use="required" />
+				<attribute type="float" name="multiplier" use="required" />
+				<attribute type="IDREF" name="actuator" use="required" />
+			</extension>
+		</simpleContent>
+	</complexType>
+	<complexType name="gadget-sineType">
+		<simpleContent>
+			<extension base="string">
+				<attribute type="float" name="cycleTime" use="required" />
+				<attribute type="float" name="cycleStart" use="required" />
+				<attribute type="IDREF" name="actuator" use="required" />
+			</extension>
+		</simpleContent>
+	</complexType>
+	<complexType name="gadget-onceType">
+		<sequence>
+			<element type="tns:gadget-setType" name="gadget-set" maxOccurs="unbounded" minOccurs="0" />
+		</sequence>
+		<attribute type="string" name="name" use="required" />
+		<attribute type="string" name="startTime" use="required" />
+		<attribute type="float" name="duration" use="required" />
+		<attribute type="string" name="activateOnStart" use="required" />
+		<attribute type="string" name="repeat" use="required" />
+	</complexType>
 </schema>
