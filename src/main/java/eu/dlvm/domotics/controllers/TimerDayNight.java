@@ -19,7 +19,7 @@ import eu.dlvm.domotics.utils.OpenWeatherMap.Info;
  * 
  * @author dirk
  */
-public class TimerDayNight extends Timer {
+public class TimerDayNight extends TimerOnOff {
 
 	private static Logger log = LoggerFactory.getLogger(TimerDayNight.class);
 

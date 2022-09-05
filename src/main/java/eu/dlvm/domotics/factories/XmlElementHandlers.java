@@ -28,7 +28,7 @@ import eu.dlvm.domotics.connectors.Connector;
 import eu.dlvm.domotics.controllers.GadgetController;
 import eu.dlvm.domotics.controllers.RepeatOffAtTimer;
 import eu.dlvm.domotics.controllers.SunWindController;
-import eu.dlvm.domotics.controllers.Timer;
+import eu.dlvm.domotics.controllers.TimerOnOff;
 import eu.dlvm.domotics.controllers.TimerDayNight;
 import eu.dlvm.domotics.events.EventType;
 import eu.dlvm.domotics.events.IEventListener;
@@ -78,8 +78,8 @@ class XmlElementHandlers extends DefaultHandler2 {
 				// ===== Inner elements
 
 			} else if (localName.equals("on")) {
-				if (currentBlock instanceof Timer) {
-					((Timer) currentBlock).setOnTime(Integer.parseInt(atts.getValue("hour")),
+				if (currentBlock instanceof TimerOnOff) {
+					((TimerOnOff) currentBlock).setOnTime(Integer.parseInt(atts.getValue("hour")),
 							Integer.parseInt(atts.getValue("minute")));
 				} else if (currentBlock instanceof IEventListener) {
 					connectEvent2Action(atts, EventType.ON);
@@ -87,8 +87,8 @@ class XmlElementHandlers extends DefaultHandler2 {
 					throw new RuntimeException("Bug.");
 
 			} else if (localName.equals("off")) {
-				if (currentBlock instanceof Timer) {
-					((Timer) currentBlock).setOffTime(Integer.parseInt(atts.getValue("hour")),
+				if (currentBlock instanceof TimerOnOff) {
+					((TimerOnOff) currentBlock).setOffTime(Integer.parseInt(atts.getValue("hour")),
 							Integer.parseInt(atts.getValue("minute")));
 				} else if (currentBlock instanceof IEventListener) {
 					connectEvent2Action(atts, EventType.OFF);
@@ -168,7 +168,7 @@ class XmlElementHandlers extends DefaultHandler2 {
 
 			} else if (localName.equals("timer")) {
 				parseBaseBlock(atts);
-				currentBlock = new Timer(name, desc, builder);
+				currentBlock = new TimerOnOff(name, desc, builder);
 
 			} else if (localName.equals("timerDayNight")) {
 				parseBaseBlock(atts);
@@ -281,7 +281,7 @@ class XmlElementHandlers extends DefaultHandler2 {
 		int idx = s.indexOf(':');
 		int hours = Integer.parseInt(s.substring(0, idx));
 		int minutes = Integer.parseInt(s.substring(idx + 1));
-		return Timer.timeInDayMillis(hours, minutes);
+		return TimerOnOff.timeInDayMillis(hours, minutes);
 	}
 
 	private void connectEvent2Action(Attributes atts, EventType targetEventType) {

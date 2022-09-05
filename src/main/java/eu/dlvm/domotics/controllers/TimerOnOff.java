@@ -16,9 +16,9 @@ import eu.dlvm.domotics.events.EventType;
  *
  * @author dirk
  */
-public class Timer extends Controller {
+public class TimerOnOff extends Controller {
 
-	private static Logger logger = LoggerFactory.getLogger(Timer.class);
+	private static Logger logger = LoggerFactory.getLogger(TimerOnOff.class);
 
 	protected int onTimeHours, onTimeMinutes, offTimeHours, offTimeMinutes;
 
@@ -72,7 +72,7 @@ public class Timer extends Controller {
 	}
 
 	// timer usage interface
-	public Timer(String name, String description, IDomoticLayoutBuilder ctx) {
+	public TimerOnOff(String name, String description, IDomoticLayoutBuilder ctx) {
 		super(name, description, null, ctx);
 		state = false;
 		onTimeMs = offTimeMs = 0;

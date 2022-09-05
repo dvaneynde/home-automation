@@ -12,7 +12,7 @@ import eu.dlvm.domotics.events.EventType;
  * @author dirk
  *
  */
-public class RepeatOffAtTimer extends Timer {
+public class RepeatOffAtTimer extends TimerOnOff {
 	private static Logger log = LoggerFactory.getLogger(RepeatOffAtTimer.class);
 	private int intervalSec;
 	private long timeLastOffSent;
