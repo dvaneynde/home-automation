@@ -135,7 +135,7 @@ public class GadgetController extends Controller implements IEventListener, IUiC
 	private boolean withinTimePeriod(long currentTime) {
 		if (daily) {
 			boolean result;
-			long midnight = TimerOnOff.getTimeMsSameDayAtHourMinute(currentTime, 0, 0);
+			long midnight = TimeUtils.getTimeMsSameDayAtHourMinute(currentTime, 0, 0);
 			long currentTimeInDay = currentTime - midnight;
 			if (onTime <= offTime) {
 				result = (currentTimeInDay >= onTime && currentTimeInDay <= offTime);

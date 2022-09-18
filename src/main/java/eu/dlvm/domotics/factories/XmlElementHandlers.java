@@ -28,14 +28,16 @@ import eu.dlvm.domotics.connectors.Connector;
 import eu.dlvm.domotics.controllers.GadgetController;
 import eu.dlvm.domotics.controllers.RepeatOffAtTimer;
 import eu.dlvm.domotics.controllers.SunWindController;
+import eu.dlvm.domotics.controllers.TimeUtils;
 import eu.dlvm.domotics.controllers.TimerOnOff;
-import eu.dlvm.domotics.controllers.SunSetOnSunRiseOff;
+import eu.dlvm.domotics.controllers.SunSetAndRise;
 import eu.dlvm.domotics.events.EventType;
 import eu.dlvm.domotics.events.IEventListener;
 import eu.dlvm.domotics.sensors.DimmerSwitch;
 import eu.dlvm.domotics.sensors.LightSensor;
 import eu.dlvm.domotics.sensors.Switch;
 import eu.dlvm.domotics.sensors.WindSensor;
+import eu.dlvm.domotics.utils.OpenWeatherMap;
 
 class XmlElementHandlers extends DefaultHandler2 {
 
@@ -172,7 +174,8 @@ class XmlElementHandlers extends DefaultHandler2 {
 
 			} else if (localName.equals("timerDayNight")) {
 				parseBaseBlock(atts);
-				currentBlock = new SunSetOnSunRiseOff(name, desc, builder);
+				int shimmer = parseIntAttribute("shimmerMinutes", atts);
+				currentBlock = new SunSetAndRise(name, desc, shimmer, new OpenWeatherMap(), builder);
 
 			} else if (localName.equals("repeatOff")) {
 				parseBaseBlock(atts);
@@ -281,7 +284,7 @@ class XmlElementHandlers extends DefaultHandler2 {
 		int idx = s.indexOf(':');
 		int hours = Integer.parseInt(s.substring(0, idx));
 		int minutes = Integer.parseInt(s.substring(idx + 1));
-		return TimerOnOff.timeInDayMillis(hours, minutes);
+		return TimeUtils.timeInDayMillis(hours, minutes);
 	}
 
 	private void connectEvent2Action(Attributes atts, EventType targetEventType) {

@@ -17,11 +17,8 @@
 					</complexType>
 				</element>
 				<element name="dimmerSwitches" type="tns:BlockWithChannelUpDownStruct" minOccurs="0" maxOccurs="1" />
-				<element name="timerOnOff" type="tns:timerType" />
-				<element name="sunSetOnSunRiseOff" type="tns:timerType">
-					<annotation>
-						<documentation>Embedded on and off times are defaults, that are overridden by OpenWeathermap sunset and sunrise times.</documentation>
-					</annotation>
+				<element name="timerOnOff" type="tns:timerOnOffType" />
+				<element name="sunSetAndRise" type="tns:SunSetAndRiseStruct">
 				</element>
 				<element name="repeatOff" type="tns:repeatOffType" />
 				<element name="windSensor" type="tns:windSensorType" />
@@ -169,7 +166,16 @@
 			<enumeration value="long" />
 		</restriction>
 	</simpleType>
-	<complexType name="timerType">
+	
+	<complexType name="SunSetAndRiseStruct">
+		<complexContent>
+			<extension base="tns:BlockStruct">
+				<attribute name="shimmerMinutes" use="required"/>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<complexType name="timerOnOffType">
 		<complexContent>
 			<extension base="tns:BlockStruct">
 				<sequence>
@@ -192,7 +198,7 @@
 
 	<complexType name="repeatOffType">
 		<complexContent>
-			<extension base="tns:timerType">
+			<extension base="tns:timerOnOffType">
 				<attribute name="intervalSec" use="required" type="int" />
 			</extension>
 		</complexContent>
