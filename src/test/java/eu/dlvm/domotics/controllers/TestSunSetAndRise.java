@@ -6,49 +6,15 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.Calendar;
-import java.util.GregorianCalendar;
 
 import org.junit.Test;
 
 import eu.dlvm.domotics.base.DomoticLayout;
 import eu.dlvm.domotics.base.IDomoticLoop;
 import eu.dlvm.domotics.utils.IOpenWeatherMap;
-import eu.dlvm.domotics.utils.OpenWeatherMap;
 import eu.dlvm.domotics.utils.IOpenWeatherMap.Info;
 
 public class TestSunSetAndRise {
-
-	@Test
-	public void testCheckChangedDay() {
-		long day0 = new GregorianCalendar(2014, 0, 1, 0, 1, 0).getTime().getTime();
-		long day1 = new GregorianCalendar(2014, 0, 2, 0, 0, 10).getTime().getTime();
-
-		SunSetAndRise t = new SunSetAndRise("test", "test", 30, new OpenWeatherMap(), new DomoticLayout());
-		t.checktTimesUpdatedForToday(day0);
-		assertFalse(t.isTimesUpdatedForToday());
-
-		day0 += 100;
-		t.checktTimesUpdatedForToday(day0);
-		assertFalse(t.isTimesUpdatedForToday());
-
-		t.setTimesUpdatedForToday(true);
-		day0 += 100;
-		t.checktTimesUpdatedForToday(day0);
-		assertTrue(t.isTimesUpdatedForToday());
-
-		t.checktTimesUpdatedForToday(day1);
-		assertFalse(t.isTimesUpdatedForToday());
-		day1 += 1 * 3600 * 10000; // 1 hour later
-		t.checktTimesUpdatedForToday(day1);
-		assertFalse(t.isTimesUpdatedForToday());
-
-		t.setTimesUpdatedForToday(true);
-		day1 += 1 * 3600 * 10000; // 1 hour later
-		t.checktTimesUpdatedForToday(day1);
-		assertTrue(t.isTimesUpdatedForToday());
-	}
-
-	// ----------------------------------------------
 
 	public Info[] createInfosSimple(Calendar calBase) {
 		Info[] infos = new Info[1];

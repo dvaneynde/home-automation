@@ -20,7 +20,8 @@ import eu.dlvm.domotics.utils.IOpenWeatherMap;
  * these for sending events {@link eu.dlvm.domotics.events.EventType#UP} and
  * {@link eu.dlvm.domotics.events.EventType#DOWN} respectively.
  * <p>
- * {@link #sh minutes is subtracted or added to account for shimmer.
+ * {@link #getShimmerMinutes()} minutes is subtracted or added to account for
+ * shimmer.
  * 
  * @author dirk
  */
@@ -28,8 +29,10 @@ public class SunSetAndRise extends Controller {
 
 	private static Logger log = LoggerFactory.getLogger(SunSetAndRise.class);
 
-	// To avoid sending requests to OpenWeahterMap too often, wait following time in
-	// between.
+	/**
+	 * To avoid sending requests to OpenWeahterMap too often, wait following time in
+	 * between. Otherwise OpenWeahterMap might throttle us.
+	 */
 	public static long TIME_BETWEEN_TIMEPROVIDER_CONTACTS_MS = 5 * 60 * 1000;
 
 	public enum States {
@@ -92,6 +95,10 @@ public class SunSetAndRise extends Controller {
 		return String.format("%02d", getSunriseHour()) + ':' + String.format("%02d", getSunriseMinute());
 	}
 
+	public IOpenWeatherMap getOpenWeatherMap() {
+		return openWeatherMap;
+	}
+
 	public static String formatHM(int hours, int minutes) {
 		return String.format("%02d", hours) + ':' + String.format("%02d", minutes);
 	}
@@ -112,11 +119,6 @@ public class SunSetAndRise extends Controller {
 	/** Testing only */
 	boolean isTimesUpdatedForToday() {
 		return timesUpdatedForToday;
-	}
-
-	/** Testing only */
-	void setTimesUpdatedForToday(boolean value) {
-		timesUpdatedForToday = value;
 	}
 
 	@Override
@@ -210,14 +212,6 @@ public class SunSetAndRise extends Controller {
 		sunriseHours = info.sunriseHours;
 		sunriseMinutes = info.sunriseMinutes;
 	}
-
-	public IOpenWeatherMap getOpenWeatherMap() {
-		return openWeatherMap;
-	}
-
-	// public void setOpenWeatherMap(IOpenWeatherMap openWeatherMap) {
-	// this.openWeatherMap = openWeatherMap;
-	// }
 
 	public class WheatherInfoCallable implements Callable<IOpenWeatherMap.Info> {
 		@Override
