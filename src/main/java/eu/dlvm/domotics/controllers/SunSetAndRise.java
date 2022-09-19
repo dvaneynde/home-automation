@@ -28,6 +28,8 @@ public class SunSetAndRise extends Controller {
 
 	private static Logger log = LoggerFactory.getLogger(SunSetAndRise.class);
 
+	// To avoid sending requests to OpenWeahterMap too often, wait following time in
+	// between.
 	public static long TIME_BETWEEN_TIMEPROVIDER_CONTACTS_MS = 5 * 60 * 1000;
 
 	public enum States {
@@ -52,6 +54,10 @@ public class SunSetAndRise extends Controller {
 		this.shimmerMinutes = shimmerTimeMin;
 		this.state = States.INIT;
 		this.openWeatherMap = owm;
+	}
+
+	public int getShimmerMinutes() {
+		return shimmerMinutes;
 	}
 
 	public int getSunsetHour() {
@@ -142,8 +148,9 @@ public class SunSetAndRise extends Controller {
 				sendUp = !sendDown;
 				break;
 			case DOWN_SENT:
-				// Can be early morning or late evening; don't do anything if late evening because already down
-				sendUp = minutesCurrentDay < minutesSunsetPlusShimmer &&  minutesCurrentDay > minutesSunriseMinusShimmer;
+				// Can be early morning or late evening; don't do anything if late evening
+				// because already down
+				sendUp = minutesCurrentDay < minutesSunsetPlusShimmer && minutesCurrentDay > minutesSunriseMinusShimmer;
 				break;
 			case UP_SENT:
 				sendDown = minutesCurrentDay > minutesSunsetPlusShimmer;
@@ -152,18 +159,17 @@ public class SunSetAndRise extends Controller {
 		if (sendUp) {
 			notifyListeners(EventType.UP);
 			state = States.UP_SENT;
-			log.info(
-					"SunSetAndRise '{}' sends event 'Up' because it is later than Sunrise '{}' minus {} shimmer mins. (Current time is {}).",
-					getName(), formatHM(sunriseHours, sunriseMinutes), shimmerMinutes, 
-					formatHM(hourMinute[0], hourMinute[1]));
 		} else if (sendDown) {
 			notifyListeners(EventType.DOWN);
 			state = States.DOWN_SENT;
-			log.info(
-					"SunSetAndRise '{}' sends event 'Down' because it is later than Sunset {} plus {} shimmer mins. (Current time is {}).",
-					getName(), formatHM(sunsetHours, sunsetMinutes),shimmerMinutes, 
-					formatHM(hourMinute[0], hourMinute[1]));
 		}
+		if (sendUp || sendDown)
+			log.info(
+					"SunSetAndRise '{}' sends event '{}'. Note: SunRise={} SunSet={} Shimmer={} mins. (Current time is {}).",
+					getName(), sendUp ? "Up" : "Down", formatHM(sunriseHours, sunriseMinutes),
+					formatHM(sunsetHours, sunsetMinutes), shimmerMinutes,
+					formatHM(hourMinute[0], hourMinute[1]));
+
 	}
 
 	private void updateSunTimesIfAvailble(long currentTime) {
@@ -176,8 +182,9 @@ public class SunSetAndRise extends Controller {
 					if (info != null) {
 						setSunnyTimes(info);
 						log.info(
-								"Checked todays' sunrise ({},{}) and sunset ({},{}) times. Note: these include {} minutes shimmer time. I'll check again tomorrow.",
-								sunriseHours, sunriseMinutes, sunsetHours, sunsetMinutes, shimmerMinutes);
+								"Checked todays' sunrise {} and sunset {} times. Note: these include {} minutes shimmer time. I'll check again tomorrow.",
+								formatHM(sunriseHours, sunriseMinutes), formatHM(sunsetHours, sunsetMinutes),
+								shimmerMinutes);
 						timesUpdatedForToday = true;
 					} else {
 						log.warn("Did not get times from internet provider. Will try again in "
