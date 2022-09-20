@@ -224,6 +224,14 @@
 
 
 	<!-- Terras -->
+	<switch name="SchakBuitenTuin" singleClick="true" longClick="true" />
+
+	<!-- Stopcontacten buiten -->
+	<lamp name="StopkBuiten" desc="Stopcontact buiten" ui="Buiten:1">
+		<toggle src="SchakBuitenTuin" event="LongClick" />
+		<off src="SchakLichtInkom" event="LongClick" />
+	</lamp>
+	
 	<!-- threshold was 25 when hardware had an issue? -->
 	<lightGauge name="LichtmeterSchemering" threshold="250" low2highTime="180" high2lowTime="180" channel="AnalogIn" ui="SPECIAAL:4" />
 	<!-- Uit doen, aan is niet belangrijk. -->
@@ -246,21 +254,13 @@
 		<on hour="23" minute="0" />
 		<off hour="1" minute="0" />
 	</timerOnOff>
-	<lamp name="LichtOverhang" desc="Nachtlichten">
+	<lamp name="LichtNacht" desc="Nachtlichten">
 		<on src="ZonOnderEnOp" event="down"/>
 		<off src="TimerOverhang" event="off" />
 		<off src="ZonOnderEnOp" event="up"/>
 	</lamp>
 
 
-	<!-- Stopcontacten buiten -->
-	<switch name="SchakBuitenTuin" singleClick="true" longClick="true" />
-	<lamp name="StopkBuiten" desc="Stopcontact buiten" ui="Buiten:1">
-		<toggle src="SchakBuitenTuin" event="LongClick" />
-		<off src="SchakLichtInkom" event="LongClick" />
-	</lamp>
-	
-	
 	<!-- Burglar -->
 	<antiBurglar name="InbraakBeveiliging" start="16:00" end="23:00">
 		<on src="SchakLichtInkom" event="LongClick" />

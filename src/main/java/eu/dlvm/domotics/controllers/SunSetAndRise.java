@@ -153,6 +153,13 @@ public class SunSetAndRise extends Controller {
 				sendDown = minutesCurrentDay > minutesSunsetPlusShimmer;
 				break;
 		}
+		if (sendUp || sendDown)
+			// first log, then do, otherwise strange sequence of stuff in log
+			log.info(
+					"SunSetAndRise '{}' sends event '{}'. Note: SunRise={} SunSet={} Shimmer={} mins. (Current time is {}).",
+					getName(), sendUp ? "Up" : "Down", formatHM(sunriseHours, sunriseMinutes),
+					formatHM(sunsetHours, sunsetMinutes), shimmerMinutes,
+					formatHM(hourMinute[0], hourMinute[1]));
 		if (sendUp) {
 			notifyListeners(EventType.UP);
 			state = States.UP_SENT;
@@ -160,12 +167,6 @@ public class SunSetAndRise extends Controller {
 			notifyListeners(EventType.DOWN);
 			state = States.DOWN_SENT;
 		}
-		if (sendUp || sendDown)
-			log.info(
-					"SunSetAndRise '{}' sends event '{}'. Note: SunRise={} SunSet={} Shimmer={} mins. (Current time is {}).",
-					getName(), sendUp ? "Up" : "Down", formatHM(sunriseHours, sunriseMinutes),
-					formatHM(sunsetHours, sunsetMinutes), shimmerMinutes,
-					formatHM(hourMinute[0], hourMinute[1]));
 
 	}
 
