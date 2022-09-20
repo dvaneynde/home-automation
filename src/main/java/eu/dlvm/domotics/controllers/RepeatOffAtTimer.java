@@ -12,7 +12,7 @@ import eu.dlvm.domotics.events.EventType;
  * @author dirk
  *
  */
-public class RepeatOffAtTimer extends Timer {
+public class RepeatOffAtTimer extends TimerOnOff {
 	private static Logger log = LoggerFactory.getLogger(RepeatOffAtTimer.class);
 	private int intervalSec;
 	private long timeLastOffSent;
@@ -35,7 +35,7 @@ public class RepeatOffAtTimer extends Timer {
 	// internal
 	@Override
 	public void loop(long currentTime) {
-		long currentTimeInDay = timeInDayMillis(currentTime);
+		long currentTimeInDay = TimeUtils.timeInDayMillis(currentTime);
 		// boolean state2 = state;
 		if (onTimeMs <= offTimeMs) {
 			state = (currentTimeInDay > onTimeMs && currentTimeInDay < offTimeMs);

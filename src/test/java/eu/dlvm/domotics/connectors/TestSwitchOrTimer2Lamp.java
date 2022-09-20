@@ -17,7 +17,7 @@ import eu.dlvm.domotics.actuators.Lamp;
 import eu.dlvm.domotics.base.Domotic;
 import eu.dlvm.domotics.base.DomoticLayout;
 import eu.dlvm.domotics.base.RememberedOutput;
-import eu.dlvm.domotics.controllers.Timer;
+import eu.dlvm.domotics.controllers.TimerOnOff;
 import eu.dlvm.domotics.events.EventType;
 import eu.dlvm.domotics.sensors.Switch;
 import eu.dlvm.iohardware.IHardware;
@@ -185,7 +185,7 @@ public class TestSwitchOrTimer2Lamp {
 
 	@Test
 	public void testTimer() {
-		Timer t = new Timer("timer", "timer", dom.getLayout());
+		TimerOnOff t = new TimerOnOff("timer", "timer", dom.getLayout());
 		t.setOnTime(22, 0);
 		t.setOffTime(7, 30);
 		t.registerListener(o1);

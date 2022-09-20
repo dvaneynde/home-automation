@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://dlvmechanografie.eu/DomoticConfig" xmlns:tns="http://dlvmechanografie.eu/DomoticConfig"
-	elementFormDefault="qualified">
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://dlvmechanografie.eu/DomoticConfig" xmlns:tns="http://dlvmechanografie.eu/DomoticConfig" elementFormDefault="qualified">
 	<element name="domotic">
 		<complexType>
 			<choice maxOccurs="unbounded">
@@ -18,8 +17,9 @@
 					</complexType>
 				</element>
 				<element name="dimmerSwitches" type="tns:BlockWithChannelUpDownStruct" minOccurs="0" maxOccurs="1" />
-				<element name="timer" type="tns:timerType" />
-				<element name="timerDayNight" type="tns:timerType" />
+				<element name="timerOnOff" type="tns:timerOnOffType" />
+				<element name="sunSetAndRise" type="tns:SunSetAndRiseStruct">
+				</element>
 				<element name="repeatOff" type="tns:repeatOffType" />
 				<element name="windSensor" type="tns:windSensorType" />
 				<element name="lightGauge" type="tns:lightGaugeType" />
@@ -153,8 +153,8 @@
 						</complexType>
 					</element>
 				</sequence>
-				<attribute name="azimuthStart" type="double" use="optional"/>
-				<attribute name="azimuthEnd" type="double" use="optional"/>
+				<attribute name="azimuthStart" type="double" use="optional" />
+				<attribute name="azimuthEnd" type="double" use="optional" />
 			</extension>
 		</complexContent>
 	</complexType>
@@ -166,7 +166,16 @@
 			<enumeration value="long" />
 		</restriction>
 	</simpleType>
-	<complexType name="timerType">
+	
+	<complexType name="SunSetAndRiseStruct">
+		<complexContent>
+			<extension base="tns:BlockStruct">
+				<attribute name="shimmerMinutes" use="required"/>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<complexType name="timerOnOffType">
 		<complexContent>
 			<extension base="tns:BlockStruct">
 				<sequence>
@@ -189,7 +198,7 @@
 
 	<complexType name="repeatOffType">
 		<complexContent>
-			<extension base="tns:timerType">
+			<extension base="tns:timerOnOffType">
 				<attribute name="intervalSec" use="required" type="int" />
 			</extension>
 		</complexContent>

@@ -218,13 +218,7 @@
 		<screen name="ScreenSlaapNoord" />
 	</sunWindController>
 
-	<!-- Ter vervanging van schemer sensor, of extra beveiliging dat het aan/uit gaat. -->
-	<timerDayNight name="TimerNacht">
-		<on hour="23" minute="0" />
-		<off hour="8" minute="0" />
-	</timerDayNight>
-
-	<!-- Terras en stopcontacten buiten -->
+	<!-- Stopcontacten buiten en terras. -->
 	<switch name="SchakBuitenTuin" singleClick="true" longClick="true" />
 	<lamp name="StopkBuiten" desc="Stopcontact buiten" ui="Buiten:1">
 		<toggle src="SchakBuitenTuin" event="LongClick" />
@@ -239,6 +233,9 @@
 	</timer>
 	-->
 
+	<!-- Ter vervanging van schemer sensor, of extra beveiliging dat het aan/uit gaat. -->
+	<sunSetAndRise name="ZonOnderEnOp" shimmerMinutes="30"/>
+
 	<lightGauge name="LichtmeterSchemering" threshold="50" low2highTime="180" high2lowTime="180" channel="AnalogIn" ui="SPECIAAL:4" />
 	<lamp name="LichtTerras" desc="Licht terras en zijkant" ui="Buiten:0">
 		<toggle src="SchakBuitenTuin" />
@@ -248,14 +245,14 @@
 		<off src="LichtmeterSchemering" event="LightHigh" />
 		<on src="LichtmeterSchemering" event="LightLow" />
 
-		<on src="TimerNacht" event="on" />
-		<off src="TimerNacht" event="off" />
+		<on src="ZonOnderEnOp" event="down" />
+		<off src="ZonOnderEnOp" event="up" />
 	</lamp>
 
 	<!-- Lampen overhang -->
 	<lamp name="LichtNacht" desc="Nachtlichten">
-		<on src="TimerNacht" event="on" />
-		<off src="TimerNacht" event="off" />
+		<on src="ZonOnderEnOp" event="down" />
+		<off src="ZonOnderEnOp" event="up" />
 	</lamp>
 
 	<!-- Burglar -->

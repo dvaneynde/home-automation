@@ -269,7 +269,7 @@ public class TestGadgetController {
 	public void dailyStartBeforeEndOnSameDay() {
         DomoticLayout dom = new DomoticLayout();
 		//GadgetController gc = new GadgetController("TestGadgetController", 17 * 3600 * 1000, 5 * 3600 * 1000, true, true, true, domoticContext);
-		GadgetController gc = new GadgetController("TestGadgetController", true, false, Timer.timeInDayMillis(17, 0), Timer.timeInDayMillis(22, 0),
+		GadgetController gc = new GadgetController("TestGadgetController", true, false, TimeUtils.timeInDayMillis(17, 0), TimeUtils.timeInDayMillis(22, 0),
 				dom);
 
 		TestGadget g0 = new TestGadget();
