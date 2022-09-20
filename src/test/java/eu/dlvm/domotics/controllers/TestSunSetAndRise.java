@@ -22,6 +22,12 @@ public class TestSunSetAndRise {
 		return infos;
 	}
 
+	public Info[] createInfosImpossibleTimes(Calendar calBase) {
+		Info[] infos = new Info[1];
+		infos[0] = createInfo(calBase, 12, 0, 10, 0);
+		return infos;
+	}
+
 	public Info[] createInfosTwoDaysAndFailedRequests(Calendar calBase) {
 		Info[] infos = new Info[5];
 		infos[0] = null;
@@ -82,6 +88,42 @@ public class TestSunSetAndRise {
 		assertEquals(30, t.getShimmerMinutes());
 		assertEquals("07:54", t.getSunriseTimeAsString());
 		assertEquals("17:38", t.getSunsetTimeAsString());
+		assertEquals(1, owmt.callseqnr);
+	}
+	
+	@Test
+	public void testImpossibleTimes() {
+		Calendar calendar = Calendar.getInstance();
+		calendar.set(2022, 11, 20, 11, 0);
+
+		// Initial state.
+		TestSunSetAndRise.OwmTest owmt = new TestSunSetAndRise.OwmTest(createInfosImpossibleTimes(calendar));
+		SunSetAndRise t = new SunSetAndRise("TestSunSetAndRise", "timer day and night", 30, owmt, new DomoticLayout());
+		assertFalse(t.isTimesUpdatedForToday());
+		assertFalse(t.isSunIsRisen());
+		assertFalse(t.isSunIsSet());
+		assertEquals(30, t.getShimmerMinutes());
+		assertEquals("00:00", t.getSunriseTimeAsString());
+		assertEquals("00:00", t.getSunsetTimeAsString());
+		assertEquals(0, owmt.callseqnr);
+
+		long time = calendar.getTimeInMillis();
+		loopTwice(t, time);
+		assertFalse(t.isTimesUpdatedForToday());
+		assertFalse(t.isSunIsRisen());
+		assertFalse(t.isSunIsSet());
+		assertEquals("00:00", t.getSunriseTimeAsString());
+		assertEquals("00:00", t.getSunsetTimeAsString());
+		assertEquals(1, owmt.callseqnr);
+
+		// TODO should check error logging, should have only 1 per day: https://www.baeldung.com/junit-asserting-logs
+		time = calendar.getTimeInMillis()+1000;
+		loopTwice(t, time);
+		assertFalse(t.isTimesUpdatedForToday());
+		assertFalse(t.isSunIsRisen());
+		assertFalse(t.isSunIsSet());
+		assertEquals("00:00", t.getSunriseTimeAsString());
+		assertEquals("00:00", t.getSunsetTimeAsString());
 		assertEquals(1, owmt.callseqnr);
 	}
 	

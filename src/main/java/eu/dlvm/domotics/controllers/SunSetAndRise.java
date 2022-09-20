@@ -44,7 +44,7 @@ public class SunSetAndRise extends Controller {
 
 	private States state;
 
-	private boolean timesUpdatedForToday;
+	private boolean timesUpdatedForToday, wrongTimesErrorReported;
 	private Calendar today;
 
 	private long lastContactTimeProviderMs;
@@ -134,13 +134,8 @@ public class SunSetAndRise extends Controller {
 		int minutesCurrentDay = hourMinute[0] * 60 + hourMinute[1];
 		int minutesSunsetPlusShimmer = sunsetHours * 60 + sunsetMinutes + shimmerMinutes;
 		int minutesSunriseMinusShimmer = sunriseHours * 60 + sunriseMinutes - shimmerMinutes;
-		// assumes minutesSunrise < minutesSunset
-		if (state != States.INIT && minutesSunriseMinusShimmer >= minutesSunsetPlusShimmer) {
-			log.error("BUG sunrise time ({}) is coming after sunset time ({}) within a day??? Doing nothing.",
-					minutesSunriseMinusShimmer, minutesSunsetPlusShimmer);
-			return;
-		}
 
+		// assumes minutesSunrise < minutesSunset, checked elsewhere in this class
 		boolean sendUp, sendDown;
 		sendUp = sendDown = false;
 		switch (state) {
@@ -182,12 +177,26 @@ public class SunSetAndRise extends Controller {
 					IOpenWeatherMap.Info info = asyncCheckWeather.get();
 					asyncCheckWeather = null;
 					if (info != null) {
-						setSunnyTimes(info);
+						if (info.sunsetHours * 60 + info.sunsetMinutes < info.sunriseHours * 60
+								+ info.sunriseMinutes) {
+							if (!wrongTimesErrorReported)
+								log.error(
+										"Sunrise time ({}) is coming after sunset time ({}) within a day??? Doing nothing.",
+										formatHM(info.sunriseHours, info.sunriseMinutes),
+										formatHM(info.sunsetHours, info.sunsetMinutes));
+							wrongTimesErrorReported = true;
+							return;
+						}
+						sunsetHours = info.sunsetHours;
+						sunsetMinutes = info.sunsetMinutes;
+						sunriseHours = info.sunriseHours;
+						sunriseMinutes = info.sunriseMinutes;
 						log.info(
 								"Checked todays' sunrise {} and sunset {} times. Note: these include {} minutes shimmer time. I'll check again tomorrow.",
 								formatHM(sunriseHours, sunriseMinutes), formatHM(sunsetHours, sunsetMinutes),
 								shimmerMinutes);
 						timesUpdatedForToday = true;
+						wrongTimesErrorReported = false;
 					} else {
 						log.warn("Did not get times from internet provider. Will try again in "
 								+ TIME_BETWEEN_TIMEPROVIDER_CONTACTS_MS / 1000 / 60 + " minutes.");
@@ -204,13 +213,6 @@ public class SunSetAndRise extends Controller {
 			Callable<IOpenWeatherMap.Info> worker = new SunSetAndRise.WheatherInfoCallable();
 			asyncCheckWeather = Executors.newSingleThreadExecutor().submit(worker);
 		}
-	}
-
-	private void setSunnyTimes(IOpenWeatherMap.Info info) {
-		sunsetHours = info.sunsetHours;
-		sunsetMinutes = info.sunsetMinutes;
-		sunriseHours = info.sunriseHours;
-		sunriseMinutes = info.sunriseMinutes;
 	}
 
 	public class WheatherInfoCallable implements Callable<IOpenWeatherMap.Info> {
