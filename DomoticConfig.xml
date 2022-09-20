@@ -195,8 +195,8 @@
 	<!-- Wind & Licht meter -->
 	<windSensor name="Windmeter" highFreq="15" lowFreq="2" lowTimeToResetAlert="600" channel="Windmeter" ui="ScreensZ:-2" />
 
-	<!-- threshold was 3500 maar te donker; filter nodig !-->
-	<lightGauge name="LichtZonZuid" threshold="1250" low2highTime="60" high2lowTime="300" channel="AnalogIn" ui="ScreensZ:-1" />
+	<!-- threshold was 3500 maar waardes altijd veel lager; dan 1250 maar ineens waardes hoger; hardware probleem? !-->
+	<lightGauge name="LichtZonZuid" threshold="3500" low2highTime="60" high2lowTime="300" channel="AnalogIn" ui="ScreensZ:-1" />
 	<sunWindController name="ZonAutoZuid" desc="Zon/Wind Automaat Tuin" ui="ScreensZ:0">
 		<!-- TODO zon en wind, afhankelijk van groep andere parameters rond lichtsterkte, ook rekening houdende met zonnestand. Dus hier moeten 
 			groepen kunnen gedefinieerd worden, met verschillende parameters, b.v. ook alarm etc. moeten hier bij wind en sun. -->
@@ -208,7 +208,7 @@
 		<screen name="ScreenKeuken" />
 	</sunWindController>
 
-	<lightGauge name="LichtZonWest" threshold="1250" low2highTime="60" high2lowTime="300" channel="AnalogIn" ui="ScreensW:-1" />
+	<lightGauge name="LichtZonWest" threshold="3500" low2highTime="60" high2lowTime="300" channel="AnalogIn" ui="ScreensW:-1" />
 	<sunWindController name="ZonAutoWest" desc="Zon/Wind Automaat Opzij" ui="ScreensW:0">
 		<!-- TODO zon en wind, afhankelijk van groep andere parameters rond lichtsterkte, ook rekening houdende met zonnestand. Dus hier moeten 
 			groepen kunnen gedefinieerd worden, met verschillende parameters, b.v. ook alarm etc. moeten hier bij wind en sun. -->
@@ -218,43 +218,49 @@
 		<screen name="ScreenSlaapNoord" />
 	</sunWindController>
 
-	<!-- Stopcontacten buiten en terras. -->
+
+	<!-- Ter aanvulling van schemer sensor, of extra beveiliging dat het aan/uit gaat. -->
+	<sunSetAndRise name="ZonOnderEnOp" shimmerMinutes="30"/>
+
+
+	<!-- Terras -->
+	<!-- threshold was 25 when hardware had an issue? -->
+	<lightGauge name="LichtmeterSchemering" threshold="250" low2highTime="180" high2lowTime="180" channel="AnalogIn" ui="SPECIAAL:4" />
+	<!-- Uit doen, aan is niet belangrijk. -->
+	<timerOnOff name="TimerTerras">
+		<on hour="23" minute="00" />
+		<off hour="0" minute="30" />
+	</timerOnOff>
+	<lamp name="LichtTerras" desc="Licht terras en zijkant" ui="Buiten:0">
+		<toggle src="SchakBuitenTuin" />
+		<off src="TimerTerras" event="off" />
+		<on src="LichtmeterSchemering" event="LightLow" />
+		<off src="LichtmeterSchemering" event="LightHigh" />
+		<on src="ZonOnderEnOp" event="Down"/>
+		<off src="ZonOnderEnOp" event="Up"/>
+	</lamp>
+
+
+	<!-- Lampen overhang -->
+	<timerOnOff name="TimerOverhang">
+		<on hour="23" minute="0" />
+		<off hour="1" minute="0" />
+	</timerOnOff>
+	<lamp name="LichtOverhang" desc="Nachtlichten">
+		<on src="ZonOnderEnOp" event="down"/>
+		<off src="TimerOverhang" event="off" />
+		<off src="ZonOnderEnOp" event="up"/>
+	</lamp>
+
+
+	<!-- Stopcontacten buiten -->
 	<switch name="SchakBuitenTuin" singleClick="true" longClick="true" />
 	<lamp name="StopkBuiten" desc="Stopcontact buiten" ui="Buiten:1">
 		<toggle src="SchakBuitenTuin" event="LongClick" />
 		<off src="SchakLichtInkom" event="LongClick" />
 	</lamp>
-
-	<!-- Uit doen, aan is niet belangrijk. -->
-	<!--
-	<timer name="TimerTerras">
-		<on hour="23" minute="00" />
-		<off hour="23" minute="30" />
-	</timer>
-	-->
-
-	<!-- Ter vervanging van schemer sensor, of extra beveiliging dat het aan/uit gaat. -->
-	<sunSetAndRise name="ZonOnderEnOp" shimmerMinutes="30"/>
-
-	<lightGauge name="LichtmeterSchemering" threshold="50" low2highTime="180" high2lowTime="180" channel="AnalogIn" ui="SPECIAAL:4" />
-	<lamp name="LichtTerras" desc="Licht terras en zijkant" ui="Buiten:0">
-		<toggle src="SchakBuitenTuin" />
-
-		<!-- <off src="TimerTerras" event="off" /> -->
-
-		<off src="LichtmeterSchemering" event="LightHigh" />
-		<on src="LichtmeterSchemering" event="LightLow" />
-
-		<on src="ZonOnderEnOp" event="down" />
-		<off src="ZonOnderEnOp" event="up" />
-	</lamp>
-
-	<!-- Lampen overhang -->
-	<lamp name="LichtNacht" desc="Nachtlichten">
-		<on src="ZonOnderEnOp" event="down" />
-		<off src="ZonOnderEnOp" event="up" />
-	</lamp>
-
+	
+	
 	<!-- Burglar -->
 	<antiBurglar name="InbraakBeveiliging" start="16:00" end="23:00">
 		<on src="SchakLichtInkom" event="LongClick" />

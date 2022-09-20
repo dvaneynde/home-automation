@@ -172,7 +172,7 @@ class XmlElementHandlers extends DefaultHandler2 {
 				parseBaseBlock(atts);
 				currentBlock = new TimerOnOff(name, desc, builder);
 
-			} else if (localName.equals("timerDayNight")) {
+			} else if (localName.equals("sunSetAndRise")) {
 				parseBaseBlock(atts);
 				int shimmer = parseIntAttribute("shimmerMinutes", atts);
 				currentBlock = new SunSetAndRise(name, desc, shimmer, new OpenWeatherMap(), builder);
