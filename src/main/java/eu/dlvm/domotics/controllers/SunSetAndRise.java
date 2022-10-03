@@ -141,16 +141,16 @@ public class SunSetAndRise extends Controller {
 		switch (state) {
 			case INIT:
 				sendDown = (minutesCurrentDay < minutesSunriseMinusShimmer)
-						|| (minutesCurrentDay > minutesSunsetPlusShimmer);
+						|| (minutesCurrentDay >= minutesSunsetPlusShimmer);
 				sendUp = !sendDown;
 				break;
 			case DOWN_SENT:
 				// Can be early morning or late evening; don't do anything if late evening
 				// because already down
-				sendUp = minutesCurrentDay < minutesSunsetPlusShimmer && minutesCurrentDay > minutesSunriseMinusShimmer;
+				sendUp = minutesCurrentDay >= minutesSunriseMinusShimmer && minutesCurrentDay < minutesSunsetPlusShimmer ;
 				break;
 			case UP_SENT:
-				sendDown = minutesCurrentDay > minutesSunsetPlusShimmer;
+				sendDown = minutesCurrentDay >= minutesSunsetPlusShimmer;
 				break;
 		}
 		if (sendUp || sendDown)
