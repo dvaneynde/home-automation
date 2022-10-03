@@ -223,7 +223,7 @@ public class TestSunSetAndRise {
 		assertEquals(3, owmt.callseqnr);
 
 		// Sun not yet risen but within shimmer time.
-		time = TimeUtils.getTimeMsSameDayAtHourMinute(basetime, 7, 25);
+		time = TimeUtils.getTimeMsSameDayAtHourMinute(basetime, 7, 24);
 		loopTwice(t, time);
 		assertTrue(t.isTimesUpdatedForToday());
 		assertTrue(t.isSunIsRisen());
@@ -244,7 +244,7 @@ public class TestSunSetAndRise {
 		assertEquals(3, owmt.callseqnr);
 
 		// Sun is set and shimmer time has passed, so Down event.
-		time = TimeUtils.getTimeMsSameDayAtHourMinute(basetime, 18, 9);
+		time = TimeUtils.getTimeMsSameDayAtHourMinute(basetime, 18, 8);
 		loopTwice(t, time);
 		assertTrue(t.isTimesUpdatedForToday());
 		assertFalse(t.isSunIsRisen());

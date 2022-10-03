@@ -220,7 +220,7 @@
 
 
 	<!-- Ter aanvulling van schemer sensor, of extra beveiliging dat het aan/uit gaat. -->
-	<sunSetAndRise name="ZonOnderEnOp" shimmerMinutes="30"/>
+	<sunSetAndRise name="ZonOnderEnOp" shimmerMinutes="15"/>
 
 
 	<!-- Terras -->
