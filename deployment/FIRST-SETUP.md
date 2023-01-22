@@ -54,6 +54,21 @@ rm id_rsa.home.pub
 
 See article on how to disable password login.
 
+## Setup Firewall
+
+Taken from https://www.digitalocean.com/community/tutorials/how-to-set-up-a-firewall-with-ufw-on-ubuntu-16-04
+
+```bash
+sudo ufw disable
+sudo ufw default deny incoming 
+sudo ufw default allow outgoing
+sudo ufw allow ssh
+sudo ufw allow http
+
+sudo ufw enable
+sudo ufw status verbose
+```
+
 ## Java, GCC & Make
 
 ```bash
