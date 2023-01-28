@@ -18,4 +18,14 @@ public class TestXmlConfig {
 		Assert.assertEquals(8, dom.getActuators().size());
 		Assert.assertEquals(2, dom.getControllers().size());
 	}
+
+	@Test
+	public void testConfigureProduction() {
+		DomoticLayout dom = new DomoticLayout();
+		BaseHardwareMock hw = new BaseHardwareMock();
+		XmlDomoticConfigurator.configure("DomoticConfig.xml", hw, dom);
+		Assert.assertEquals(41, dom.getSensors().size());
+		Assert.assertEquals(31, dom.getActuators().size());
+		Assert.assertEquals(8, dom.getControllers().size());
+	}
 }

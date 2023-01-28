@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://dlvmechanografie.eu/DomoticConfig" xmlns:tns="http://dlvmechanografie.eu/DomoticConfig" elementFormDefault="qualified">
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="http://dlvmechanografie.eu/DomoticConfig"
+	xmlns:tns="http://dlvmechanografie.eu/DomoticConfig" elementFormDefault="qualified">
 	<element name="domotic">
 		<complexType>
 			<choice maxOccurs="unbounded">
@@ -18,8 +20,8 @@
 				</element>
 				<element name="dimmerSwitches" type="tns:BlockWithChannelUpDownStruct" minOccurs="0" maxOccurs="1" />
 				<element name="timerOnOff" type="tns:timerOnOffType" />
-				<element name="sunSetAndRise" type="tns:SunSetAndRiseStruct">
-				</element>
+				<element name="dailyEvent" type="tns:DailyEventStruct" />
+				<element name="sunSetAndRise" type="tns:SunSetAndRiseStruct" />
 				<element name="repeatOff" type="tns:repeatOffType" />
 				<element name="windSensor" type="tns:windSensorType" />
 				<element name="lightGauge" type="tns:lightGaugeType" />
@@ -166,11 +168,27 @@
 			<enumeration value="long" />
 		</restriction>
 	</simpleType>
-	
+
 	<complexType name="SunSetAndRiseStruct">
 		<complexContent>
 			<extension base="tns:BlockStruct">
-				<attribute name="shimmerMinutes" use="required"/>
+				<attribute name="shimmerMinutes" use="required" />
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<complexType name="DailyEventStruct">
+		<complexContent>
+			<extension base="tns:BlockStruct">
+				<sequence minOccurs="1" maxOccurs="1">
+					<element name="at">
+						<complexType>
+							<attribute name="hour" type="int" use="required" />
+							<attribute name="minute" type="int" use="required" />
+							<attribute name="event" type="string" use="required" />
+						</complexType>
+					</element>
+				</sequence>
 			</extension>
 		</complexContent>
 	</complexType>
@@ -239,10 +257,8 @@
 		<complexContent>
 			<extension base="tns:BlockStruct">
 				<annotation>
-					<documentation>Default channel naam is name attribute, kan
-						overridden door
-						channel attribuut.
-					</documentation>
+					<documentation>Default channel naam is name attribute, kan overridden door
+						channel attribuut. </documentation>
 				</annotation>
 				<attribute name="channel" type="string" use="optional" />
 			</extension>
@@ -274,7 +290,7 @@
 								<attributeGroup ref="tns:EventConsumerAttributeGroup"></attributeGroup>
 							</complexType>
 						</element>
-						<element name="ecoToggle">
+						<element name="eco">
 							<complexType>
 								<attributeGroup ref="tns:EventConsumerAttributeGroup"></attributeGroup>
 							</complexType>
@@ -294,10 +310,8 @@
 		<complexContent>
 			<extension base="tns:BlockStruct">
 				<annotation>
-					<documentation>Default channel naam is name attribute, kan
-						overridden door
-						channel attribuut.
-					</documentation>
+					<documentation>Default channel naam is name attribute, kan overridden door
+						channel attribuut. </documentation>
 				</annotation>
 				<attribute name="channelDown" type="string" use="optional" />
 				<attribute name="channelUp" type="string" use="optional" />

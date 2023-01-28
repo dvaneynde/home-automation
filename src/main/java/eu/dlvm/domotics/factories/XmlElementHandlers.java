@@ -25,6 +25,7 @@ import eu.dlvm.domotics.base.Controller;
 import eu.dlvm.domotics.base.IDomoticLayoutBuilder;
 import eu.dlvm.domotics.base.Sensor;
 import eu.dlvm.domotics.connectors.Connector;
+import eu.dlvm.domotics.controllers.DailyEvent;
 import eu.dlvm.domotics.controllers.GadgetController;
 import eu.dlvm.domotics.controllers.RepeatOffAtTimer;
 import eu.dlvm.domotics.controllers.SunWindController;
@@ -58,14 +59,14 @@ class XmlElementHandlers extends DefaultHandler2 {
 	}
 
 	private IHardwareReader getReader() {
-	    return hw.getReader();
+		return hw.getReader();
 	}
 
-    private IHardwareWriter getWriter() {
-        return hw.getWriter();
-    }
+	private IHardwareWriter getWriter() {
+		return hw.getWriter();
+	}
 
-    public XmlElementHandlers(IDomoticLayoutBuilder builder, IHardware hardware) {
+	public XmlElementHandlers(IDomoticLayoutBuilder builder, IHardware hardware) {
 		super();
 		this.builder = builder;
 		this.hw = hardware;
@@ -78,6 +79,15 @@ class XmlElementHandlers extends DefaultHandler2 {
 				;
 
 				// ===== Inner elements
+
+			} else if (localName.equals("at")) {
+				if (currentBlock instanceof DailyEvent) {
+					EventType event = EventType.fromAlias(atts.getValue("event"));
+					((DailyEvent) currentBlock).setTimeAndEvent(Integer.parseInt(atts.getValue("hour")),
+							Integer.parseInt(atts.getValue("minute")), event);
+				} else
+					throw new RuntimeException("Bug. Element name 'at' currently only works with DailyEvent.");
+
 
 			} else if (localName.equals("on")) {
 				if (currentBlock instanceof TimerOnOff) {
@@ -100,8 +110,9 @@ class XmlElementHandlers extends DefaultHandler2 {
 			} else if (localName.equals("toggle")) {
 				connectEvent2Action(atts, EventType.TOGGLE);
 
-			} else if (localName.equals("ecoToggle")) {
-				connectEvent2Action(atts, EventType.ECO_TOGGLE);
+			} else if (localName.equals("eco")) {
+				String eventName = atts.getValue("event");
+				connectEvent2Action(atts, EventType.fromAlias(eventName));
 
 			} else if (localName.equals("delayedOnOff")) {
 				IEventListener target = (IEventListener) currentBlock;
@@ -156,21 +167,26 @@ class XmlElementHandlers extends DefaultHandler2 {
 				// int highTimeBeforeAlert =
 				// parseIntAttribute("highTimeBeforeAlert", atts);
 				int lowTimeToResetAlert = parseIntAttribute("lowTimeToResetAlert", atts);
-				currentBlock = new WindSensor(name, desc, ui, channel, getReader(), builder, highFreqThreshold, lowFreqThreshold,
-						lowTimeToResetAlert);
+				currentBlock = new WindSensor(name, desc, ui, channel, getReader(), builder, highFreqThreshold,
+						lowFreqThreshold, lowTimeToResetAlert);
 
 			} else if (localName.equals("lightGauge")) {
 				parseBaseBlockWithChannel(atts);
 				int threshold = parseIntAttribute("threshold", atts);
 				int low2highTime = parseIntAttribute("low2highTime", atts);
 				int high2lowTime = parseIntAttribute("high2lowTime", atts);
-				currentBlock = new LightSensor(name, desc, ui, channel, getReader(), builder, threshold, low2highTime, high2lowTime);
+				currentBlock = new LightSensor(name, desc, ui, channel, getReader(), builder, threshold, low2highTime,
+						high2lowTime);
 
 				// ===== Controllers
 
 			} else if (localName.equals("timerOnOff")) {
 				parseBaseBlock(atts);
 				currentBlock = new TimerOnOff(name, desc, builder);
+
+			} else if (localName.equals("dailyEvent")) {
+				parseBaseBlock(atts);
+				currentBlock = new DailyEvent(name, desc, builder);
 
 			} else if (localName.equals("sunSetAndRise")) {
 				parseBaseBlock(atts);
@@ -312,7 +328,7 @@ class XmlElementHandlers extends DefaultHandler2 {
 						"Unknown event '" + eventAlias + "' on block '" + currentBlock.getName() + "'.");
 		} else {
 			throw new ConfigurationException(
-					"Could not find srcBlock =" + srcName + ". Check config of " + currentBlock.getName());
+					"Could not find srcBlock '" + srcName + ".. Check config of '" + currentBlock.getName()+"'");
 		}
 		return ae;
 	}

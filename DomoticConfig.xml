@@ -1,11 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<domotic xmlns="http://dlvmechanografie.eu/DomoticConfig" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://dlvmechanografie.eu/DomoticConfig DomoticConfig.xsd ">
+<domotic xmlns="http://dlvmechanografie.eu/DomoticConfig"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://dlvmechanografie.eu/DomoticConfig DomoticConfig.xsd
+						">
+
+	<!-- Re-enable Eco mode every morning -->
+	<dailyEvent name="DailyEcoOn">
+		<at hour="1" minute="0" event="EcoOn" />
+	</dailyEvent>
+
 
 	<!-- Lichten en Stopcontacten, incl. All On/Off -->
 	<switch name="SchakLichtInkom" longClick="true" />
 	<lamp name="LichtInkom" desc="Inkom" ui="Nutsruimtes:0" autoOffSec="300" blink="true">
 		<toggle src="SchakLichtInkom" />
+		<eco src="DailyEcoOn" event="EcoOn" />
 		<off src="SchakLichtInkom" event="LongClick" />
 	</lamp>
 
@@ -15,23 +24,24 @@
 		<off src="SchakLichtInkom" event="LongClick" />
 	</lamp>
 
-	<switch name="SchakVentilatorWC0" singleClick="true" longClick="true"/>
+	<switch name="SchakVentilatorWC0" singleClick="true" longClick="true" />
 	<fan name="VentilatorWC0" desc="Ventilator WC" delayOnSec="180" delayOffSec="180" onSec="420">
 		<toggle src="SchakVentilatorWC0" />
-		<off src="SchakVentilatorWC0" event="LongClick" /> 
+		<off src="SchakVentilatorWC0" event="LongClick" />
 		<delayedOnOff src="LichtWC0" />
 	</fan>
 
 	<switch name="SchakLichtGarageTuin" singleClick="true" longClick="true" doubleClick="true" />
 	<lamp name="LichtGarageTuin" desc="Garage (Tuin)" ui="Nutsruimtes:3" autoOffSec="600" blink="false">
 		<toggle src="SchakLichtGarageTuin" />
-		<ecoToggle src="SchakLichtGarageTuin" event="DoubleClick" />
+		<eco src="DailyEcoOn" event="EcoOn" />
 		<off src="SchakLichtInkom" event="LongClick" />
 	</lamp>
 	<switch name="SchakLichtGaragePoort" />
 	<lamp name="LichtGaragePoort" desc="Garage (Poort)" ui="Nutsruimtes:2" autoOffSec="600" blink="false">
 		<toggle src="SchakLichtGaragePoort" />
 		<toggle src="SchakLichtGarageTuin" event="LongClick" />
+		<eco src="DailyEcoOn" event="EcoOn" />
 		<off src="SchakLichtInkom" event="LongClick" />
 	</lamp>
 
@@ -88,6 +98,7 @@
 	<switch name="SchakLichtGangBoven" />
 	<lamp name="LichtGangBoven" desc="Gang Boven" ui="Kinderen:0" autoOffSec="300" blink="true">
 		<toggle src="SchakLichtGangBoven" />
+		<eco src="DailyEcoOn" event="EcoOn" />
 		<off src="SchakLichtInkom" event="LongClick" />
 	</lamp>
 
@@ -220,7 +231,7 @@
 
 
 	<!-- Ter aanvulling van schemer sensor, of extra beveiliging dat het aan/uit gaat. -->
-	<sunSetAndRise name="ZonOnderEnOp" shimmerMinutes="15"/>
+	<sunSetAndRise name="ZonOnderEnOp" shimmerMinutes="15" />
 
 
 	<!-- Terras -->
@@ -231,7 +242,7 @@
 		<toggle src="SchakBuitenTuin" event="LongClick" />
 		<off src="SchakLichtInkom" event="LongClick" />
 	</lamp>
-	
+
 	<!-- threshold was 25 when hardware had an issue? -->
 	<lightGauge name="LichtmeterSchemering" threshold="250" low2highTime="180" high2lowTime="180" channel="AnalogIn" ui="SPECIAAL:4" />
 	<!-- Uit doen, aan is niet belangrijk. -->
@@ -244,8 +255,8 @@
 		<off src="TimerTerras" event="off" />
 		<on src="LichtmeterSchemering" event="LightLow" />
 		<off src="LichtmeterSchemering" event="LightHigh" />
-		<on src="ZonOnderEnOp" event="Down"/>
-		<off src="ZonOnderEnOp" event="Up"/>
+		<on src="ZonOnderEnOp" event="Down" />
+		<off src="ZonOnderEnOp" event="Up" />
 	</lamp>
 
 
@@ -255,9 +266,9 @@
 		<off hour="1" minute="0" />
 	</timerOnOff>
 	<lamp name="LichtNacht" desc="Nachtlichten">
-		<on src="ZonOnderEnOp" event="down"/>
+		<on src="ZonOnderEnOp" event="down" />
 		<off src="TimerOverhang" event="off" />
-		<off src="ZonOnderEnOp" event="up"/>
+		<off src="ZonOnderEnOp" event="up" />
 	</lamp>
 
 
