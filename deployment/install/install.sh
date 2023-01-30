@@ -64,6 +64,7 @@ fi
 #30
 echo Kopieren van domotic.tar naar domotica systeem, en uitpakken in $NEWDIR
 scp domotic.tar dirk@$DOMHOST:$NEWPATH
+scp resetLinks.sh dirk@$DOMHOST:$DOMDIR
 ssh dirk@$DOMHOST <<END
 cd $NEWPATH
 tar -x -f domotic.tar
