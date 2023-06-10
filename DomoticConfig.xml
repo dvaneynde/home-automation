@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <domotic xmlns="http://dlvmechanografie.eu/DomoticConfig"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://dlvmechanografie.eu/DomoticConfig DomoticConfig.xsd">
+	xsi:schemaLocation="http://dlvmechanografie.eu/DomoticConfig DomoticConfig.xsd
+						">
 
-	<!-- Re-enable Eco mode every morning -->
+	<!-- Re-enable Eco mode every day -->
 	<dailyEvent name="DailyEcoOn">
-		<at hour="1" minute="0" event="EcoOn" />
+		<at hour="17" minute="30" event="EcoOn" />
 	</dailyEvent>
 
 
@@ -237,9 +238,12 @@
 	<switch name="SchakBuitenTuin" singleClick="true" longClick="true" />
 
 	<!-- Stopcontacten buiten -->
+	<dailyEvent name="DailyStopkOn">
+		<at hour="9" minute="0" event="On" />
+	</dailyEvent>
 	<lamp name="StopkBuiten" desc="Stopcontact buiten" ui="Buiten:1">
 		<toggle src="SchakBuitenTuin" event="LongClick" />
-		<off src="SchakLichtInkom" event="LongClick" />
+		<on src="DailyStopkOn" event="On" />
 	</lamp>
 
 	<!-- threshold was 25 when hardware had an issue? -->
