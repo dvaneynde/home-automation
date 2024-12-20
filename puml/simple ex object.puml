@@ -1,0 +1,15 @@
+@startuml Simple Example Object
+object "SwitchDoor : Switch" as s
+s : name = SwitchDoor
+s : listener = c1
+object "c1:Connector" as c
+c : fromEvent = SingleClick
+c : toEvent = Toggle
+c : listener = LampDoor
+object "LampDoor : Lamp" as l
+l : name = LampDoor
+l : autoOffSec = 300
+l : blink = true
+s - c : listener >
+c - l : listener >
+@enduml

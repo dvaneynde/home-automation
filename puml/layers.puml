@@ -1,0 +1,45 @@
+@startuml Layers
+package User_Interfaces <<layer>> {
+    package WebUI <<elm>>
+    package SwitchesAndLampsEtc <<real-world>>
+}
+
+package Home_Automation_Logic <<layer>> {
+        package eu.dlvm.domotics <<java exe>> {
+            interface RestAPI
+            file DomoticConfig <<xml>>   
+        }
+
+        package eu.dlvm.iohardware <<java>>{
+            interface IHardwareBuilder 
+            interface IHardware
+            interface IHardwareReader
+            interface IHardwareWriter
+            IHardwareBuilder ..> IHardware
+            IHardware ..> IHardwareReader
+            IHardware ..> IHardwareWriter
+        }
+
+        eu.dlvm.domotics .> IHardwareBuilder
+        'eu.dlvm.domotics ..> IHardware
+}
+
+WebUI ..> RestAPI
+
+package Hardware_Specific_Logic <<layer>> {
+    package eu.dlvm.iohardware.diamondsys as ds <<java>> {
+        IHardware <|.. DiamondsysHardware
+        IHardwareReader <|.. DiamondsysHardware
+        IHardwareWriter <|.. DiamondsysHardware
+        IHardwareBuilder <|.. DiamondsysHardwareBuilder
+        file DiamondBoardsConfig <<xml>>
+        DiamondsysHardware -[hidden]- DiamondBoardsConfig
+    }
+    interface ReadWriteProtocol <<txt/tcp>>
+    package HwDriver <<C exe>>
+    ds ..> ReadWriteProtocol
+    HwDriver ..> ReadWriteProtocol
+}
+
+SwitchesAndLampsEtc ..> HwDriver : via-IO-boards
+@enduml

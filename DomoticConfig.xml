@@ -251,7 +251,7 @@
 	<!-- Uit doen, aan is niet belangrijk. -->
 	<timerOnOff name="TimerTerras">
 		<on hour="23" minute="00" />
-		<off hour="0" minute="30" />
+		<off hour="23" minute="30" />
 	</timerOnOff>
 	<lamp name="LichtTerras" desc="Licht terras en zijkant" ui="Buiten:0">
 		<toggle src="SchakBuitenTuin" />

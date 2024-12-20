@@ -1,0 +1,32 @@
+@startuml Deployment View
+
+node PC_or_mobile  {
+    component browser {
+        component webapp <<elm>>
+    }
+}
+
+node server <<linux>> {
+    component domotic <<java exe>>
+    component hwdriver <<c exe>>
+    file DiamondBoardsConfig <<xml>>
+    file DomoticConfig <<xml>>
+    file domotic.pid <<txt>>
+    file driver.pid <<txt>>
+    file DomoticOutputStates <<txt>>
+    folder logs <<txt>>
+}
+
+PC_or_mobile -= server : <<ip>>
+
+webapp -- domotic : <<http>>
+domotic -- hwdriver : <<tcp/ip>>
+domotic .> DomoticConfig
+domotic .> DiamondBoardsConfig
+domotic .> domotic.pid
+domotic ..> DomoticOutputStates
+hwdriver .> driver.pid
+domotic ..> logs
+logs <. hwdriver
+
+@enduml

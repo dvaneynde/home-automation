@@ -1,0 +1,39 @@
+@startuml "Simple Example Sequence"
+
+control ": Domotic" as o
+participant ": IHardwareReader" as hi
+participant ": IHardwareWriter" as ho
+participant "SwitchDoor : Switch" as s
+participant "c1 : Connector" as c
+participant "LampDoor : Lamp" as l
+o --> o : loopOnce()
+note left: every 20 ms.
+activate o
+o --> hi : refreshInputs()
+note right: all inputs are read and buffered
+o --> s : loop(100)
+note left: current time is 100ms
+activate s
+hi <-- s : readDigitalInput()
+s --> s : set state
+note right : assume Switch detected single-click (using state machine)
+s -> c : notify("SingleClick")
+c -> l : notify("Toggle")
+activate l
+l -> l : remember 'Toggle' event
+deactivate l
+deactivate s
+
+o --> l : loop(100)
+activate l
+l -> l : check received event
+note left : current state is 'off', event is 'Toggle', so need to change output state to 'on'
+l -> l : setState(on)
+ho <-- l : writeDigitalOutput()
+deactivate l
+
+o --> ho : refreshOutputs()
+note right: outputs were buffered and now send to IO boards
+deactivate o
+
+@enduml

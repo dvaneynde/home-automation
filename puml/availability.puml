@@ -1,0 +1,28 @@
+@startuml Availability
+
+node server <<linux>> {
+    component cron <<service>>
+    component init.d <<service>>
+    component domotic.sh <<script>>
+    component watchdog.sh <<script>>
+    component domotic <<java exe>>
+    component hwdriver <<c exe>>
+    file domotic.pid
+    file driver.pid
+
+    init.d ..> domotic.sh : 1_on_boot_start_domotic
+    domotic.sh ..> domotic : 1.1_start
+    domotic -[bold]-> hwdriver : 1.2_start_as_subprocess
+    cron ..> watchdog.sh : 2_run_every_60sec
+    watchdog.sh -[dotted]-> domotic : 2.1_check_process
+    domotic -> domotic : 3_self_check
+
+    domotic.sh <. watchdog.sh : 4_run_restart_if_dead
+    domotic.sh .> hwdriver : 4.1_kill
+    domotic.sh ..> domotic : 4.2_kill_and_start
+
+    domotic.pid <- domotic
+    driver.pid <- hwdriver
+}
+server -> server : 5_reboot_on_crash
+@enduml

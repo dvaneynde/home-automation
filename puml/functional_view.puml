@@ -1,0 +1,31 @@
+@startuml "Functional View"
+
+package UserInterfaces {
+    component webapp <<elm>>
+    component switches_lamps_etc <<hardware>>
+}
+
+component domotic <<java exe>> 
+interface RestAPI <<rest>>
+interface IStatic <<http>>
+interface IUiCapableBlock <<websocket>>
+RestAPI -- domotic
+IStatic -- domotic
+IUiCapableBlock -- domotic
+webapp --> IStatic
+webapp --> RestAPI 
+webapp <-- IUiCapableBlock 
+
+interface OpenWeatherApi <<rest>>
+OpenWeatherApi <- domotic
+
+component hwdriver <<c exe>>
+interface IHwApi <<tcp>>
+domotic -> IHwApi
+IHwApi -- hwdriver
+
+component IO_board <<hardware>>
+hwdriver <-> IO_board : <<mem-dmmat>
+
+switches_lamps_etc <--> IO_board : <<electricity>>
+@enduml

@@ -11,7 +11,7 @@
 
 Home automation system built up from common hardware and custom software.
 
-A functional and technical overview is in [Design](./DESIGN.md), which really is a Software Architecture Document. 
+A functional and technical overview is in [Design](./DESIGN.md), Structured a Software Architecture Document. 
 
 Some historical evolutions (and more photos) are in [History](./HISTORY.md).
 
@@ -19,11 +19,11 @@ Some historical evolutions (and more photos) are in [History](./HISTORY.md).
 
 There are multiple projects, each one in its own sub-folder with its own README:
 
-1. [home-automation](./README.md) : (this document) the main documentation and crucially the main program (Java)
+1. [home-automation](./README.md) : (this repository) the main program, backend in Java
 2. [hwdriver](../hwdriver/README.md) : the C program talking to the hardware
 3. [elm-ui](../elm-ui/README.md) : the web UI
-5. [azimuth](../azimuth/README.md) : library to calculated azimuth, scala based
-4. [home-automation/deployment](./deployment/README.md) : automated deployment of increments, including hwdriver; also first time setup
+4. [azimuth](../azimuth/README.md) : library to calculate azimuth,  written in Scala
+5. [home-automation/deployment](./deployment/README.md) : automated deployment of increments, including hwdriver; also describes first time setup
 
 # Build and Deploy
 

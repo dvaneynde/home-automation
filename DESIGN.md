@@ -22,13 +22,13 @@
     - [4.4.1. Model](#441-model)
     - [4.4.2. Simple Example](#442-simple-example)
     - [4.4.3. Rationale and Alternatives](#443-rationale-and-alternatives)
-  - [4.5. Availability & Reliability Perspective](#45-availability--reliability-perspective)
-    - [4.5.1.  Fault Detection & Restart Model](#451--fault-detection--restart-model)
+  - [4.5. Availability \& Reliability Perspective](#45-availability--reliability-perspective)
+    - [4.5.1.  Fault Detection \& Restart Model](#451--fault-detection--restart-model)
     - [4.5.2. Availability Calculation Model](#452-availability-calculation-model)
     - [4.5.3. Rationale and Alternatives](#453-rationale-and-alternatives)
-- [5. Architectural Evaluation & Risks](#5-architectural-evaluation--risks)
+- [5. Architectural Evaluation \& Risks](#5-architectural-evaluation--risks)
   - [5.1. Evaluation](#51-evaluation)
-  - [5.2. Risks & Mitigation](#52-risks--mitigation)
+  - [5.2. Risks \& Mitigation](#52-risks--mitigation)
   - [5.3. Missing Views / Future Work](#53-missing-views--future-work)
 - [6. End of Document](#6-end-of-document)
 
@@ -99,40 +99,7 @@ Legend for below model diagram:
 - arrow: **connector**; communication between components and/or interfaces; arrow direction is from communication-initiator to target
 - lollipop: **interface**; optional, explicit interface offered by the component it has a line too
 
-
-```plantuml
-@startuml "Functional View"
-
-package UserInterfaces {
-    component webapp <<elm>>
-    component switches_lamps_etc <<hardware>>
-}
-
-component domotic <<java exe>> 
-interface RestAPI <<rest>>
-interface IStatic <<http>>
-interface IUiCapableBlock <<websocket>>
-RestAPI -- domotic
-IStatic -- domotic
-IUiCapableBlock -- domotic
-webapp --> IStatic
-webapp --> RestAPI 
-webapp <-- IUiCapableBlock 
-
-interface OpenWeatherApi <<rest>>
-OpenWeatherApi <- domotic
-
-component hwdriver <<c exe>>
-interface IHwApi <<tcp>>
-domotic -> IHwApi
-IHwApi -- hwdriver
-
-component IO_board <<hardware>>
-hwdriver <-> IO_board : <<mem-dmmat>
-
-switches_lamps_etc <--> IO_board : <<electricity>>
-@enduml
-```
+![functional view](./images/Functional%20View.png)
 
 Description of the different components, interfaces and connectors:
 
@@ -194,40 +161,7 @@ Legend for below model diagram, which is based on UML:
 - full line: **connector**; communication between components or nodes
 - dashed line: **usage**; component writes and/or reads that file
 
-```plantuml
-@startuml Deployment
-
-node PC_or_mobile  {
-    component browser {
-        component webapp <<elm>>
-    }
-}
-
-node server <<linux>> {
-    component domotic <<java exe>>
-    component hwdriver <<c exe>>
-    file DiamondBoardsConfig <<xml>>
-    file DomoticConfig <<xml>>
-    file domotic.pid <<txt>>
-    file driver.pid <<txt>>
-    file DomoticOutputStates <<txt>>
-    folder logs <<txt>>
-}
-
-PC_or_mobile -= server : <<ip>>
-
-webapp -- domotic : <<http>>
-domotic -- hwdriver : <<tcp/ip>>
-domotic .> DomoticConfig
-domotic .> DiamondBoardsConfig
-domotic .> domotic.pid
-domotic ..> DomoticOutputStates
-hwdriver .> driver.pid
-domotic ..> logs
-logs <. hwdriver
-
-@enduml
-```
+![Deployment View](./images/Deployment%20View.png)
 
 Description of the different nodes and components is in below table. Elements already explained earlier are left out.
 
@@ -270,53 +204,7 @@ Legend: follows UML Class Diagrams, with these specifics:
 - &lt;&lt;layer&gt;&gt; - Package defining a layer.
 - &lt;&lt;exe&gt;&gt; - Executable, basically contains a `main()` routine.
 
-```plantuml
-@startuml
-package User_Interfaces <<layer>> {
-    package WebUI <<elm>>
-    package SwitchesAndLampsEtc <<real-world>>
-}
-
-package Home_Automation_Logic <<layer>> {
-        package eu.dlvm.domotics <<java exe>> {
-            interface RestAPI
-            file DomoticConfig <<xml>>   
-        }
-
-        package eu.dlvm.iohardware <<java>>{
-            interface IHardwareBuilder 
-            interface IHardware
-            interface IHardwareReader
-            interface IHardwareWriter
-            IHardwareBuilder ..> IHardware
-            IHardware ..> IHardwareReader
-            IHardware ..> IHardwareWriter
-        }
-
-        eu.dlvm.domotics .> IHardwareBuilder
-        'eu.dlvm.domotics ..> IHardware
-}
-
-WebUI ..> RestAPI
-
-package Hardware_Specific_Logic <<layer>> {
-    package eu.dlvm.iohardware.diamondsys as ds <<java>> {
-        IHardware <|.. DiamondsysHardware
-        IHardwareReader <|.. DiamondsysHardware
-        IHardwareWriter <|.. DiamondsysHardware
-        IHardwareBuilder <|.. DiamondsysHardwareBuilder
-        file DiamondBoardsConfig <<xml>>
-        DiamondsysHardware -[hidden]- DiamondBoardsConfig
-    }
-    interface ReadWriteProtocol <<txt/tcp>>
-    package HwDriver <<C exe>>
-    ds ..> ReadWriteProtocol
-    HwDriver ..> ReadWriteProtocol
-}
-
-SwitchesAndLampsEtc ..> HwDriver : via-IO-boards
-@enduml
-```
+![development view Layers](./images/Layers.png)
 
 | element | description |
 |---|---|
@@ -353,76 +241,7 @@ The main classes related to a specific configuration of a home automation system
 
 Legend: classical UML Class diagram representing Java classes and interfaces.
 
-```plantuml
-@startuml
-class Domotic <<singleton>> {
-    void loopOnce()
-}
-
-abstract class Block {
-    string name
-}
-
-interface IDomoticLoop {
-    void loop(long timeMs)
-}
-Domotic .> IDomoticLoop
-
-interface IEventListener {
-    void onEvent(Block source, EventType event)
-}
-
-abstract class Sensor  {
-    string channel
-}
-
-abstract class Controller {
-
-}
-
-abstract class Actuator {
-    string channel
-}
-
-class Connector {
-    fromEvent
-    toEvent
-}
-IEventListener <|.. Connector
-IEventListener "1" <-- Connector
-
-interface IHardwareReader {
-    void refreshInputs()
-    boolean readDigitalInput(String channel)
-    int readAnalogInput(String channel)
-
-}
-
-interface IHardwareWriter {
-    void refreshOutputs()
-    void writeDigitalOutput(String channel, boolean value)
-    void writeAnalogOutput(String channel, int value)
-
-}
-
-IDomoticLoop <|.. Sensor
-IDomoticLoop <|.. Controller
-IEventListener <|.. Controller
-IDomoticLoop <|.. Actuator
-IEventListener <|.. Actuator
-
-Sensor ..> IHardwareReader
-
-Sensor --|> Block
-Controller --|> Block
-Actuator --|> Block
-
-Actuator ..> IHardwareWriter
-
-IEventListener "*" <-- Block  : listeners <
-
-@enduml
-```
+![Modules](./images/Modules.png)
 
 | element | description |
 |---|---|
@@ -482,91 +301,16 @@ Functionally this means:
 
 So how does this relate to the structure explained in the previous section? First let's see how Lamp and Switch types fit in. I included some of the methods we'll need later.
 
-```plantuml
-@startuml
-abstract class Sensor  {
-    string channel
-}
-
-abstract class Actuator {
-    string channel
-}
-
-class Switch {
-    void loop(long timeMs)
-}
-
-class Lamp {
-    void loop(long timeMs)
-    void onEvent(Block source, EventType event)
-}
-
-Sensor <|-- Switch
-Actuator <|-- Lamp
-@enduml
-```
+![Simple Example](./images/Simple%20Example%20Class.png)
 
 The following object diagram translates the configuration. Note the listener links, the Lamp listens on events from the Connector who listens in turn to events on Switch.
 
-```plantuml
-@startuml
-object "SwitchDoor : Switch" as s
-s : name = SwitchDoor
-s : listener = c1
-object "c1:Connector" as c
-c : fromEvent = SingleClick
-c : toEvent = Toggle
-c : listener = LampDoor
-object "LampDoor : Lamp" as l
-l : name = LampDoor
-l : autoOffSec = 300
-l : blink = true
-s - c : listener >
-c - l : listener >
-@enduml
-```
+![Simple Example Object](./images/Simple%20Example%20Object.png)
 
 Next let's see at execution. Suppose the lamp is Off and a user just clicked the switch.
 
-```plantuml
-@startuml
-control ": Domotic" as o
-participant ": IHardwareReader" as hi
-participant ": IHardwareWriter" as ho
-participant "SwitchDoor : Switch" as s
-participant "c1 : Connector" as c
-participant "LampDoor : Lamp" as l
-o --> o : loopOnce()
-note left: every 20 ms.
-activate o
-o --> hi : refreshInputs()
-note right: all inputs are read and buffered
-o --> s : loop(100)
-note left: current time is 100ms
-activate s
-hi <-- s : readDigitalInput()
-s --> s : set state
-note right : assume Switch detected single-click (using state machine)
-s -> c : notify("SingleClick")
-c -> l : notify("Toggle")
-activate l
-l -> l : remember 'Toggle' event
-deactivate l
-deactivate s
+![](./images/Simple%20Example%20Sequence.png)
 
-o --> l : loop(100)
-activate l
-l -> l : check received event
-note left : current state is 'off', event is 'Toggle', so need to change output state to 'on'
-l -> l : setState(on)
-ho <-- l : writeDigitalOutput()
-deactivate l
-
-o --> ho : refreshOutputs()
-note right: outputs were buffered and now send to IO boards
-deactivate o
-@enduml
-```
 
 More complex configurations exist, using multiple inputs or `Controller`s, but this gives the general flow.
 
@@ -604,36 +348,8 @@ Legend:
 - dotted line: check a process
 - bold plain line: start as a sub-process
 
-```plantuml
-@startuml Availability
+![](./images/Availability.png)
 
-node server <<linux>> {
-    component cron <<service>>
-    component init.d <<service>>
-    component domotic.sh <<script>>
-    component watchdog.sh <<script>>
-    component domotic <<java exe>>
-    component hwdriver <<c exe>>
-    file domotic.pid
-    file driver.pid
-
-    init.d ..> domotic.sh : 1_on_boot_start_domotic
-    domotic.sh ..> domotic : 1.1_start
-    domotic -[bold]-> hwdriver : 1.2_start_as_subprocess
-    cron ..> watchdog.sh : 2_run_every_60sec
-    watchdog.sh -[dotted]-> domotic : 2.1_check_process
-    domotic -> domotic : 3_self_check
-
-    domotic.sh <. watchdog.sh : 4_run_restart_if_dead
-    domotic.sh .> hwdriver : 4.1_kill
-    domotic.sh ..> domotic : 4.2_kill_and_start
-
-    domotic.pid <- domotic
-    driver.pid <- hwdriver
-}
-server -> server : 5_reboot_on_crash
-@enduml
-```
 | element | description |
 |---|---|
 | init.d | Ubuntu 16 service mechanism. |

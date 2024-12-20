@@ -1,0 +1,68 @@
+@startuml Modules
+class Domotic <<singleton>> {
+    void loopOnce()
+}
+
+abstract class Block {
+    string name
+}
+
+interface IDomoticLoop {
+    void loop(long timeMs)
+}
+Domotic .> IDomoticLoop
+
+interface IEventListener {
+    void onEvent(Block source, EventType event)
+}
+
+abstract class Sensor  {
+    string channel
+}
+
+abstract class Controller {
+
+}
+
+abstract class Actuator {
+    string channel
+}
+
+class Connector {
+    fromEvent
+    toEvent
+}
+IEventListener <|.. Connector
+IEventListener "1" <-- Connector
+
+interface IHardwareReader {
+    void refreshInputs()
+    boolean readDigitalInput(String channel)
+    int readAnalogInput(String channel)
+
+}
+
+interface IHardwareWriter {
+    void refreshOutputs()
+    void writeDigitalOutput(String channel, boolean value)
+    void writeAnalogOutput(String channel, int value)
+
+}
+
+IDomoticLoop <|.. Sensor
+IDomoticLoop <|.. Controller
+IEventListener <|.. Controller
+IDomoticLoop <|.. Actuator
+IEventListener <|.. Actuator
+
+Sensor ..> IHardwareReader
+
+Sensor --|> Block
+Controller --|> Block
+Actuator --|> Block
+
+Actuator ..> IHardwareWriter
+
+IEventListener "*" <-- Block  : listeners <
+
+@enduml

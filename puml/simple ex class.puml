@@ -1,0 +1,21 @@
+@startuml Simple Example Class
+abstract class Sensor  {
+    string channel
+}
+
+abstract class Actuator {
+    string channel
+}
+
+class Switch {
+    void loop(long timeMs)
+}
+
+class Lamp {
+    void loop(long timeMs)
+    void onEvent(Block source, EventType event)
+}
+
+Sensor <|-- Switch
+Actuator <|-- Lamp
+@enduml
