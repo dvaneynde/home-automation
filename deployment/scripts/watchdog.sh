@@ -10,9 +10,9 @@ checkprocess() {
 		ps -p $pid >/dev/null
 		if [ $? -ne 0 ]
 		then
-			echo "Found pid file $1 but not its process ${pid}. Will restart domotic after 10 sec sleep."
+			echo "[Watchdog] Found pid file $1 but not its process ${pid}. Will restart domotic after 10 sec sleep."
 			sleep 10
-			echo "Restart..."
+			echo "[Watchdog] Restart..."
 			sudo $INITSCRIPT restart
 		fi
 	fi

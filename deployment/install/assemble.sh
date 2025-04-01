@@ -14,8 +14,8 @@ cp ${PREFIX}/hwdriver/src/*.[ch] ./work/
 rm -f work/target.h
 rm -f work/*mock*
 cp template/* work/
-cp ${PREFIX}/home-automation/DomoticConfig* work/
-cp ${PREFIX}/home-automation/DiamondBoardsConfig* work/
+cp ${PREFIX}/../domotics-config/home-automation/DomoticConfig* work/
+cp ${PREFIX}/../domotics-config/home-automation/DiamondBoardsConfig* work/
 cp ${PREFIX}/home-automation/target/domotic*dependencies.jar work/
 
 echo tar into ./domotic.tar
