@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <boards xmlns="http://dlvmechanografie.eu/DiamondBoardsConfig"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://dlvmechanografie.eu/DiamondBoardsConfig ../../../DiamondBoardsConfig.xsd ">
+	xsi:schemaLocation="http://dlvmechanografie.eu/DiamondBoardsConfig ../../main/resources/DiamondBoardsConfig.xsd ">
 	<opalmm address="0x380" board="0" desc="Een opalmm bordje.">
 		<digital-input>
 			<channel channel="5" logical-id="87" />

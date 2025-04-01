@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <boards xmlns="http://dlvmechanografie.eu/DiamondBoardsConfig"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://dlvmechanografie.eu/DiamondBoardsConfig /Users/dirk/Documents/workspace_helios/domotic/DiamondBoardsConfig.xsd ">
+	xsi:schemaLocation="http://dlvmechanografie.eu/DiamondBoardsConfig ../../main/resources/DiamondBoardsConfig.xsd ">
 	<opalmm board="0" address="0x300" desc="OPALMM 0 - enkel output.">
 		<digital-output>
 			<channel channel="2" logical-id="0" />

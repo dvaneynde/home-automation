@@ -1,7 +1,5 @@
 package eu.dlvm.domotics;
 
-// TODO move to eu.dlvm.domotics.processwatch
-
 public class DriverMonitor {
 
 	private ProcessWatch prWatch;

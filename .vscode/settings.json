@@ -4,4 +4,18 @@
         "**/target": true
     },
     "java.format.settings.url": ".vscode/formatting.xml",
+    "java.test.config": [
+        
+        {
+            // Added this, so XSD files are loaded by visual code Test Runner for Java
+            "name": "config-for-xsd-issue",
+            "workingDirectory": "${workspaceFolder}",
+            "vmargs": [ "-Xmx512M" ],
+            "classPaths": [
+                "${workspaceFolder}/target/classes",
+                "${workspaceFolder}/src/main/resources",
+                "${workspaceFolder}/src/test/resources"
+            ]
+        }
+    ]
 }

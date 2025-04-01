@@ -1,18 +1,21 @@
 package eu.dlvm.iohardware.diamondsys.factories;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
-
+import javax.xml.XMLConstants;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
-
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
-
+import eu.dlvm.domotics.base.ConfigurationException;
 import eu.dlvm.iohardware.ChannelType;
 import eu.dlvm.iohardware.diamondsys.Board;
 import eu.dlvm.iohardware.diamondsys.ChannelMap;
@@ -27,7 +30,7 @@ import eu.dlvm.iohardware.diamondsys.messaging.Opmm1616BoardWithMsg;
 public class XmlHwConfigurator implements IBoardFactory {
 
 	private static final Logger log = LoggerFactory.getLogger(XmlHwConfigurator.class);
-	private String cfgFilepath; 
+	private String cfgFilepath;
 
 	int boardNr, address;
 	private ChannelType chtype = null;
@@ -41,10 +44,21 @@ public class XmlHwConfigurator implements IBoardFactory {
 	@Override
 	public void configure(final List<Board> boards, final ChannelMap map) {
 		try {
-			SAXParserFactory f = SAXParserFactory.newInstance();
-			f.setValidating(true);
-			f.setNamespaceAware(true);
-			SAXParser p = f.newSAXParser();
+			SAXParserFactory parserFactory = SAXParserFactory.newInstance();			
+			SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+
+			// Load the XSD file from the classpath
+			ClassLoader classLoader = getClass().getClassLoader();
+			try (InputStream xsdStream = classLoader.getResourceAsStream("DiamondBoardsConfig.xsd")) {
+				if (xsdStream == null) {
+					throw new IOException("XSD file 'DiamondBoardsConfig.xsd' not found in classpath.");
+				}
+				Schema schema = schemaFactory.newSchema(new StreamSource(xsdStream));
+				parserFactory.setSchema(schema);
+			}
+
+			parserFactory.setNamespaceAware(true);
+
 			DefaultHandler h = new DefaultHandler() {
 				public void startElement(String uri, String localName, String qqName, Attributes atts)
 						throws SAXException {
@@ -107,16 +121,13 @@ public class XmlHwConfigurator implements IBoardFactory {
 					chtype = null;
 					digiIn = digiOut = anaIns = anaOuts = false;
 				}
-
-				/*
-				 * public void characters(char ch[], int start, int length)
-				 * throws SAXException { String s = new String(ch, start,
-				 * length); }
-				 */
 			};
-			p.parse(getCfgFilepath(), h);
+			SAXParser parser = parserFactory.newSAXParser();
+			parser.parse(getCfgFilepath(), h);
+
 		} catch (ParserConfigurationException | SAXException | IOException e) {
 			log.error("Error while parsing config file " + getCfgFilepath(), e);
+			throw new ConfigurationException(e.getMessage());
 		}
 	}
 

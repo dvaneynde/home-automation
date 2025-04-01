@@ -1,7 +1,5 @@
 <span style="font-family:Arial; font-size:3em;">DIY Home Automation</span>
 
-> Note: git log shows too many entries, repository was once an everything-combined repo, which was not a good idea.
-
 # Contact & Licensing
 - Author: Dirk Vaneynde
 - Contact: dirk@dlvmechanografie.eu
@@ -11,28 +9,36 @@
 
 Home automation system built up from common hardware and custom software.
 
-A functional and technical overview is in [Design](./DESIGN.md), Structured a Software Architecture Document. 
+Background - and photos - are in [History](./HISTORY.md).
 
-Some historical evolutions (and more photos) are in [History](./HISTORY.md).
+A functional and technical overview is in [Design](./DESIGN.md), structured as a Software Architecture Document. 
 
 # Projects
 
 There are multiple projects, each one in its own sub-folder with its own README:
 
 1. [home-automation](./README.md) : (this repository) the main program, backend in Java
-2. [hwdriver](../hwdriver/README.md) : the C program talking to the hardware
-3. [elm-ui](../elm-ui/README.md) : the web UI
+2. [hwdriver](../hwdriver/README.md) : the C program talking to the Diamond hardware and the Java back-end
+3. [elm-ui](../elm-ui/README.md) : the Web App, optional since the main interface are switches, lamps, et cetera in the house
 4. [azimuth](../azimuth/README.md) : library to calculate azimuth,  written in Scala
-5. [home-automation/deployment](./deployment/README.md) : automated deployment of increments, including hwdriver; also describes first time setup
+5. [home-automation/deployment](./deployment/README.md) : for standalone deployment on a headless server with Ubuntu and real Diamond hardware connecting to switches, lamps, et cetera
 
-# Build and Deploy
 
-See [Deployment](./deployment/README.md).
-
-# How to run
+# How to run on your development machine in simulation mode
 
 ```bash
+$ mvn package
+
+$ java -Dlogback.configurationFile=src/main/resources/logback-dev.xml \
+    -jar target/domotica-1.0-jar-with-dependencies.jar  \
+    domo -s -c src/test/resources/TestDiamondHwConfig.xml -b src/test/resources/TestDomoticConfig.xml -w static
+```
+
+To run the Web App make sure subfolder `static` has the javascript (as generated from elm) code.
+
+
 # For help
+```bash
 $ java -jar domotica-1.0-jar-with-dependencies.jar -h
 
 Usage:	Main domo [-s] [-r] [-d path2Driver] [-t looptime] [-h hostname] [-p port] [-w webapproot] -b blocks-config-file -c hardware-config-file
@@ -46,14 +52,7 @@ Usage:	Main domo [-s] [-r] [-d path2Driver] [-t looptime] [-h hostname] [-p port
 	-b domotic blocks xml configuration file
 	-c hardware xml configuration file
 To configure logging externally, use 'java -Dlogback.configurationFile=/path/to/config.xml ...' or system env variable.
-Domotica Main
 ```
 
 
-To run in simulation mode, make sure subfolder `static` has the javascript (from elm) code. Then:
-
-```bash
-$ java -Dlogback.configurationFile=src/main/resources/logback-dev.xml -jar target/domotica-1.0-jar-with-dependencies.jar  \
-    domo -s -c DiamondBoardsConfig.xml -b DomoticConfig.xml -w static
-```
 
