@@ -19,6 +19,7 @@ DOMHOST=$1
 
 # Stop on error
 set -e
+
 if [ $(basename $(pwd)) != "install" ]
 then 
 	echo "You must be in .../deployment/install directory to execute this script."
@@ -41,18 +42,18 @@ echo
 echo
 echo "INSTALL ======================"
 echo
-DOMDIR=/home/dirk/domotic
+DOMPATH=/home/dirk/domotic
 NEWDIR=$(date +%F_%T)
-NEWPATH=$DOMDIR/$NEWDIR
-export DOMDIR
+NEWPATH=$DOMPATH/$NEWDIR
+export DOMPATH
 export NEWDIR
 export NEWPATH
 
 #10
 echo Nieuwe directory aanmaken op domotica systeem, $NEWDIR
 ssh dirk@$DOMHOST <<END
-mkdir -p $DOMDIR
-cd $DOMDIR
+mkdir -p $DOMPATH
+cd $DOMPATH
 mkdir $NEWDIR
 END
 if [[ $? -ne 0 ]]
@@ -64,8 +65,10 @@ fi
 #30
 echo Kopieren van domotic.tar naar domotica systeem, en uitpakken in $NEWDIR
 scp domotic.tar dirk@$DOMHOST:$NEWPATH
-scp resetLinks.sh dirk@$DOMHOST:$DOMDIR
+scp resetLinks.sh dirk@$DOMHOST:$DOMPATH
 ssh dirk@$DOMHOST <<END
+cd $DOMPATH
+chmod +x resetLinks.sh
 cd $NEWPATH
 tar -x -f domotic.tar
 END
@@ -80,7 +83,7 @@ END
 #50
 echo Tenslotte, de verbindingen herleggen van 'domotic.jar' en 'hwdriver'
 ssh dirk@$DOMHOST <<END
-cd $DOMDIR
+cd $DOMPATH
 rm -f domotic.jar
 rm -f hwdriver
 rm -f DiamondBoardsConfig.xml DomoticConfig.xml
