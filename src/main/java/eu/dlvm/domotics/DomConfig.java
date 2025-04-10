@@ -1,7 +1,5 @@
 package eu.dlvm.domotics;
 
-import eu.dlvm.domotics.Main;
-
 import java.io.File;
 
 public class DomConfig {

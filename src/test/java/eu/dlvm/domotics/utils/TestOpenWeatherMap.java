@@ -5,6 +5,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Ignore;
 import org.junit.Test;
+import eu.dlvm.domotics.controllers.SunSetAndRise;
 
 public class TestOpenWeatherMap {
 
@@ -12,7 +13,7 @@ public class TestOpenWeatherMap {
 	@Test
 	public void testOpenWeatherMap() {
 		OpenWeatherMap owm = new OpenWeatherMap();
-		IOpenWeatherMap.Info info = owm.getWeatherReport();
+		SunSetAndRise info = owm.getSunSetAndRise();
 		assertNotNull(info);
 		assertNotNull(info.getSunrise());
 		assertNotNull(info.getSunset());

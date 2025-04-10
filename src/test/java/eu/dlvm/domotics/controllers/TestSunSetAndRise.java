@@ -11,25 +11,23 @@ import org.junit.Test;
 
 import eu.dlvm.domotics.base.DomoticLayout;
 import eu.dlvm.domotics.base.IDomoticLoop;
-import eu.dlvm.domotics.utils.IOpenWeatherMap;
-import eu.dlvm.domotics.utils.IOpenWeatherMap.Info;
 
 public class TestSunSetAndRise {
 
-	public Info[] createInfosSimple(Calendar calBase) {
-		Info[] infos = new Info[1];
+	public SunSetAndRise[] createInfosSimple(Calendar calBase) {
+		SunSetAndRise[] infos = new SunSetAndRise[1];
 		infos[0] = createInfo(calBase, 7, 54, 17, 38);
 		return infos;
 	}
 
-	public Info[] createInfosImpossibleTimes(Calendar calBase) {
-		Info[] infos = new Info[1];
+	public SunSetAndRise[] createInfosImpossibleTimes(Calendar calBase) {
+		SunSetAndRise[] infos = new SunSetAndRise[1];
 		infos[0] = createInfo(calBase, 12, 0, 10, 0);
 		return infos;
 	}
 
-	public Info[] createInfosTwoDaysAndFailedRequests(Calendar calBase) {
-		Info[] infos = new Info[5];
+	public SunSetAndRise[] createInfosTwoDaysAndFailedRequests(Calendar calBase) {
+		SunSetAndRise[] infos = new SunSetAndRise[5];
 		infos[0] = null;
 		infos[1] = null;
 		infos[2] = createInfo(calBase, 7, 54, 17, 38);
@@ -38,7 +36,7 @@ public class TestSunSetAndRise {
 		return infos;
 	}
 
-	private IOpenWeatherMap.Info createInfo(Calendar calBase, int hoursSunrise, int minsSunrise, int hoursSunset,
+	private SunSetAndRise createInfo(Calendar calBase, int hoursSunrise, int minsSunrise, int hoursSunset,
 			int minsSunset) {
 		Calendar calSunrise = (Calendar) calBase.clone();
 		calSunrise.set(Calendar.HOUR_OF_DAY, hoursSunrise);
@@ -46,19 +44,19 @@ public class TestSunSetAndRise {
 		Calendar calSunset = (Calendar) calBase.clone();
 		calSunset.set(Calendar.HOUR_OF_DAY, hoursSunset);
 		calSunset.set(Calendar.MINUTE, minsSunset);
-		return new Info(calSunrise, calSunset);
+		return new SunSetAndRise(calSunrise, calSunset);
 	}
 
-	public class OwmTest implements IOpenWeatherMap {
-		Info[] infos;
+	public class OwmTest implements ISunSetAnRiseProvider {
+		SunSetAndRise[] infos;
 		int callseqnr;
 
-		public OwmTest(Info[] infos) {
+		public OwmTest(SunSetAndRise[] infos) {
 			this.infos = infos;
 			callseqnr = 0;
 		}
 
-		public Info getWeatherReport() {
+		public SunSetAndRise getSunSetAndRise() {
 			if (callseqnr >= infos.length)
 				fail("getWeatherReport should not have been called anymore.");
 			return infos[callseqnr++];
@@ -72,7 +70,7 @@ public class TestSunSetAndRise {
 
 		// Initial state.
 		TestSunSetAndRise.OwmTest owmt = new TestSunSetAndRise.OwmTest(createInfosSimple(calendar));
-		SunSetAndRise t = new SunSetAndRise("TestSunSetAndRise", "timer day and night", 30, owmt, new DomoticLayout());
+		SunSetAndRiseController t = new SunSetAndRiseController("TestSunSetAndRise", "timer day and night", 30, owmt, new DomoticLayout());
 		assertFalse(t.isTimesUpdatedForToday());
 		assertFalse(t.isSunIsRisen());
 		assertFalse(t.isSunIsSet());
@@ -98,7 +96,7 @@ public class TestSunSetAndRise {
 
 		// Initial state.
 		TestSunSetAndRise.OwmTest owmt = new TestSunSetAndRise.OwmTest(createInfosImpossibleTimes(calendar));
-		SunSetAndRise t = new SunSetAndRise("TestSunSetAndRise", "timer day and night", 30, owmt, new DomoticLayout());
+		SunSetAndRiseController t = new SunSetAndRiseController("TestSunSetAndRiseController", "timer day and night", 30, owmt, new DomoticLayout());
 		assertFalse(t.isTimesUpdatedForToday());
 		assertFalse(t.isSunIsRisen());
 		assertFalse(t.isSunIsSet());
@@ -134,7 +132,7 @@ public class TestSunSetAndRise {
 
 		// Initial state.
 		TestSunSetAndRise.OwmTest owmt = new TestSunSetAndRise.OwmTest(createInfosSimple(calendar));
-		SunSetAndRise t = new SunSetAndRise("TestSunSetAndRise", "timer day and night", 30, owmt, new DomoticLayout());
+		SunSetAndRiseController t = new SunSetAndRiseController("TestSunSetAndRiseController", "timer day and night", 30, owmt, new DomoticLayout());
 		assertFalse(t.isTimesUpdatedForToday());
 		assertFalse(t.isSunIsRisen());
 		assertFalse(t.isSunIsSet());
@@ -161,7 +159,7 @@ public class TestSunSetAndRise {
 
 		// Initial state. OpenWeatherMap does not return anything yet.
 		TestSunSetAndRise.OwmTest owmt = new TestSunSetAndRise.OwmTest(createInfosTwoDaysAndFailedRequests(calendar));
-		SunSetAndRise t = new SunSetAndRise("TestSunSetAndRise", "timer day and night", 30, owmt, new DomoticLayout());
+		SunSetAndRiseController t = new SunSetAndRiseController("TestSunSetAndRiseController", "timer day and night", 30, owmt, new DomoticLayout());
 		assertFalse(t.isTimesUpdatedForToday());
 		assertFalse(t.isSunIsRisen());
 		assertFalse(t.isSunIsSet());
@@ -276,7 +274,7 @@ public class TestSunSetAndRise {
 		assertEquals(5, owmt.callseqnr);
 	}
 
-	// Because of async executor in {@see SunSetAndRise} need to loop twice so it
+	// Because of async executor in {@see SunSetAndRiseController} need to loop twice so it
 	// finishes.
 	private static void loopTwice(IDomoticLoop t, long time) {
 		t.loop(time);

@@ -31,7 +31,7 @@ import eu.dlvm.domotics.controllers.RepeatOffAtTimer;
 import eu.dlvm.domotics.controllers.SunWindController;
 import eu.dlvm.domotics.controllers.TimeUtils;
 import eu.dlvm.domotics.controllers.TimerOnOff;
-import eu.dlvm.domotics.controllers.SunSetAndRise;
+import eu.dlvm.domotics.controllers.SunSetAndRiseController;
 import eu.dlvm.domotics.events.EventType;
 import eu.dlvm.domotics.events.IEventListener;
 import eu.dlvm.domotics.sensors.DimmerSwitch;
@@ -191,7 +191,7 @@ class XmlElementHandlers extends DefaultHandler2 {
 			} else if (localName.equals("sunSetAndRise")) {
 				parseBaseBlock(atts);
 				int shimmer = parseIntAttribute("shimmerMinutes", atts);
-				currentBlock = new SunSetAndRise(name, desc, shimmer, new OpenWeatherMap(), builder);
+				currentBlock = new SunSetAndRiseController(name, desc, shimmer, new OpenWeatherMap(), builder);
 
 			} else if (localName.equals("repeatOff")) {
 				parseBaseBlock(atts);
