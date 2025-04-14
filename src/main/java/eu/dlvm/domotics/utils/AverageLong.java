@@ -1,5 +1,6 @@
 package eu.dlvm.domotics.utils;
 
+// TODO Not really used, discard.
 public class AverageLong {
 
 	long sum;

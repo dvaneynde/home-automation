@@ -189,6 +189,14 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<systemPropertyVariables>
+						<env.OPEN_WEATHER_MAP_API_KEY>${env.OPEN_WEATHER_MAP_API_KEY}</env.OPEN_WEATHER_MAP_API_KEY>
+					</systemPropertyVariables>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 	<reporting>

@@ -22,8 +22,20 @@ public class OpenWeatherMap implements ISunSetAnRiseProvider {
 
 	static Logger log = LoggerFactory.getLogger(OpenWeatherMap.class);
 
-	static final String APP_ID = "9432e6e90eb0c5c30b4f4c19ba396d37";// System.getenv("OPEN_WEATHER_MAP_APP_ID");
-	String requestUrl = "http://api.openweathermap.org/data/2.5/weather?q=Leuven,be&appid=" + APP_ID;
+	static final String API_KEY = getOpenWeatherMapApiKey();
+	String requestUrl = "http://api.openweathermap.org/data/2.5/weather?q=Leuven,be&appid=" + API_KEY;
+
+	public static String getOpenWeatherMapApiKey() {
+		// Used from command line, and by Visual Code Test Runner for Java
+        String apiKey = System.getenv("OPEN_WEATHER_MAP_API_KEY");
+        if (apiKey == null) {
+			// Used by Maven
+            apiKey = System.getProperty("env.OPEN_WEATHER_MAP_API_KEY");
+        }
+		// if (apiKey == null)
+		// 	throw new IllegalStateException("OPEN_WEATHER_MAP_API_KEY is not set in environment variables or system properties.");
+		return apiKey;
+	}
 
 	public SunSetAndRise getSunSetAndRise() {
 		SunSetAndRise info = null;
@@ -35,7 +47,10 @@ public class OpenWeatherMap implements ISunSetAnRiseProvider {
 	}
 
 	private String getJsonWeatherReport() {
-
+		if (API_KEY == null || API_KEY.isEmpty()) {
+			log.warn("OPEN_WEATHER_MAP_API_KEY is not set in environment variables or system properties.");
+			return null;
+		}
 		DefaultHttpClient httpclient = new DefaultHttpClient();
 		HttpGet httpGet = new HttpGet(requestUrl);
 		String weather = null;

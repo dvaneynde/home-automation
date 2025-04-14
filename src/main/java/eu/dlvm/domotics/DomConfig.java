@@ -19,7 +19,8 @@ public class DomConfig {
 
     public DomConfig(String[] args) {
         if (args.length == 0) {
-            throw new RuntimeException("No arguments given.");
+            usage();
+            System.exit(2);
         }
         if (args[0].equalsIgnoreCase("domo"))
             domotic = true;
@@ -87,6 +88,8 @@ public class DomConfig {
                 + "\n\t-w path of directory with webapp (where index.html is located)"
                 + "\n\t-b domotic blocks xml configuration file"
                 + "\n\t-c hardware xml configuration file"
-                + "\nTo configure logging externally, use 'java -Dlogback.configurationFile=/path/to/config.xml ...' or system env variable.\n");
+                + "\nTo configure logging externally, use 'java -Dlogback.configurationFile=/path/to/config.xml ...' or environment variable.\n"
+                + "To enable use of OpenWeatherMap environment variable OPEN_WEATHER_MAP_API_KEY must contain a valid key. \n");
     }
 }
+//To enable OpenWeatherMap, the environment valuable OPEN_WEATHER_MAP_API_KEY must contain a valid key.

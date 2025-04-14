@@ -22,6 +22,10 @@ PIDFILE=$DOMDIR/domotic.pid
 PIDFILE_DRIVER=$DOMDIR/driver.pid
 SCRIPTNAME=/etc/init.d/$NAME
 
+set -a # automatically export all variables
+source $DOMDIR/domotics.env
+set +a
+
 # Gracefully exit if the package has been removed.
 # test -x $DAEMON || exit 0
 
