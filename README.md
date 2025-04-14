@@ -18,9 +18,9 @@ A functional and technical overview is in [Design](./DESIGN.md), structured as a
 There are multiple projects, each one in its own sub-folder with its own README:
 
 1. [home-automation](./README.md) : (this repository) the main program, backend in Java
-2. [hwdriver](https://github.com/dvaneynde/hwdriver/README.md) : the C program talking to the Diamond hardware and the Java back-end
-3. [elm-ui](https://github.com/dvaneynde/elm-ui/README.md) : the Web App, optional since the main interface are switches, lamps, et cetera in the house
-4. [azimuth](https://github.com/dvaneynde/azimuth/README.md) : library to calculate azimuth,  written in Scala
+2. [hwdriver](https://github.com/dvaneynde/hwdriver) : the C program talking to the Diamond hardware and the Java back-end
+3. [elm-ui](https://github.com/dvaneynde/elm-ui) : the Web App, optional since the main interface are switches, lamps, et cetera in the house
+4. [azimuth](https://github.com/dvaneynde/azimuth) : library to calculate azimuth,  written in Scala
 5. [home-automation/deployment](./deployment/README.md) : for standalone deployment on a headless server with Ubuntu and real Diamond hardware connecting to switches, lamps, et cetera
 
 
@@ -28,7 +28,7 @@ There are multiple projects, each one in its own sub-folder with its own README:
 
 To pass all tests your need a key for Open Weather Map API, see `pom.xml`.
 
-To run the Web App make sure subfolder `static` has the javascript (as generated from elm) code. See the separate ELM project [elm-ui](../elm-ui/README.md).
+To run the Web App make sure subfolder `static` has the javascript as generated from the separate ELM project [elm-ui](https://github.com/dvaneynde/elm-ui).
 
 ```bash
 $ mvn package
