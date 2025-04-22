@@ -9,13 +9,13 @@ public class Oscillator extends Thread {
 
 	static Logger log = LoggerFactory.getLogger(Oscillator.class);
 	
-	private ICanLoopAllBlocks dom;
+	private Domotic dom;
 	private long tickTimeMs;
 	private boolean goOn;
 	private long currentTime;
 	private AverageLong avgLong;	// for quality only
 	
-	public Oscillator(ICanLoopAllBlocks dom, long tickTimeMs) {
+	public Oscillator(Domotic dom, long tickTimeMs) {
 		super("Oscillator");
 		this.dom = dom;
 		this.tickTimeMs = tickTimeMs;
@@ -36,11 +36,13 @@ public class Oscillator extends Thread {
 		while (localGoOn) {
 			currentTime = System.currentTimeMillis();
 			dom.loopOnceAllBlocks(currentTime);
+			/*
+			// TODO See issue updating web sockets: this might take longer than 20 ms. Does not seem to be a real problem, need to investigate.
 			avgLong.add(System.currentTimeMillis() - currentTime);
 			if (avgLong.enoughSamples())
 				avgLong.avgAndClear();
-				//logger.info("Loops took on average "+avgLong.avgAndClear()+" ms.");
-			// FIXME must be tick - time-passed !!!
+				logger.info("Loops took on average "+avgLong.avgAndClear()+" ms.");
+			*/
 			try {
 				Thread.sleep(tickTimeMs);
 			} catch (InterruptedException e) {

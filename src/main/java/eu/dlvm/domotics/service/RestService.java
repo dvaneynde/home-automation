@@ -15,7 +15,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.base.Domotic;
-import eu.dlvm.domotics.base.IUiCapableBlock;
 import eu.dlvm.domotics.service.uidata.UiInfo;
 
 @Singleton
@@ -46,6 +45,7 @@ public class RestService {
 		Log.info("Shutdown of domotic requested.");
 	}
 
+	// TODO Change path to UI blocks
 	@Path("statuses")
 	@Produces(MediaType.APPLICATION_JSON)
 	@GET
@@ -65,6 +65,7 @@ public class RestService {
 		return list;
 	}
 
+	// TODO Change path to UI blocks
 	@Path("statuses/{name}")
 	@Produces(MediaType.APPLICATION_JSON)
 	@GET
@@ -85,6 +86,7 @@ public class RestService {
 		}
 	}
 
+	// TODO Change path to UI blocks, Action is A query Parmiter
 	/**
 	 * @param name
 	 * @param action

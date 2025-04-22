@@ -3,10 +3,28 @@ package eu.dlvm.domotics.service.uidata;
 import eu.dlvm.domotics.base.Block;
 
 /**
- * Data to update UI.
+ * The UiInfo class is a UI information about a domotics {@Block} for display or processing
+ * purposes.
+ * </p>
+ * 
+ * <p>
+ * Fields:
+ * </p>
+ * <ul>
+ * <li><b>name</b>: The identifying name of the UI element.</li>
+ * <li><b>type</b>: The type of the UI element, typically derived from the block's class name.</li>
+ * <li><b>description</b>: A textual description of the UI element. Defaults to an empty string if
+ * not provided.</li>
+ * <li><b>groupName</b>: The name of the group to which the UI element belongs. Defaults to an empty
+ * string if not provided.</li>
+ * <li><b>groupSeq</b>: The sequence number of the UI element within its group, 0 based. Defaults to 0 if not
+ * provided.</li>
+ * <li><b>status</b>: The status of the UI element. Defaults to an empty string if not
+ * provided.</li>
+ * </ul>
  * 
  * @author dirk
- *
+ * 
  */
 public class UiInfo {
 	private String name;
@@ -16,8 +34,7 @@ public class UiInfo {
 	private int groupSeq = 0;
 	private String status = "";
 
-	public UiInfo() {
-	}
+	public UiInfo() {}
 
 	public UiInfo(Block block, String status) {
 		setName(block.getName());
@@ -31,7 +48,7 @@ public class UiInfo {
 			setGroupName(groupSeqList[0]);
 			setGroupSeq(Integer.valueOf(groupSeqList[1]));
 		}
-}
+	}
 
 	public String getName() {
 		return name;

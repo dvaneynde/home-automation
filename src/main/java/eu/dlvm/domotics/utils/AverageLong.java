@@ -1,6 +1,6 @@
 package eu.dlvm.domotics.utils;
 
-// TODO Not really used, discard.
+// TODO Not really used, discard? Should also be ring buffer with moving average, For wind and sun and such.
 public class AverageLong {
 
 	long sum;

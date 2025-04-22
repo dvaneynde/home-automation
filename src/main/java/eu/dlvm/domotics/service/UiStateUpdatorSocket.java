@@ -5,7 +5,6 @@ import java.util.List;
 
 import eu.dlvm.domotics.base.Domotic;
 import eu.dlvm.domotics.base.IStateChangedListener;
-import eu.dlvm.domotics.base.IUiCapableBlock;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
@@ -17,9 +16,45 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import eu.dlvm.domotics.service.uidata.UiInfo;
 
+// TODO Is created whenever a websocket is created, so whenever a client connects. If multiple clients connnect at same time, multiple are created.
+// TODO Make thread safe? Make loop()) synchronised? At least COUNT variable.
+// FIXME Why is this a IStateChangedListener? Needs major refactoring...
+
 /**
- * Is created whenever a websocket is created, so whenever a client connects. If
- * multiple clients connnect at same time, multiple are created.<br/>
+ * WebSocket implementation for updating the UI state in real-time.
+ * This class listens for state changes and sends updates to connected WebSocket clients.
+ * It implements the {@link IStateChangedListener} interface to receive state change notifications.
+ * 
+ * <p>Each instance of this class is associated with a WebSocket session and is responsible
+ * for managing its lifecycle, including opening and closing the session, and sending updates
+ * to the client.</p>
+ * 
+ * <p>Key responsibilities:</p>
+ * <ul>
+ *   <li>Manage WebSocket session lifecycle (open, close).</li>
+ *   <li>Listen for state changes and send serialized UI information to the client.</li>
+ *   <li>Serialize UI state into JSON format using Jackson's {@link ObjectMapper}.</li>
+ * </ul>
+ * 
+ * <p>Usage:</p>
+ * <ol>
+ *   <li>Create an instance of this class, passing a list of {@link IStateChangedListener} to register itself.</li>
+ *   <li>When a WebSocket connection is established, the {@code onOpen} method is called to initialize the session.</li>
+ *   <li>When the connection is closed, the {@code onClose} method is called to clean up resources.</li>
+ *   <li>The {@code updateUi} method is triggered to send the latest UI state to the client.</li>
+ * </ol>
+ * 
+ * <p>Thread Safety:</p>
+ * This class is not thread-safe. Ensure proper synchronization if accessed from multiple threads.
+ * 
+ * <p>Dependencies:</p>
+ * <ul>
+ *   <li>{@link ObjectMapper} for JSON serialization.</li>
+ *   <li>{@link Domotic} singleton for accessing UI-capable blocks.</li>
+ *   <li>{@link Logger} for logging lifecycle events and errors.</li>
+ * </ul>
+ * 
+ * @author Dirk
  */
 @WebSocket
 public class UiStateUpdatorSocket implements IStateChangedListener {
@@ -72,7 +107,6 @@ public class UiStateUpdatorSocket implements IStateChangedListener {
 
 	private List<UiInfo> createUiInfos() {
 		List<UiInfo> uiInfos = new ArrayList<>();
-		// TODO must not be Domotic, but DomoticLayout
 		for (IUiCapableBlock ui : Domotic.singleton().getLayout().getUiCapableBlocks()) {
 			if (ui.getUiGroup() == null)
 				continue;

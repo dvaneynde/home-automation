@@ -8,6 +8,16 @@ import eu.dlvm.domotics.base.Block;
  * @author dirk
  *
  */
+/**
+ * The {@code UiInfoOnOff} class extends {@code UiInfo} and represents
+ * a UI information object with an additional boolean state indicating
+ * whether it is "on" or "off".
+ * 
+ * <p>This class provides constructors for initialization and getter/setter
+ * methods to access and modify the "on" state.
+ * 
+ * @see UiInfo
+ */
 public class UiInfoOnOff extends UiInfo {
 	private boolean on;
 
@@ -25,6 +35,11 @@ public class UiInfoOnOff extends UiInfo {
 
 	public void setOn(boolean on) {
 		this.on = on;
+	}
+
+	@Override
+	public String toString() {
+		return "UiInfoOnOff [on=" + on + " [" + super.toString() + "]]";
 	}
 
 }

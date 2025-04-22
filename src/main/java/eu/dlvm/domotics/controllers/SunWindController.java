@@ -11,9 +11,9 @@ import eu.dlvm.domotic.sensor.sun.SunHeightAzimuth;
 import eu.dlvm.domotics.base.Block;
 import eu.dlvm.domotics.base.Controller;
 import eu.dlvm.domotics.base.IDomoticLayoutBuilder;
-import eu.dlvm.domotics.base.IUiCapableBlock;
 import eu.dlvm.domotics.events.EventType;
 import eu.dlvm.domotics.events.IEventListener;
+import eu.dlvm.domotics.service.IUiCapableBlock;
 import eu.dlvm.domotics.service.uidata.UiInfo;
 import eu.dlvm.domotics.service.uidata.UiInfoOnOff;
 

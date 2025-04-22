@@ -5,9 +5,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.base.IDomoticLayoutBuilder;
-import eu.dlvm.domotics.base.IUiCapableBlock;
 import eu.dlvm.domotics.base.Sensor;
 import eu.dlvm.domotics.events.EventType;
+import eu.dlvm.domotics.service.IUiCapableBlock;
 import eu.dlvm.domotics.service.uidata.UiInfo;
 import eu.dlvm.domotics.service.uidata.UiInfoLevel;
 
