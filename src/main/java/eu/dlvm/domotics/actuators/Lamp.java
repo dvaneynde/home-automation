@@ -6,14 +6,14 @@ import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.base.Actuator;
 import eu.dlvm.domotics.base.Block;
-import eu.dlvm.domotics.base.IDomoticLayoutBuilder;
+import eu.dlvm.domotics.base.DomoticLayout;
+import eu.dlvm.domotics.base.IUiCapableBlock;
 import eu.dlvm.domotics.base.RememberedOutput;
+import eu.dlvm.domotics.base.ui.UiInfo;
+import eu.dlvm.domotics.base.ui.UiInfoOnOff;
+import eu.dlvm.domotics.base.ui.UiInfoOnOffEco;
 import eu.dlvm.domotics.events.EventType;
 import eu.dlvm.domotics.events.IEventListener;
-import eu.dlvm.domotics.service.IUiCapableBlock;
-import eu.dlvm.domotics.service.uidata.UiInfo;
-import eu.dlvm.domotics.service.uidata.UiInfoOnOff;
-import eu.dlvm.domotics.service.uidata.UiInfoOnOffEco;
 
 /**
  * Lamp - or anything that can go on or off - with optional auto-off.
@@ -64,12 +64,12 @@ public class Lamp extends Actuator implements IEventListener, IUiCapableBlock {
 		ON, OFF, GOING_OFF_BLINK, GOING_OFF_UNLESS_CLICK;
 	}
 
-	public Lamp(String name, String description, boolean isEcoEnabled, String channel, IHardwareWriter writer, IDomoticLayoutBuilder builder) {
-		this(name, description, isEcoEnabled, null, channel, writer, builder);
+	public Lamp(String name, String description, boolean isEcoEnabled, String channel, IHardwareWriter writer, DomoticLayout layout) {
+		this(name, description, isEcoEnabled, null, channel, writer, layout);
 	}
 
-	public Lamp(String name, String description, boolean isEcoEnabled, String ui, String channel, IHardwareWriter writer, IDomoticLayoutBuilder builder) {
-		super(name, description, ui, channel, writer, builder);
+	public Lamp(String name, String description, boolean isEcoEnabled, String ui, String channel, IHardwareWriter writer, DomoticLayout layout) {
+		super(name, description, ui, channel, writer, layout);
 		ecoEnabled = isEcoEnabled;
 		state = States.OFF;
 	}

@@ -16,13 +16,13 @@ import org.xml.sax.SAXException;
 import org.xml.sax.ext.DefaultHandler2;
 
 import eu.dlvm.domotics.base.ConfigurationException;
-import eu.dlvm.domotics.base.IDomoticLayoutBuilder;
+import eu.dlvm.domotics.base.DomoticLayout;
 
 public class XmlDomoticConfigurator {
 
 	private static Logger logger = LoggerFactory.getLogger(XmlDomoticConfigurator.class);
 
-	public static void configure(String cfgFilepath, IHardware hardware, IDomoticLayoutBuilder builder) {
+	public static void configure(String cfgFilepath, IHardware hardware, DomoticLayout layout) {
 		try {
 			SAXParserFactory parserFactory = SAXParserFactory.newInstance();
 			SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
@@ -40,7 +40,7 @@ public class XmlDomoticConfigurator {
 			parserFactory.setNamespaceAware(true);
 
 			SAXParser parser = parserFactory.newSAXParser();
-			DefaultHandler2 handler = new XmlElementHandlers(builder, hardware);
+			DefaultHandler2 handler = new XmlElementHandlers(layout, hardware);
 			parser.parse(cfgFilepath, handler);
 
 		} catch (ParserConfigurationException | SAXException | IOException e) {

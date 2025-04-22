@@ -5,6 +5,8 @@ import java.util.List;
 
 import eu.dlvm.domotics.base.Domotic;
 import eu.dlvm.domotics.base.IStateChangedListener;
+import eu.dlvm.domotics.base.IUiCapableBlock;
+import eu.dlvm.domotics.base.ui.UiInfo;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
@@ -13,8 +15,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import eu.dlvm.domotics.service.uidata.UiInfo;
 
 // TODO Is created whenever a websocket is created, so whenever a client connects. If multiple clients connnect at same time, multiple are created.
 // TODO Make thread safe? Make loop()) synchronised? At least COUNT variable.

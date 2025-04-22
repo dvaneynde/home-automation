@@ -57,6 +57,7 @@ public class Domotic {
 	private AtomicBoolean errorStopRequested = new AtomicBoolean();
 	private int nrNoResponsesFromDriver;
 
+	// FIXME Should be passed as constructor argument. Current implementation is weird.
 	private DomoticLayout layout = new DomoticLayout();
 	private List<IStateChangedListener> stateChangeListeners;
 	// protected access for test cases only
@@ -286,9 +287,7 @@ public class Domotic {
 		hw.getWriter().refreshOutputs();
 
 		if (getStateChangeListeners() != null) {
-			// TODO should be async in separate thread, since might take longer than 20
-			// ms...
-			// and with timeout perhaps?
+			// FIXME should be async in separate thread, since might take longer than 20 ms... and with timeout perhaps?
 			long startTimeWs = System.currentTimeMillis();
 			if (loopSequence % 10 == 0) {
 				for (IStateChangedListener uiUpdator : getStateChangeListeners())
@@ -296,7 +295,7 @@ public class Domotic {
 			}
 			long tookMs = System.currentTimeMillis() - startTimeWs;
 			if (tookMs >= 20)
-				log.error("Updating websockets took more than 19 ms!\nTotal=" + tookMs + " ms.");
+				log.warn("Updating websockets took more than 19 ms!\nTotal=" + tookMs + " ms.");
 		}
 
 		if (loopSequence % 10 == 0)

@@ -5,7 +5,7 @@ import java.util.Map;
 import eu.dlvm.domotics.actuators.Lamp;
 import eu.dlvm.domotics.base.Actuator;
 import eu.dlvm.domotics.base.Block;
-import eu.dlvm.domotics.base.IDomoticLayoutBuilder;
+import eu.dlvm.domotics.base.DomoticLayout;
 import eu.dlvm.domotics.controllers.GadgetController;
 import eu.dlvm.domotics.controllers.gadgets.GadgetSet;
 import eu.dlvm.domotics.controllers.gadgets.OnOff;
@@ -24,7 +24,7 @@ import eu.dlvm.domotics.controllers.gadgets.RandomOnOff;
  */
 public class AntiBurglarBuilder {
 
-	public static GadgetController build(Map<String, Block> blocksSoFar, String name, int onTime, int offTime, IDomoticLayoutBuilder ctx) {
+	public static GadgetController build(Map<String, Block> blocksSoFar, String name, int onTime, int offTime, DomoticLayout ctx) {
 		GadgetController.Builder builder = new GadgetController.Builder(name, true, ctx);
 		GadgetController ab = builder.activateOnStart(false).repeat(true).setOnOffTime(onTime, offTime).build();
 

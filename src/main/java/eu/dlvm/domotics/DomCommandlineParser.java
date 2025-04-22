@@ -2,7 +2,7 @@ package eu.dlvm.domotics;
 
 import java.io.File;
 
-public class DomConfig {
+public class DomCommandlineParser {
 
     public static final int DEFAULT_LOOP_TIME_MS = 20;
 
@@ -17,7 +17,7 @@ public class DomConfig {
     public int port = 4444;
     public File htmlRootFile = null;
 
-    public DomConfig(String[] args) {
+    public DomCommandlineParser(String[] args) {
         if (args.length == 0) {
             usage();
             System.exit(2);
@@ -76,11 +76,11 @@ public class DomConfig {
     }
 
     public static void usage() {
-        System.out.println("Usage:\ttwo options:\n\t"
+        System.out.println("Usage: two options, to run either the domotics system or the hardware console:\n\t"
                 + Main.class.getSimpleName() + " domo [-s] [-r] [-d path2Driver] [-t looptime] [-h hostname] [-p port] [-w webapproot] -b blocks-config-file -c hardware-config-file\n\t"
                 + Main.class.getSimpleName() + " hw [-d path2Driver] [-h hostname] [-p port] -c hardware-config-file"
                 + "\n\twhere:"
-                + "\n\t-s simulate hardware driver (domotic only, for testing and development)"
+                + "\n\t-s simulate hardware driver (domotics only, for testing and development purposes)"
                 + "\n\t-d path to driver, if it needs to be started and managed by this program"
                 + "\n\t-t time between loops, in ms; defaults to "+ DEFAULT_LOOP_TIME_MS + " ms."
                 + "\n\t-h hostname of hardware driver; incompatible with -d"
@@ -92,4 +92,3 @@ public class DomConfig {
                 + "To enable use of OpenWeatherMap environment variable OPEN_WEATHER_MAP_API_KEY must contain a valid key. \n");
     }
 }
-//To enable OpenWeatherMap, the environment valuable OPEN_WEATHER_MAP_API_KEY must contain a valid key.

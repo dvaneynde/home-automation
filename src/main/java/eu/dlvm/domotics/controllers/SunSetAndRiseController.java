@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.base.Block;
 import eu.dlvm.domotics.base.Controller;
-import eu.dlvm.domotics.base.IDomoticLayoutBuilder;
+import eu.dlvm.domotics.base.DomoticLayout;
 import eu.dlvm.domotics.events.EventType;
 
 /**
@@ -51,7 +51,7 @@ public class SunSetAndRiseController extends Controller {
 	private Future<SunSetAndRise> asyncCheckWeather;
 
 	public SunSetAndRiseController(String name, String description, int shimmerTimeMin, ISunSetAnRiseProvider owm,
-			IDomoticLayoutBuilder ctx) {
+			DomoticLayout ctx) {
 		super(name, description, null, ctx);
 		this.shimmerMinutes = shimmerTimeMin;
 		this.state = States.INIT;

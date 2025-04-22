@@ -4,12 +4,12 @@ import eu.dlvm.iohardware.IHardwareReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import eu.dlvm.domotics.base.IDomoticLayoutBuilder;
+import eu.dlvm.domotics.base.DomoticLayout;
+import eu.dlvm.domotics.base.IUiCapableBlock;
 import eu.dlvm.domotics.base.Sensor;
+import eu.dlvm.domotics.base.ui.UiInfo;
+import eu.dlvm.domotics.base.ui.UiInfoLevel;
 import eu.dlvm.domotics.events.EventType;
-import eu.dlvm.domotics.service.IUiCapableBlock;
-import eu.dlvm.domotics.service.uidata.UiInfo;
-import eu.dlvm.domotics.service.uidata.UiInfoLevel;
 
 /**
  * As soon as wind speed (actually rotations per second of a gauge) is above
@@ -50,20 +50,20 @@ public class WindSensor extends Sensor implements IUiCapableBlock {
 	 * @param name
 	 * @param description
 	 * @param channel
-	 * @param builder
+	 * @param layout
 	 * @param highFreqThreshold
 	 * @param lowFreqThreshold
 	 * @param lowTimeToResetAlert
 	 *            Unit is seconds.
 	 */
-	public WindSensor(String name, String description, String channel, IHardwareReader reader, IDomoticLayoutBuilder builder, int highFreqThreshold,
+	public WindSensor(String name, String description, String channel, IHardwareReader reader, DomoticLayout layout, int highFreqThreshold,
                       int lowFreqThreshold, int lowTimeToResetAlert) {
-		this(name, description, null, channel, reader, builder, highFreqThreshold, lowFreqThreshold, lowTimeToResetAlert);
+		this(name, description, null, channel, reader, layout, highFreqThreshold, lowFreqThreshold, lowTimeToResetAlert);
 	}
 
-	public WindSensor(String name, String description, String ui, String channel, IHardwareReader reader, IDomoticLayoutBuilder builder,
+	public WindSensor(String name, String description, String ui, String channel, IHardwareReader reader, DomoticLayout layout,
                       int highFreqThreshold, int lowFreqThreshold, int lowTimeToResetAlert) {
-		super(name, description, ui, channel, reader, builder);
+		super(name, description, ui, channel, reader, layout);
 		if (highFreqThreshold < lowFreqThreshold) // TODO higfreq must be 'far'
 													// below 1/(2 xlooptime)
 			throw new RuntimeException("Configuration error: highSpeedThreshold must be lower than lowSpeedThreshold.");

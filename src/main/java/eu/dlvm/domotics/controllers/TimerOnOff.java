@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.base.Block;
 import eu.dlvm.domotics.base.Controller;
-import eu.dlvm.domotics.base.IDomoticLayoutBuilder;
+import eu.dlvm.domotics.base.DomoticLayout;
 import eu.dlvm.domotics.events.EventType;
 
 /**
@@ -27,7 +27,7 @@ public class TimerOnOff extends Controller {
 	static boolean loggedOnce = false;
 
 	// timer usage interface
-	public TimerOnOff(String name, String description, IDomoticLayoutBuilder ctx) {
+	public TimerOnOff(String name, String description, DomoticLayout ctx) {
 		super(name, description, null, ctx);
 		state = false;
 		onTimeMs = offTimeMs = 0;

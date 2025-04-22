@@ -1,4 +1,4 @@
-package eu.dlvm.domotics.service.uidata;
+package eu.dlvm.domotics.base.ui;
 
 import eu.dlvm.domotics.base.Block;
 

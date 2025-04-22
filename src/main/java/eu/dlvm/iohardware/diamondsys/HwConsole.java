@@ -11,16 +11,14 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import eu.dlvm.domotics.Main;
 import eu.dlvm.iohardware.ChannelFault;
 import eu.dlvm.iohardware.ChannelType;
 import eu.dlvm.iohardware.diamondsys.factories.XmlHwConfigurator;
 import eu.dlvm.iohardware.diamondsys.messaging.HwDriverTcpChannel;
 
-// TODO moet naar diamondsys sub-package, want gebruikt meer dan alleen IHardwareIO... Zie import statemens !
 public class HwConsole {
 
-	static Logger log = LoggerFactory.getLogger(Main.class);
+	static Logger log = LoggerFactory.getLogger(HwConsole.class);
 
 	private DiamondsysHardware hw;
 

@@ -6,13 +6,13 @@ import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.base.Actuator;
 import eu.dlvm.domotics.base.Block;
-import eu.dlvm.domotics.base.IDomoticLayoutBuilder;
+import eu.dlvm.domotics.base.DomoticLayout;
+import eu.dlvm.domotics.base.IUiCapableBlock;
 import eu.dlvm.domotics.base.RememberedOutput;
+import eu.dlvm.domotics.base.ui.UiInfo;
+import eu.dlvm.domotics.base.ui.UiInfoOnOff;
 import eu.dlvm.domotics.events.EventType;
 import eu.dlvm.domotics.events.IEventListener;
-import eu.dlvm.domotics.service.IUiCapableBlock;
-import eu.dlvm.domotics.service.uidata.UiInfo;
-import eu.dlvm.domotics.service.uidata.UiInfoOnOff;
 
 /**
  * A Fan that runs for a {@link #getOnDurationSec()} seconds when toggled on.
@@ -62,8 +62,8 @@ public class Fan extends Actuator implements IEventListener, IUiCapableBlock {
 	/**
 	 * Constructor.
 	 */
-	public Fan(String name, String description, String channel, IHardwareWriter writer, IDomoticLayoutBuilder builder) {
-		super(name, description, null, channel, writer, builder);
+	public Fan(String name, String description, String channel, IHardwareWriter writer, DomoticLayout layout) {
+		super(name, description, null, channel, writer, layout);
 		statemachine = new FanStatemachine(this);
 	}
 

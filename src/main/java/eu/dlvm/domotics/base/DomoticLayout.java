@@ -5,9 +5,8 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import eu.dlvm.domotics.service.IUiCapableBlock;
 
-public class DomoticLayout implements IDomoticLayoutBuilder {
+public class DomoticLayout {
 
     static Logger log = LoggerFactory.getLogger(DomoticLayout.class);
 
@@ -17,14 +16,6 @@ public class DomoticLayout implements IDomoticLayoutBuilder {
     private List<IUiCapableBlock> uiblocks = null;
 
 
-    /**
-     * Add Sensor to loop set (see {@link #loopOnceAllBlocks(long)}.
-     * 
-     * @param domotic TODO
-     * @param sensor
-     *                Added, if not already present. Each Sensor can be present no
-     *                more than once.
-     */
     public void addSensor(Sensor sensor) {
         if (sensors.contains(sensor)) {
             Domotic.log.warn("Sensor already added, ignored: " + sensor);
@@ -39,13 +30,7 @@ public class DomoticLayout implements IDomoticLayoutBuilder {
         return sensors;
     }
 
-    /**
-     * Add Actuator to loop set (see {@link #loopOnceAllBlocks(long)}.
-     * 
-     * @param actuator
-     *                 Added, if not already present. Each Actuator can be present
-     *                 no more than once.
-     */
+
     public void addActuator(Actuator actuator) {
         if (actuators.contains(actuator)) {
             log.warn("Actuator already added, ignored: " + actuator);
@@ -77,10 +62,10 @@ public class DomoticLayout implements IDomoticLayoutBuilder {
 
     // ----------- UI Support -------------
 
+    // FIXME Move to separate class, only UI and websocket related
     /**
-     * @return all registered {@link Actuator} and {@link Controller} blocks
-     *         that implement {@link IUiCapableBlock}, or those blocks
-     *         registered explicitly...
+     * @return all registered {@link Actuator} and {@link Controller} blocks that implement
+     *         {@link IUiCapableBlock}, or those blocks registered explicitly...
      */
     public List<IUiCapableBlock> getUiCapableBlocks() {
         if (uiblocks == null)

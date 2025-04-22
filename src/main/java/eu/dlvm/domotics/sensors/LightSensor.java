@@ -4,13 +4,13 @@ import eu.dlvm.iohardware.IHardwareReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import eu.dlvm.domotics.base.IDomoticLayoutBuilder;
+import eu.dlvm.domotics.base.DomoticLayout;
+import eu.dlvm.domotics.base.IUiCapableBlock;
 import eu.dlvm.domotics.base.ConfigurationException;
 import eu.dlvm.domotics.base.Sensor;
+import eu.dlvm.domotics.base.ui.UiInfo;
+import eu.dlvm.domotics.base.ui.UiInfoLevel;
 import eu.dlvm.domotics.events.EventType;
-import eu.dlvm.domotics.service.IUiCapableBlock;
-import eu.dlvm.domotics.service.uidata.UiInfo;
-import eu.dlvm.domotics.service.uidata.UiInfoLevel;
 import eu.dlvm.iohardware.IHardware;
 
 /**
@@ -48,9 +48,9 @@ public class LightSensor extends Sensor implements IUiCapableBlock {
 		LOW, LOW2HIGH_DELAY, HIGH, HIGH2LOW_DELAY,
 	};
 
-	public LightSensor(String name, String description, String ui, String channel, IHardwareReader reader, IDomoticLayoutBuilder builder, int threshold, int lowToHighDelaySec,
+	public LightSensor(String name, String description, String ui, String channel, IHardwareReader reader, DomoticLayout layout, int threshold, int lowToHighDelaySec,
                        int highToLowDelaySec) throws ConfigurationException {
-		super(name, description, ui, channel, reader, builder);
+		super(name, description, ui, channel, reader, layout);
 		if (threshold < 0 || lowToHighDelaySec < 0 || highToLowDelaySec < 0) {
 			throw new ConfigurationException("Threshold and/or delays cannot be negative.");
 		}

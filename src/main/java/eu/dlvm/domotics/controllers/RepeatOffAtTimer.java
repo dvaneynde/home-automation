@@ -3,7 +3,7 @@ package eu.dlvm.domotics.controllers;
 import org.slf4j.Logger; 
 import org.slf4j.LoggerFactory;
 
-import eu.dlvm.domotics.base.IDomoticLayoutBuilder;
+import eu.dlvm.domotics.base.DomoticLayout;
 import eu.dlvm.domotics.events.EventType;
 
 /**
@@ -18,7 +18,7 @@ public class RepeatOffAtTimer extends TimerOnOff {
 	private long timeLastOffSent;
 
 	// public user api
-	public RepeatOffAtTimer(String name, String description, IDomoticLayoutBuilder ctx, int intervalSec) {
+	public RepeatOffAtTimer(String name, String description, DomoticLayout ctx, int intervalSec) {
 		super(name, description, ctx);
 		timeLastOffSent = 0;
 		setIntervalSec(intervalSec);

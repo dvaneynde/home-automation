@@ -7,7 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.base.Domotic;
-import eu.dlvm.domotics.base.IDomoticLayoutBuilder;
+import eu.dlvm.domotics.base.DomoticLayout;
 import eu.dlvm.domotics.factories.XmlDomoticConfigurator;
 import eu.dlvm.iohardware.IHardware;
 
@@ -22,7 +22,7 @@ public class Main {
 
     private static final Logger log = LoggerFactory.getLogger(Main.class);
 
-    public void setupBlocksConfig(String cfgFilename, IHardware hw, IDomoticLayoutBuilder layoutBuilder) {
+    public void setupBlocksConfig(String cfgFilename, IHardware hw, DomoticLayout layoutBuilder) {
         try {
             XmlDomoticConfigurator.configure(cfgFilename, hw, layoutBuilder);
         } catch (Exception e) {
@@ -53,9 +53,9 @@ public class Main {
      * @param args See DomConfig
      */
     public static void main(String[] args) {
-        DomConfig cfg;
+        DomCommandlineParser cfg;
         try {
-            cfg = new DomConfig(args);
+            cfg = new DomCommandlineParser(args);
             if (cfg.domotic) {
                 new Main().startAndRunDomotic(cfg.looptime, cfg.path2Driver, cfg.blocksCfgFile, cfg.hwCfgFile, cfg.hostname, cfg.port, cfg.htmlRootFile, cfg.simulation);
             } else {
@@ -64,7 +64,7 @@ public class Main {
             log.info("ENDED normally Domotic system.");
         } catch (IllegalArgumentException e) {
             System.err.println(e.getMessage());
-            DomConfig.usage();
+            DomCommandlineParser.usage();
             System.exit(2);
         }
 

@@ -4,7 +4,7 @@ import eu.dlvm.iohardware.IHardwareReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import eu.dlvm.domotics.base.IDomoticLayoutBuilder;
+import eu.dlvm.domotics.base.DomoticLayout;
 import eu.dlvm.domotics.base.Sensor;
 import eu.dlvm.domotics.events.EventType;
 
@@ -40,8 +40,8 @@ public class DimmerSwitch extends Sensor {
 	}
 
 	/**  */
-	public DimmerSwitch(String name, String description, String channelLeft, String channelRight, IHardwareReader reader, IDomoticLayoutBuilder builder) {
-		super(name, description, channelLeft, reader, builder);
+	public DimmerSwitch(String name, String description, String channelLeft, String channelRight, IHardwareReader reader, DomoticLayout layout) {
+		super(name, description, channelLeft, reader, layout);
 		this.channelR = channelRight;
 	}
 
@@ -54,8 +54,8 @@ public class DimmerSwitch extends Sensor {
 	 * @param channelRight
 	 * @deprecated
 	 */
-	public DimmerSwitch(String name, String description, int channelLeft, int channelRight, IHardwareReader reader, IDomoticLayoutBuilder builder) {
-		this(name, description, Integer.toString(channelLeft), Integer.toString(channelRight), reader, builder);
+	public DimmerSwitch(String name, String description, int channelLeft, int channelRight, IHardwareReader reader, DomoticLayout layout) {
+		this(name, description, Integer.toString(channelLeft), Integer.toString(channelRight), reader, layout);
 	}
 
 	@Override
