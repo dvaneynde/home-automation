@@ -2,7 +2,7 @@ package eu.dlvm.domotics;
 
 import java.io.File;
 
-public class DomCommandlineParser {
+public class CommandlineParserConffig {
 
     public static final int DEFAULT_LOOP_TIME_MS = 20;
 
@@ -17,7 +17,7 @@ public class DomCommandlineParser {
     public int port = 4444;
     public File htmlRootFile = null;
 
-    public DomCommandlineParser(String[] args) {
+    public CommandlineParserConffig(String[] args) {
         if (args.length == 0) {
             usage();
             System.exit(2);

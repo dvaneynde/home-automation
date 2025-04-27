@@ -6,6 +6,21 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * DomoticLayout is a container for sensors, actuators, and controllers.
+ * It provides methods to add and retrieve these components.
+ * 
+ * <p>This class is part of the Domotic framework and is used to organize and manage
+ * the various components that make up a domotic system.</p>
+ * 
+ * <p>Key Responsibilities:</p>
+ * <ul>
+ *   <li>Add and retrieve sensors, actuators, and controllers.</li>
+ *   <li>Ensure that each component is unique within the layout.</li>
+ * </ul>
+ * 
+ * @author Dirk
+ */
 public class DomoticLayout {
 
     static Logger log = LoggerFactory.getLogger(DomoticLayout.class);
@@ -13,7 +28,6 @@ public class DomoticLayout {
     private List<Sensor> sensors = new ArrayList<Sensor>(64);
     private List<Actuator> actuators = new ArrayList<Actuator>(64);
     private List<Controller> controllers = new ArrayList<Controller>(64);
-    private List<IUiCapableBlock> uiblocks = null;
 
 
     public void addSensor(Sensor sensor) {
@@ -60,56 +74,4 @@ public class DomoticLayout {
         return controllers;
     }
 
-    // ----------- UI Support -------------
-
-    // FIXME Move to separate class, only UI and websocket related
-    /**
-     * @return all registered {@link Actuator} and {@link Controller} blocks that implement
-     *         {@link IUiCapableBlock}, or those blocks registered explicitly...
-     */
-    public List<IUiCapableBlock> getUiCapableBlocks() {
-        if (uiblocks == null)
-            registerUiCapables();
-        return uiblocks;
-    }
-
-    public IUiCapableBlock findUiCapable(String name) {
-        for (IUiCapableBlock ui : getUiCapableBlocks()) {
-            if (ui.getUiInfo().getName().equals(name))
-                return ui;
-        }
-        return null;
-    }
-
-
-    private void registerUiCapables() {
-        uiblocks = new ArrayList<IUiCapableBlock>(64);
-        for (Block b : sensors)
-            registerIfUiCapable(b);
-        for (Block b : controllers)
-            registerIfUiCapable(b);
-        for (Block b : actuators)
-            registerIfUiCapable(b);
-    }
-
-    private void registerIfUiCapable(Block b) {
-        if (b instanceof IUiCapableBlock) {
-            IUiCapableBlock uiblock0 = ((IUiCapableBlock) b);
-
-            if (uiblock0.getUiInfo() == null) {
-                log.warn("Not adding UI info for " + ((Block) uiblock0).getName()
-                        + ". BlockInfo is null - is a bug, refactor code.");
-                return;
-            }
-            for (IUiCapableBlock uiblock : uiblocks) {
-                if (uiblock.getUiInfo().getName().equals(uiblock0.getUiInfo().getName())) {
-                    log.warn("addUiCapableBlock(): incoming UiCapable '" + uiblock0.getUiInfo().getName()
-                            + "' already registered - ignored.");
-                    return;
-                }
-            }
-            uiblocks.add(uiblock0);
-            log.debug("Add UiCapableBlock " + uiblock0.getUiInfo().getName());
-        }
-    }
 }

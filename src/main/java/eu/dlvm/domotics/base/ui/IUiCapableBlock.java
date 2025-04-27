@@ -1,6 +1,6 @@
-package eu.dlvm.domotics.base;
+package eu.dlvm.domotics.base.ui;
 
-import eu.dlvm.domotics.base.ui.UiInfo;
+import eu.dlvm.domotics.base.Block;
 import eu.dlvm.domotics.events.EventType;
 
 /**

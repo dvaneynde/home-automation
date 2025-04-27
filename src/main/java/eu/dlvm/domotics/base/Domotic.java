@@ -2,8 +2,6 @@ package eu.dlvm.domotics.base;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -11,6 +9,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.DriverMonitor;
+import eu.dlvm.domotics.base.ui.IUiUpdator;
+import eu.dlvm.domotics.base.ui.UiUpdateMgr;
 import eu.dlvm.domotics.server.ServiceServer;
 import eu.dlvm.iohardware.ChannelFault;
 import eu.dlvm.iohardware.IHardware;
@@ -59,7 +59,8 @@ public class Domotic {
 
 	// FIXME Should be passed as constructor argument. Current implementation is weird.
 	private DomoticLayout layout = new DomoticLayout();
-	private List<IStateChangedListener> stateChangeListeners;
+	private UiUpdateMgr uiUpdatorMgr;
+
 	// protected access for test cases only
 	protected IHardware hw = null;
 	protected long loopSequence = -1L;
@@ -83,8 +84,8 @@ public class Domotic {
 		return layout;
 	}
 
-	public List<IStateChangedListener> getStateChangeListeners() {
-		return stateChangeListeners;
+	public UiUpdateMgr getUiUpdatorMgr() {
+		return uiUpdatorMgr;
 	}
 
 	public IHardware getHw() {
@@ -178,8 +179,8 @@ public class Domotic {
 		ServiceServer server = null;
 		if (htmlRootFile != null) {
 			server = new ServiceServer(htmlRootFile);
-			stateChangeListeners = new LinkedList<IStateChangedListener>();
-			server.start(stateChangeListeners);
+			uiUpdatorMgr = new UiUpdateMgr(layout);
+			server.start(uiUpdatorMgr);
 		} else
 			log.warn("HTTP server not started as there is no html root file given.");
 
@@ -263,7 +264,7 @@ public class Domotic {
       * executed, so they can update hardware output state.</li>
       * <li>{@link IHardware#refreshOutputs()} is called, so that hardware
       * layer outputs are updated.</li>
-      * <li>Finally any {@link IStateChangedListener}s are called to update model
+      * <li>Finally any {@link IUiUpdator}s are called to update model
       * state of connected client UIs.
       * </ol>
 	 * 
@@ -286,19 +287,10 @@ public class Domotic {
 		}
 		hw.getWriter().refreshOutputs();
 
-		if (getStateChangeListeners() != null) {
-			// FIXME should be async in separate thread, since might take longer than 20 ms... and with timeout perhaps?
-			long startTimeWs = System.currentTimeMillis();
-			if (loopSequence % 10 == 0) {
-				for (IStateChangedListener uiUpdator : getStateChangeListeners())
-					uiUpdator.updateUi();
-			}
-			long tookMs = System.currentTimeMillis() - startTimeWs;
-			if (tookMs >= 20)
-				log.warn("Updating websockets took more than 19 ms!\nTotal=" + tookMs + " ms.");
-		}
+		if (uiUpdatorMgr != null)
+			uiUpdatorMgr.UpdateUis(loopSequence);
 
-		if (loopSequence % 10 == 0)
+		if (loopSequence % 100 == 0)
 			MON.info("loopOnce() done, loopSequence=" + loopSequence + ", currentTime=" + currentTime);
 	}
 

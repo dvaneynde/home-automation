@@ -53,9 +53,9 @@ public class Main {
      * @param args See DomConfig
      */
     public static void main(String[] args) {
-        DomCommandlineParser cfg;
+        CommandlineParserConffig cfg;
         try {
-            cfg = new DomCommandlineParser(args);
+            cfg = new CommandlineParserConffig(args);
             if (cfg.domotic) {
                 new Main().startAndRunDomotic(cfg.looptime, cfg.path2Driver, cfg.blocksCfgFile, cfg.hwCfgFile, cfg.hostname, cfg.port, cfg.htmlRootFile, cfg.simulation);
             } else {
@@ -64,7 +64,7 @@ public class Main {
             log.info("ENDED normally Domotic system.");
         } catch (IllegalArgumentException e) {
             System.err.println(e.getMessage());
-            DomCommandlineParser.usage();
+            CommandlineParserConffig.usage();
             System.exit(2);
         }
 

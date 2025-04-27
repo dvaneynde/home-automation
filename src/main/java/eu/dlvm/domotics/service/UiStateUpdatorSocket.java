@@ -1,12 +1,10 @@
 package eu.dlvm.domotics.service;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import eu.dlvm.domotics.base.Domotic;
-import eu.dlvm.domotics.base.IStateChangedListener;
-import eu.dlvm.domotics.base.IUiCapableBlock;
+import eu.dlvm.domotics.base.ui.IUiUpdator;
 import eu.dlvm.domotics.base.ui.UiInfo;
+import eu.dlvm.domotics.base.ui.UiUpdateMgr;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
@@ -18,12 +16,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 // TODO Is created whenever a websocket is created, so whenever a client connects. If multiple clients connnect at same time, multiple are created.
 // TODO Make thread safe? Make loop()) synchronised? At least COUNT variable.
-// FIXME Why is this a IStateChangedListener? Needs major refactoring...
 
 /**
  * WebSocket implementation for updating the UI state in real-time.
- * This class listens for state changes and sends updates to connected WebSocket clients.
- * It implements the {@link IStateChangedListener} interface to receive state change notifications.
+ * This class forwards state changes to connected WebSocket clients.
+ * It implements the {@link IUiUpdator} interface to receive state change notifications.
  * 
  * <p>Each instance of this class is associated with a WebSocket session and is responsible
  * for managing its lifecycle, including opening and closing the session, and sending updates
@@ -38,7 +35,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * 
  * <p>Usage:</p>
  * <ol>
- *   <li>Create an instance of this class, passing a list of {@link IStateChangedListener} to register itself.</li>
+ *   <li>Create an instance of this class, passing a {@link UiUpdateMgr}.</li>
  *   <li>When a WebSocket connection is established, the {@code onOpen} method is called to initialize the session.</li>
  *   <li>When the connection is closed, the {@code onClose} method is called to clean up resources.</li>
  *   <li>The {@code updateUi} method is triggered to send the latest UI state to the client.</li>
@@ -47,27 +44,20 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * <p>Thread Safety:</p>
  * This class is not thread-safe. Ensure proper synchronization if accessed from multiple threads.
  * 
- * <p>Dependencies:</p>
- * <ul>
- *   <li>{@link ObjectMapper} for JSON serialization.</li>
- *   <li>{@link Domotic} singleton for accessing UI-capable blocks.</li>
- *   <li>{@link Logger} for logging lifecycle events and errors.</li>
- * </ul>
- * 
  * @author Dirk
  */
 @WebSocket
-public class UiStateUpdatorSocket implements IStateChangedListener {
+public class UiStateUpdatorSocket implements IUiUpdator {
 
 	private static final Logger LOG = LoggerFactory.getLogger(UiStateUpdatorSocket.class);
 	private static int COUNT = 0;
 	private ObjectMapper objectMapper;
 	private int id;
-	private List<IStateChangedListener>  stateChangeListeners;
+	private UiUpdateMgr uiUpdateMgr;
 	private Session savedSession;
 
-	public UiStateUpdatorSocket(List<IStateChangedListener>  stateChangeListeners) {
-		this.stateChangeListeners = stateChangeListeners;
+	public UiStateUpdatorSocket(UiUpdateMgr  uiUpdateMgr) {
+		this.uiUpdateMgr = uiUpdateMgr;
 		this.objectMapper= new ObjectMapper();
 		this.id = COUNT++;
 		LOG.debug("Created UiStateUpdatorSocket, id=" + id);
@@ -76,14 +66,14 @@ public class UiStateUpdatorSocket implements IStateChangedListener {
 	@OnWebSocketConnect
 	public void onOpen(Session session) {
 		this.savedSession = session;
-		stateChangeListeners.add(this);
+		uiUpdateMgr.addUiUpdator(this);
 		LOG.debug("Opened websocket session (id=" + id + ") for remote " + this.savedSession.getRemoteAddress());
 	}
 
 	@OnWebSocketClose
 	public void onClose(int closeCode, String closeReasonPhrase) {
 		this.savedSession = null;
-		stateChangeListeners.remove(this);
+		uiUpdateMgr.removeUiUpdator(this);
 		LOG.debug("Closed websocket session (id=" + id + "), reason=" + closeReasonPhrase);
 	}
 
@@ -93,25 +83,15 @@ public class UiStateUpdatorSocket implements IStateChangedListener {
 	}
 	
 	@Override
-	public void updateUi() {
+	public void updateUi(List<UiInfo> uiInfos) {
 		LOG.debug("updateUI called on websocket id=" + id + ", session=" + savedSession);
 		if (savedSession == null)
 			return;
 		try {
-			String json = objectMapper.writeValueAsString(createUiInfos());
+			String json = objectMapper.writeValueAsString(uiInfos);
 			savedSession.getRemote().sendString(json);
 		} catch (Exception e) {
 			LOG.warn("Cannot send state to client. Perhaps race condition, i.e. closed in parallel to update?", e);
 		}
-	}
-
-	private List<UiInfo> createUiInfos() {
-		List<UiInfo> uiInfos = new ArrayList<>();
-		for (IUiCapableBlock ui : Domotic.singleton().getLayout().getUiCapableBlocks()) {
-			if (ui.getUiGroup() == null)
-				continue;
-			uiInfos.add(ui.getUiInfo());
-		}
-		return uiInfos;
 	}
 }

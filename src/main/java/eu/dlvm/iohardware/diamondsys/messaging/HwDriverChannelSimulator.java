@@ -4,8 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Mock Hardware Driver when simulating. This is not for automated tests, but
- * exploring while really running the app.
+ * Mock Hardware Driver when simulating. Doesn't do anything, so no input is read and no output is changed. This works perfectly with the UI. 
+ * 
+ * <p>One exception is generating light and wind. 
+ * 
+ * This is not inntended for automated tests.
  * 
  * @author dirk
  *

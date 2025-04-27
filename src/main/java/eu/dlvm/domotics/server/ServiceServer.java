@@ -5,13 +5,9 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.EnumSet;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import javax.servlet.DispatcherType;
-
-import eu.dlvm.domotics.base.IStateChangedListener;
-
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.servlet.DefaultServlet;
@@ -30,7 +26,7 @@ import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+import eu.dlvm.domotics.base.ui.UiUpdateMgr;
 import eu.dlvm.domotics.service.RestService;
 import eu.dlvm.domotics.service.UiStateUpdatorSocket;
 
@@ -51,22 +47,22 @@ public class ServiceServer {
 	}
 
 	public static class UiSocketCreator implements WebSocketCreator {
-		private List<IStateChangedListener>  stateChangeListeners;
+		private UiUpdateMgr uiUpdateMgr;
 
-		public UiSocketCreator(List<IStateChangedListener> listeners) {
-			this.stateChangeListeners = listeners;
+		public UiSocketCreator(UiUpdateMgr uiUpdateMgr) {
+			this.uiUpdateMgr = uiUpdateMgr;
 		}
 
 		@Override
 		public Object createWebSocket(ServletUpgradeRequest req, ServletUpgradeResponse resp) {
 			InetSocketAddress remoteAddress = req.getRemoteSocketAddress();
 			log.debug("Creating websocket connection, remote address=" + remoteAddress.toString());
-			UiStateUpdatorSocket uiStateUpdatorSocket = new UiStateUpdatorSocket(stateChangeListeners);
+			UiStateUpdatorSocket uiStateUpdatorSocket = new UiStateUpdatorSocket(uiUpdateMgr);
 			return uiStateUpdatorSocket;
 		}
 	}
 
-	public void start(List<IStateChangedListener> stateChangeListeners) {
+	public void start(UiUpdateMgr uiUpdateMgr) {
 		server = new Server();
 		ServerConnector connector = new ServerConnector(server);
 		connector.setPort(80);
@@ -97,7 +93,7 @@ public class ServiceServer {
 			// Configure websocket behavior
 			wsfilter.getFactory().getPolicy().setIdleTimeout(5000);
 			// Add websocket mapping
-			wsfilter.addMapping(new ServletPathSpec("/status/"), new UiSocketCreator(stateChangeListeners));
+			wsfilter.addMapping(new ServletPathSpec("/status/"), new UiSocketCreator(uiUpdateMgr));
 
 			// Add REST interface handler
 			// https://www.acando.no/thedailypassion/200555/a-rest-service-with-jetty-and-jersey

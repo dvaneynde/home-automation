@@ -15,7 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import eu.dlvm.domotics.base.Domotic;
-import eu.dlvm.domotics.base.IUiCapableBlock;
+import eu.dlvm.domotics.base.ui.IUiCapableBlock;
 import eu.dlvm.domotics.base.ui.UiInfo;
 
 @Singleton
@@ -51,17 +51,7 @@ public class RestService {
 	@Produces(MediaType.APPLICATION_JSON)
 	@GET
 	public List<UiInfo> listActuators() {
-		List<UiInfo> list = new ArrayList<>();
-		try {
-			for (IUiCapableBlock a : Domotic.singleton().getLayout().getUiCapableBlocks()) {
-				UiInfo aj = a.getUiInfo();
-				if (aj != null)
-					list.add(aj);
-			}
-		} catch (Throwable e) {
-			Log.warn("listActuators() failed", e);
-			list.clear();
-		}
+		List<UiInfo> list =  Domotic.singleton().getUiUpdatorMgr().buildUiInfos();
 		Log.debug("listActuators() returns: " + list);
 		return list;
 	}
@@ -72,7 +62,7 @@ public class RestService {
 	@GET
 	public UiInfo getActuatorStatus(@PathParam("name") String name) {
 		try {
-			IUiCapableBlock uiCapable = Domotic.singleton().getLayout().findUiCapable(name);
+			IUiCapableBlock uiCapable = Domotic.singleton().getUiUpdatorMgr().findUiCapable(name);
 			if (uiCapable == null) {
 				Log.debug("getActuatorStatus() cannot find actuator with name: " + name);
 				return null;
@@ -97,7 +87,7 @@ public class RestService {
 	@POST
 	public void updateActuator(@PathParam("name") String name, @PathParam("action") String action) {
 		Log.info("Domotic API: got update actuator '" + name + "' action='" + action + "' (POST)");
-		IUiCapableBlock act = Domotic.singleton().getLayout().findUiCapable(name);
+		IUiCapableBlock act = Domotic.singleton().getUiUpdatorMgr().findUiCapable(name);
 		if (act == null) {
 			// TODO iets terugsturen?
 			Log.warn("updateActuator(): could not find actuator " + name);
